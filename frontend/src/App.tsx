@@ -16,6 +16,7 @@ function App() {
       <div className="min-h-screen bg-gray-900 text-white overflow-x-hidden">
         <Navbar />
         <motion.div
+          className="pt-16"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
