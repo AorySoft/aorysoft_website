@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { Analytics } from "@vercel/analytics/next";
 import CloudflareAnalytics from "@/components/CloudflareAnalytics";
 import "./globals.css";
 
@@ -51,6 +52,7 @@ export default function RootLayout({
         <div className="pt-16">{children}</div>
         <Footer />
         <CloudflareAnalytics />
+        <Analytics />
       </body>
     </html>
   );
