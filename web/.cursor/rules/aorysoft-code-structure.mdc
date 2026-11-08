@@ -1,0 +1,14 @@
+---
+description: AorySoft file size limits and known fat files that must not grow.
+alwaysApply: true
+---
+
+# Code structure
+
+| Unit | Warn | Hard |
+|---|---|---|
+| File | 300 lines | 500 (prefer ≤450) |
+| Function | 40 | 75 |
+| Nesting | — | 3 |
+
+**Do not grow:** `QuoteForm.tsx` (~687), `BlogContent.tsx`, `ContactContent.tsx`, `SettingsForm.tsx`. Split before adding features.

@@ -11,6 +11,10 @@
 # env files — never commit secrets (plan §5.5)
 .env
 .env*.local
+.env.production
+.env.development
+!.env.example
+!.env.production.example
 
 # misc
 .DS_Store

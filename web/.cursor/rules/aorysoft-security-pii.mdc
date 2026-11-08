@@ -1,0 +1,16 @@
+---
+description: AorySoft RLS, service-role, PII, XSS, and role-escalation rules.
+alwaysApply: true
+---
+
+# Security & PII
+
+- RLS default-deny; anon reads published/active only.
+- No public INSERT/UPDATE/DELETE policies — form writes use service role after Turnstile + rate limit + validate.
+- `profiles` not client-writable; roles via service-role / dashboard only.
+- `SUPABASE_SERVICE_ROLE_KEY` server-only; never `NEXT_PUBLIC_`.
+- Sanitize admin HTML on render (`sanitizeContent` / `SafeHtml`).
+- Submissions + newsletter = PII; no public listing; no subscriber enumeration in errors.
+- RLS/policy changes require `npm run test:rls`.
+
+See `.cursor/docs/security.md`.

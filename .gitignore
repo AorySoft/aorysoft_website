@@ -5,10 +5,11 @@ node_modules
 dist
 dist-ssr
 
-# Local environment files (secrets)
+# Local environment files (secrets) — never commit filled .env.production
 .env
 .env.*
 !.env.example
+!.env.production.example
 *.local
 
 # Editor / OS files

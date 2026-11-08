@@ -9,15 +9,17 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:rls": "node scripts/admin-rls-matrix-tests.mjs",
-    "test:ratelimit": "node --experimental-strip-types --env-file=.env.local --import ./scripts/register-app-loader.mjs scripts/ratelimit-integration-tests.mjs"
+    "test:ratelimit": "node --experimental-strip-types --env-file=.env.local --import ./scripts/register-app-loader.mjs scripts/ratelimit-integration-tests.mjs",
+    "env:pull": "vercel env pull .env.production --environment=production --yes",
+    "env:pull:preview": "vercel env pull .env.local --environment=preview --yes"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
-    "@supabase/supabase-js": "^2.118.0",
+    "@supabase/supabase-js": "^2.119.0",
     "@vercel/analytics": "^2.0.1",
     "framer-motion": "^12.23.6",
     "lucide-react": "^0.469.0",
-    "next": "16.4.2",
+    "next": "^16.4.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "sanitize-html": "^2.18.1",
@@ -30,14 +32,17 @@
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@types/sanitize-html": "^2.16.2",
-    "@vitejs/plugin-react": "^6.1.2",
+    "@vitejs/plugin-react": "^6.2.1",
     "autoprefixer": "^10.4.20",
     "eslint": "^9.0.0",
-    "eslint-config-next": "16.4.2",
+    "eslint-config-next": "^16.4.5",
     "jsdom": "^29.1.1",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.19",
     "typescript": "^5.6.0",
-    "vitest": "^5.0.5"
+    "vitest": "^5.1.0"
+  },
+  "overrides": {
+    "minimatch": "^11.0.5"
   }
 }

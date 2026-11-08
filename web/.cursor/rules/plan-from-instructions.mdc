@@ -1,0 +1,14 @@
+---
+description: Before writing an AorySoft plan, load relevant skills and save to plans/.
+alwaysApply: true
+---
+
+# Plan from instructions
+
+1. Read `CLAUDE.md` and `.cursor/docs/stack.md`.
+2. Load matching skills under `.cursor/skills/` (architecture, api-integration, security-pii, testing, yagni, …).
+3. Inspect real `src/` / `supabase/` paths.
+4. Save to `plans/YYYY-MM-DD-short-name.md` with goal, non-goals, current state, steps, files, verification, risks.
+5. Wait for approval before implementing (unless the user already said implement now).
+
+Forbidden: Payload / second auth; rewriting imaginary `frontend/`; skipping security when forms/RLS/roles are involved.

@@ -1,0 +1,12 @@
+---
+description: Every implementation plan must be saved under plans/, not left only in chat.
+alwaysApply: true
+---
+
+# Save plans
+
+When producing an implementation plan for this project, write it to:
+
+`plans/YYYY-MM-DD-short-name.md`
+
+Do not leave the only copy in chat. Follow `plan-from-instructions`.

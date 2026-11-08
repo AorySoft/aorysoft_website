@@ -1,0 +1,15 @@
+---
+description: Run AorySoft pr-self-review before opening a PR; fix only after user approval.
+alwaysApply: false
+---
+
+# PR self-review
+
+When preparing a PR:
+
+1. `node .claude/skills/pr-self-review/scripts/review.mjs origin/main...HEAD`
+2. Walk `.claude/skills/pr-self-review/references/checklist.md`
+3. Build claims ledger + blast radius + failure paths + a11y notes
+4. Report 🔴/🟡/🟢 with verdict; **do not auto-fix** until the user says yes
+
+Also available as skill `pr-self-review` under `.cursor/skills/`.

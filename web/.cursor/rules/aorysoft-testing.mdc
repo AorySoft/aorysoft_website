@@ -1,0 +1,17 @@
+---
+description: AorySoft which-change-needs-which-test and required verification commands.
+alwaysApply: true
+---
+
+# Testing
+
+| Change | Test |
+|---|---|
+| Validators / helpers | Co-located `*.test.ts` |
+| Forms / Turnstile / tokens / email | `src/lib/public-forms/*.test.ts` |
+| Sanitize | `sanitize.test.ts`, `safe-html.render.test.tsx` |
+| Permissions | `permissions.test.ts` |
+| RLS SQL | `npm run test:rls` |
+| Rate limits | `npm run test:ratelimit` |
+
+Commands: `npm run test` · `typecheck` · `lint`. Playwright is not installed — do not claim E2E. Do not claim done without running the matching commands.

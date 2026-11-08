@@ -1,0 +1,30 @@
+---
+description: AorySoft App Router → server actions → Supabase architecture and layer boundaries.
+alwaysApply: true
+---
+
+# Architecture
+
+## Data flow
+
+- Public RSC → `src/lib/data.ts` (anon) → RLS published/active only.
+- Public forms → `src/lib/public-forms/actions.ts`: honeypot → Turnstile → rate limit → validate → service-role insert → Resend.
+- Admin → `src/proxy.ts` session gate → server actions with user JWT → RLS + `permissions.ts`.
+
+## Layers
+
+| Layer | Does | Never |
+|---|---|---|
+| `src/app/**` | UI, metadata, call lib | service-role secrets; raw SQL |
+| `src/components/**` | UI / motion | DB writes; secrets |
+| `src/lib/data.ts` | Public reads | Writes; service role |
+| `src/lib/public-forms/**` | Form pipeline | Trust client-only validation |
+| `src/lib/admin/**` | CRUD + permissions | Skip permission checks |
+| `src/lib/supabase/admin.ts` | Service role | Import from client components |
+| `src/proxy.ts` | Session UX gate | Row-level auth (RLS does) |
+
+## Hard constraints
+
+- Server Components by default; `'use client'` only for interactive islands.
+- Auth gate is `src/proxy.ts` (Next 16), not `middleware.ts`.
+- One auth: Supabase Auth only. Revalidate public paths on content save.

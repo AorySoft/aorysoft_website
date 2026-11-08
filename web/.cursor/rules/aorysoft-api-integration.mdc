@@ -1,0 +1,26 @@
+---
+description: AorySoft public forms, admin mutations, cron, and newsletter token routes.
+globs:
+  - src/lib/public-forms/**/*
+  - src/lib/admin/**/*
+  - src/app/api/**/*
+  - src/app/newsletter/**/*
+  - src/app/admin/**/actions.ts
+alwaysApply: false
+---
+
+# API & mutations
+
+Public form order (mandatory):
+
+`honeypot → Turnstile → rate limit → validate → service-role insert → email`
+
+Admin resource fields: SQL → types → `resources.ts` → `validate.ts` → revalidate public paths.
+
+| Route | Gate |
+|---|---|
+| `api/cron/keep-alive` | Bearer `CRON_SECRET` |
+| `newsletter/confirm|unsubscribe` | Signed tokens |
+| admin exports | Authenticated session |
+
+Browser gets generic failures; logs get real reasons. Do not add email/spam SDKs without approval.

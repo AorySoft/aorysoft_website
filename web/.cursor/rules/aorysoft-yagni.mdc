@@ -1,0 +1,15 @@
+---
+description: AorySoft YAGNI / Ponytail — reuse first, no speculative vendors or abstractions.
+alwaysApply: true
+---
+
+# YAGNI
+
+1. Reuse `resources.ts`, public-forms pipeline, sanitize, supabase helpers.
+2. Use existing deps (fetch Resend, Turnstile helpers, Vitest).
+3. Minimum new code in the correct layer.
+4. New dependency/vendor only with explicit approval.
+
+Never cut: validation, tests, a11y basics, RLS/auth, honest errors.
+
+Reject: second auth, Payload, Redux/Zustand for this site, growing `QuoteForm.tsx`, fabricated trust content, speculative i18n/bookings/members.

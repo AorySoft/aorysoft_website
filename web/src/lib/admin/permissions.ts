@@ -47,6 +47,7 @@ export function canEdit(role: Role | null, area: Area): boolean {
 }
 
 /** Can the role delete rows/files in this area? Owner-only, everywhere. */
-export function canDelete(role: Role | null, _area: Area): boolean {
+export function canDelete(role: Role | null, area: Area): boolean {
+  void area; // reserved for per-area delete policy; today owner-only everywhere
   return role === "owner";
 }

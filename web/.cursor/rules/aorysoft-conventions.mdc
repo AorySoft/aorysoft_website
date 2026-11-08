@@ -1,0 +1,19 @@
+---
+description: AorySoft naming, imports, server/client boundaries.
+alwaysApply: true
+---
+
+# Conventions
+
+| Kind | Pattern |
+|---|---|
+| Routes | lowercase path segments |
+| Components | PascalCase files |
+| Tests | `*.test.ts(x)` beside source |
+| SQL | `supabase/NNNN_name.sql` |
+| Alias | `@/` → `src/` |
+
+- Server-only modules start with `import "server-only"`.
+- Never import `@/lib/supabase/admin` from `'use client'` files.
+- Extend admin CRUD via `resources.ts` + SQL + `validate.ts` for posts/categories/services/jobs.
+- Honest null/setup states when Supabase is unset — no fake success.
