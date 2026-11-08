@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, User, ArrowRight, Clock } from 'lucide-react';
+import InsightSearch from '../components/InsightSearch';
 
 const Blog = () => {
   const blogPosts = [
@@ -102,6 +103,9 @@ const Blog = () => {
           </motion.div>
         </div>
       </section>
+
+      {/* Live web search */}
+      <InsightSearch />
 
       {/* Featured Post */}
       {featuredPost && (

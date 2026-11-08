@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Smooth in-page scrolling for /#about, /#services, /#portfolio hash links,
+   honoring the user's motion preference (scroll-restoration audit fix). */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
