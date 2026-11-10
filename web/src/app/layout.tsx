@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import { DM_Sans, Instrument_Serif } from "next/font/google";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Analytics } from "@vercel/analytics/next";
-import CloudflareAnalytics from "@/components/CloudflareAnalytics";
+import SiteAnalytics from "@/components/SiteAnalytics";
 import "./globals.css";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
@@ -79,8 +78,7 @@ export default function RootLayout({
           {children}
         </div>
         <Footer />
-        <CloudflareAnalytics />
-        <Analytics />
+        <SiteAnalytics />
       </body>
     </html>
   );
