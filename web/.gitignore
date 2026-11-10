@@ -28,6 +28,21 @@ npm-debug.log*
 # typescript
 next-env.d.ts
 
+# Local AI tooling — do not commit plugin dumps / live caches.
+# AorySoft project skills (aorysoft-*, pr-self-review, plan-from-instructions)
+# stay tracked; everything else under skills/ is ignored.
+.agents/
+skills-lock.json
+.impeccable/
+.claude/skills/*
+!.claude/skills/aorysoft-*/
+!.claude/skills/plan-from-instructions/
+!.claude/skills/pr-self-review/
+.cursor/skills/*
+!.cursor/skills/aorysoft-*/
+!.cursor/skills/plan-from-instructions/
+!.cursor/skills/pr-self-review/
+
 # impeccable-live-ignore-start
 .impeccable/hook.cache.json
 .impeccable/hook.pending.json
