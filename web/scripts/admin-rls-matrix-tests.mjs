@@ -207,10 +207,24 @@ console.log("\n── 2. Editor session (plan §5.5 matrix) ──");
     E.from("categories").insert({ name: "editor cat", slug: `ed-cat-${stamp}` }).select("id"),
   );
   check("editor INSERT category", cIns.ok);
+  if (cIns.ok) {
+    const { data: cRows } = await E.from("categories")
+      .select("id")
+      .eq("slug", `ed-cat-${stamp}`)
+      .limit(1);
+    if (cRows?.[0]?.id) seeded.categories.push(cRows[0].id);
+  }
   const pIns = await wrote(
     E.from("posts").insert({ title: "editor post", slug: `ed-post-${stamp}`, status: "draft" }).select("id"),
   );
   check("editor INSERT post", pIns.ok);
+  if (pIns.ok) {
+    const { data: edPosts } = await E.from("posts")
+      .select("id")
+      .eq("slug", `ed-post-${stamp}`)
+      .limit(1);
+    if (edPosts?.[0]?.id) seeded.posts.push(edPosts[0].id);
+  }
   const pUpd = await wrote(
     E.from("posts").update({ title: "editor post (edited)" }).eq("id", seeded.posts[0]).select("id"),
   );
@@ -236,14 +250,31 @@ console.log("\n── 2. Editor session (plan §5.5 matrix) ──");
     seeded.posts[0] = back.id;
   }
 
+  // Insert inactive so a failed cleanup never leaks test titles onto the public site.
   const sIns = await wrote(
-    E.from("services").insert({ title: "editor service" }).select("id"),
+    E.from("services").insert({ title: "editor service", active: false }).select("id"),
   );
   check("editor INSERT service", sIns.ok);
+  if (sIns.ok) {
+    const { data: sRows } = await E.from("services")
+      .select("id")
+      .eq("title", "editor service")
+      .order("created_at", { ascending: false })
+      .limit(1);
+    if (sRows?.[0]?.id) seeded.services.push(sRows[0].id);
+  }
   const jIns = await wrote(
-    E.from("jobs").insert({ title: "editor job" }).select("id"),
+    E.from("jobs").insert({ title: "editor job", active: false }).select("id"),
   );
   check("editor INSERT job", jIns.ok);
+  if (jIns.ok) {
+    const { data: jRows } = await E.from("jobs")
+      .select("id")
+      .eq("title", "editor job")
+      .order("created_at", { ascending: false })
+      .limit(1);
+    if (jRows?.[0]?.id) seeded.jobs.push(jRows[0].id);
+  }
 
   // Submissions: editor reads + updates status, but CANNOT delete (owner-only).
   const { data: subs } = await E.from("submissions").select("id").limit(1);
@@ -283,6 +314,13 @@ console.log("\n── 3. Owner session (full surface) ──");
     O.from("posts").insert({ title: "owner post", slug: `ow-post-${stamp}`, status: "draft" }).select("id"),
   );
   check("owner INSERT post", pIns.ok);
+  if (pIns.ok) {
+    const { data: pRows } = await O.from("posts")
+      .select("id")
+      .eq("slug", `ow-post-${stamp}`)
+      .limit(1);
+    if (pRows?.[0]?.id) seeded.posts.push(pRows[0].id);
+  }
 
   // Owner CAN delete content (the seeded draft).
   const pDel = await wrote(
@@ -313,10 +351,33 @@ console.log("\n── 3. Owner session (full surface) ──");
     check("owner DELETEs media row", mDel.ok);
   }
 
+  // Patch a disposable key only — never replace the whole JSONB blob (that
+  // wiped real footer/hero copy on earlier matrix runs).
+  const { data: settingsBefore } = await svc
+    .from("site_settings")
+    .select("data")
+    .eq("id", true)
+    .maybeSingle();
+  const settingsProbe = {
+    ...(settingsBefore?.data ?? {}),
+    __matrix_probe: stamp,
+  };
   const setWrite = await wrote(
-    O.from("site_settings").upsert({ id: true, data: {} }, { onConflict: "id" }).select("id"),
+    O.from("site_settings")
+      .upsert({ id: true, data: settingsProbe }, { onConflict: "id" })
+      .select("id"),
   );
   check("owner WRITES site_settings", setWrite.ok);
+  if (settingsBefore?.data) {
+    await svc
+      .from("site_settings")
+      .update({ data: settingsBefore.data })
+      .eq("id", true);
+  } else if (setWrite.ok) {
+    const cleaned = { ...settingsProbe };
+    delete cleaned.__matrix_probe;
+    await svc.from("site_settings").update({ data: cleaned }).eq("id", true);
+  }
 
   // Role change through the service path (what the Users admin action does).
   const roleFlip = await wrote(

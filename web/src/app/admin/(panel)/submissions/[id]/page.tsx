@@ -55,13 +55,13 @@ export default async function SubmissionDetailPage({
         </h1>
         <Link
           href="/admin/submissions"
-          className="text-sm text-gray-400 transition-colors duration-200 hover:text-white"
+          className="text-sm text-ink-subtle transition-colors duration-200 hover:text-ink"
         >
           ← Back to inbox
         </Link>
       </div>
 
-      <section className="space-y-4 rounded-2xl border border-gray-800 bg-gray-900/60 p-6">
+      <section className="space-y-4 rounded-atelier-lg border border-line bg-surface/80 p-6">
         <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {[
             ["Received", new Date(row.created_at).toLocaleString()],
@@ -72,20 +72,20 @@ export default async function SubmissionDetailPage({
             ["Service", row.service ?? "—"],
           ].map(([label, value]) => (
             <div key={label}>
-              <dt className="text-xs uppercase tracking-wide text-gray-500">
+              <dt className="text-xs uppercase tracking-wide text-ink-subtle">
                 {label}
               </dt>
-              <dd className="mt-1 text-sm text-gray-200">{value}</dd>
+              <dd className="mt-1 text-sm text-ink-muted">{value}</dd>
             </div>
           ))}
         </dl>
 
         {row.message && (
           <div>
-            <p className="text-xs uppercase tracking-wide text-gray-500">
+            <p className="text-xs uppercase tracking-wide text-ink-subtle">
               Message
             </p>
-            <p className="mt-2 whitespace-pre-wrap rounded-xl bg-gray-950/60 p-4 text-sm leading-relaxed text-gray-200">
+            <p className="mt-2 whitespace-pre-wrap rounded-atelier-lg bg-canvas/60 p-4 text-sm leading-relaxed text-ink-muted">
               {row.message}
             </p>
           </div>
@@ -93,29 +93,29 @@ export default async function SubmissionDetailPage({
 
         {details && (
           <div>
-            <p className="text-xs uppercase tracking-wide text-gray-500">
+            <p className="text-xs uppercase tracking-wide text-ink-subtle">
               Quote details (JSON)
             </p>
-            <pre className="mt-2 overflow-x-auto rounded-xl bg-gray-950/60 p-4 text-xs text-gray-300">
+            <pre className="mt-2 overflow-x-auto rounded-atelier-lg bg-canvas/60 p-4 text-xs text-ink-muted">
               {details}
             </pre>
           </div>
         )}
       </section>
 
-      <section className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-gray-800 bg-gray-900/60 p-6">
+      <section className="flex flex-wrap items-center justify-between gap-4 rounded-atelier-lg border border-line bg-surface/80 p-6">
         <form
           action={updateSubmissionStatusAction.bind(null, row.id)}
           className="flex items-center gap-3"
         >
-          <label htmlFor="status" className="text-sm text-gray-300">
+          <label htmlFor="status" className="text-sm text-ink-muted">
             Status
           </label>
           <select
             id="status"
             name="status"
             defaultValue={row.status}
-            className="rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white focus:border-cyan-400 focus:outline-none"
+            className="rounded-atelier border border-line bg-surface-raised px-3 py-2 text-sm text-ink focus:border-signal focus:outline-none"
           >
             {STATUSES.map((status) => (
               <option key={status} value={status}>
@@ -125,7 +125,7 @@ export default async function SubmissionDetailPage({
           </select>
           <button
             type="submit"
-            className="rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 px-4 py-2 text-sm font-semibold text-white transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/50"
+            className="rounded-atelier-lg bg-signal px-4 py-2 text-sm font-semibold text-canvas transition-all duration-200 hover:shadow-lg hover:shadow-signal"
           >
             Update
           </button>
@@ -133,7 +133,8 @@ export default async function SubmissionDetailPage({
 
         {canDelete(role, "submissions") && (
           <ConfirmDeleteButton
-            remove={() => deleteSubmission(row.id)}
+            action={deleteSubmission}
+            id={row.id}
             label={`Delete submission from ${row.name}`}
             confirmMessage={`Delete the submission from ${row.name}? This cannot be undone.`}
           />

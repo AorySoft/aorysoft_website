@@ -5,7 +5,7 @@ import { getActiveJobs } from "@/lib/data";
 export const metadata: Metadata = {
   title: "Careers",
   description:
-    "Join AorySoft and help build the next generation of AI-powered solutions. Explore open positions and benefits.",
+    "Build software, AI systems, and automation with AorySoft. See open roles or get in touch.",
 };
 
 // Job edits in /admin revalidate this route (plan §8).

@@ -1,28 +1,33 @@
 import HeroSection from "@/components/HeroSection";
 import AboutSection from "@/components/AboutSection";
 import ServicesSection from "@/components/ServicesSection";
-import PortfolioSection from "@/components/PortfolioSection";
 import TechnologiesSection from "@/components/TechnologiesSection";
 import IndustriesSection from "@/components/IndustriesSection";
 import CareersPreview from "@/components/CareersPreview";
-import { getActiveServices } from "@/lib/data";
+import ReviewsSection from "@/components/ReviewsSection";
+import FinalCtaSection from "@/components/FinalCtaSection";
+import { getActiveServices, getPublishedReviews } from "@/lib/data";
 
-// Content edits in /admin revalidate this route (plan §8 ISR flow).
 export const revalidate = 60;
 
+// Selected work is not rendered until real case studies are cleared; its note
+// and the #work anchor live in FinalCtaSection (PortfolioSection is kept for then).
 export default async function Home() {
-  // null → Supabase not connected → sections render placeholder content.
-  const services = await getActiveServices();
+  const [services, reviews] = await Promise.all([
+    getActiveServices(),
+    getPublishedReviews(),
+  ]);
 
   return (
     <main className="overflow-x-hidden">
       <HeroSection />
-      <AboutSection />
       <ServicesSection services={services} />
-      <PortfolioSection />
+      <AboutSection />
       <TechnologiesSection />
       <IndustriesSection />
+      <ReviewsSection reviews={reviews} />
       <CareersPreview />
+      <FinalCtaSection />
     </main>
   );
 }

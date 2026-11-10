@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 42.4 39.2" fill="none">
+  <!-- AorySoft "A" mark, traced from brand/aorysoft-logo.jpg (100x100 source). -->
+  <defs>
+    <linearGradient id="aory-mark-fill" x1="0" y1="0.6" x2="0" y2="38.6" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#3A9CD8"/>
+      <stop offset="0.42" stop-color="#3070C6"/>
+      <stop offset="0.7" stop-color="#358BCD"/>
+      <stop offset="1" stop-color="#06D6EA"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#aory-mark-fill)" d="M18 0.6H27.3L10.6 38.6H0.6Z"/>
+  <path fill="url(#aory-mark-fill)" d="M27.2 10.6L41.8 38.6H15.9L19.6 29.6H27.8L24.3 22.5V17Z"/>
+</svg>

@@ -4,8 +4,8 @@
 -- Apply AFTER 0001_schema.sql, 0002_rls.sql, 0003_storage.sql.
 --
 -- Note: the six blog posts are seeded as DRAFTS (placeholders the owner can
--- review/edit/publish from /admin). Jobs are seeded active to match the
--- currently-shown frontend listings.
+-- review/edit/publish from /admin). Jobs are seeded INACTIVE — activate only
+-- real openings from /admin (PRODUCT.md: never fabricate careers).
 
 -- ── site settings (single row; hero/about/industries/tech/footer copy) ──
 insert into public.site_settings (id, data)
@@ -43,9 +43,13 @@ values (
       {"name": "GraphQL", "category": "API"}
     ],
     "footerEmail": "info@aorysoft.com",
-    "footerPhone": "+1 (555) 123-4567",
-    "footerAddress": "123 Innovation Drive, Tech City, TC 12345",
-    "socialLinks": []
+    "footerPhone": "",
+    "footerAddress": "",
+    "socialLinks": [
+      {"label": "LinkedIn", "url": "https://www.linkedin.com/company/aorysoft"},
+      {"label": "Facebook", "url": "https://www.facebook.com/profile.php?id=61554433847153"},
+      {"label": "Instagram", "url": "https://www.instagram.com/aorysoft/"}
+    ]
   }'::jsonb
 )
 on conflict (id) do nothing;
@@ -95,53 +99,53 @@ on conflict (slug) do nothing;
 
 -- ── services ──
 insert into public.services (title, subtitle, description, features, icon, color, sort_order, active) values
-  ('AI Automation', 'Intelligent Process Automation',
-   'Transform your business operations with cutting-edge AI automation solutions.',
+  ('AI Automation', 'Cut repetitive work with practical AI workflows',
+   'Automate the busywork: document handling, workflows, and ops tools that save time without adding ceremony.',
    '["Robotic Process Automation (RPA)", "Intelligent Document Processing", "Workflow Optimization", "Predictive Analytics", "Natural Language Processing"]'::jsonb,
    'bot', 'from-blue-600 to-cyan-500', 1, true),
-  ('Smart Integrations', 'Seamless System Connectivity',
-   'Connect disparate systems with intelligent integration solutions.',
+  ('Smart Integrations', 'Connect the systems you already use',
+   'APIs and integrations that keep data moving between your tools, including older systems that still matter.',
    '["API Development & Integration", "Cloud Platform Connectivity", "Data Synchronization", "Legacy System Modernization", "Real-time Data Processing"]'::jsonb,
    'zap', 'from-purple-600 to-pink-500', 2, true),
-  ('Data Analytics', 'Actionable Business Intelligence',
-   'Turn raw data into actionable insights with advanced analytics.',
+  ('Data Analytics', 'Clear views of what is happening',
+   'Dashboards, reporting, and models that help you see patterns and make decisions with better data.',
    '["Business Intelligence Dashboards", "Predictive Modeling", "Data Visualization", "Machine Learning Models", "Custom Analytics Solutions"]'::jsonb,
    'bar-chart', 'from-green-600 to-teal-500', 3, true),
-  ('Cloud Solutions', 'Scalable Infrastructure',
-   'Build robust, scalable applications on modern cloud platforms.',
+  ('Cloud Solutions', 'Deploy and run with less friction',
+   'Cloud setup, containers, and ops practices so your apps stay reliable as traffic and features grow.',
    '["Cloud Migration Services", "Serverless Architecture", "Container Orchestration", "DevOps Implementation", "Security & Compliance"]'::jsonb,
    'cloud', 'from-orange-600 to-red-500', 4, true)
 on conflict do nothing;
 
--- ── jobs (active, mirroring the frontend listings) ──
+-- ── jobs (inactive placeholders — activate only real openings in /admin) ──
 insert into public.jobs (title, department, location, type, experience, description, requirements, responsibilities, active) values
   ('Senior AI Engineer', 'Engineering', 'Remote / San Francisco', 'full-time', '5+ years',
    'Lead the development of cutting-edge AI solutions and mentor junior engineers.',
    '["Master''s degree in Computer Science, AI, or related field", "5+ years of experience in AI/ML development", "Proficiency in Python, TensorFlow, PyTorch", "Experience with cloud platforms (AWS, GCP, Azure)", "Strong problem-solving and communication skills"]'::jsonb,
    '["Design and implement AI algorithms and models", "Lead technical architecture decisions", "Mentor junior team members", "Collaborate with cross-functional teams", "Stay updated with latest AI research and technologies"]'::jsonb,
-   true),
+   false),
   ('Frontend Developer', 'Engineering', 'Remote / New York', 'full-time', '3+ years',
    'Build beautiful and responsive user interfaces for our AI-powered applications.',
    '["Bachelor''s degree in Computer Science or related field", "3+ years of frontend development experience", "Expertise in React, TypeScript, and modern CSS", "Experience with responsive design and accessibility", "Knowledge of state management libraries"]'::jsonb,
    '["Develop responsive web applications", "Collaborate with designers and backend developers", "Optimize applications for performance", "Implement best practices for code quality", "Participate in code reviews and team meetings"]'::jsonb,
-   true),
+   false),
   ('Data Scientist', 'AI Research', 'Remote / Austin', 'full-time', '4+ years',
    'Analyze complex datasets and develop predictive models to drive business insights.',
    '["PhD or Master''s in Data Science, Statistics, or related field", "4+ years of experience in data science", "Proficiency in Python, R, SQL", "Experience with machine learning frameworks", "Strong statistical analysis skills"]'::jsonb,
    '["Analyze large datasets and extract insights", "Develop and validate predictive models", "Create data visualizations and reports", "Collaborate with engineering teams", "Present findings to stakeholders"]'::jsonb,
-   true),
+   false),
   ('DevOps Engineer', 'Infrastructure', 'Remote / Seattle', 'full-time', '4+ years',
    'Build and maintain scalable infrastructure for our AI applications.',
    '["Bachelor''s degree in Computer Science or related field", "4+ years of DevOps experience", "Experience with Docker, Kubernetes, CI/CD", "Knowledge of cloud platforms and monitoring tools", "Strong scripting and automation skills"]'::jsonb,
    '["Design and implement CI/CD pipelines", "Manage cloud infrastructure and deployments", "Monitor system performance and reliability", "Automate routine operational tasks", "Ensure security and compliance standards"]'::jsonb,
-   true),
+   false),
   ('Product Manager', 'Product', 'Remote / Boston', 'full-time', '5+ years',
    'Drive product strategy and roadmap for our AI-powered solutions.',
    '["MBA or equivalent experience", "5+ years of product management experience", "Experience with AI/ML products", "Strong analytical and communication skills", "Customer-focused mindset"]'::jsonb,
    '["Define product vision and strategy", "Collaborate with engineering and design teams", "Conduct market research and user interviews", "Manage product roadmap and priorities", "Track product metrics and performance"]'::jsonb,
-   true),
+   false),
   ('UX/UI Designer', 'Design', 'Remote / Los Angeles', 'full-time', '3+ years',
    'Create intuitive and engaging user experiences for our AI applications.',
    '["Bachelor''s degree in Design or related field", "3+ years of UX/UI design experience", "Proficiency in Figma, Sketch, or similar tools", "Experience with design systems and prototyping", "Understanding of user research methodologies"]'::jsonb,
    '["Design user interfaces and experiences", "Create wireframes, prototypes, and mockups", "Conduct user research and usability testing", "Collaborate with product and engineering teams", "Maintain and evolve design systems"]'::jsonb,
-   true);
+   false);

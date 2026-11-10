@@ -1,0 +1,219 @@
+/* Registered so the intro and the touch-device drift can interpolate them. */
+@property --px {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+@property --py {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+@property --depth {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 1;
+}
+@property --intro {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+.root {
+  --px: 0;
+  --py: 0;
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  margin-inline: auto;
+  aspect-ratio: 600 / 640;
+  container-type: inline-size;
+  animation: assemble 1.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.scene {
+  position: absolute;
+  inset: 0 0 auto;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.glow {
+  transform: translate(calc(var(--px) * 30px), calc(var(--py) * 20px));
+}
+
+/* Each plane recedes up-right at rest and swings away from the pointer. */
+.plane {
+  transform: translate(
+    calc((var(--px) * -7 + 7) * var(--layer) * var(--depth) * 1px),
+    calc((var(--py) * -7 - 5.5) * var(--layer) * var(--depth) * 1px)
+  );
+  opacity: calc((0.7 - var(--layer) * 0.085) * var(--depth));
+}
+
+.face {
+  transform: translate(calc(var(--px) * 4px), calc(var(--py) * 4px));
+}
+
+.sweep {
+  transform: translateX(calc((var(--px) + 1 + var(--intro)) * 280px));
+  mix-blend-mode: soft-light;
+}
+
+.track {
+  stroke: rgb(var(--color-line));
+  stroke-width: 1;
+  transition: stroke 240ms ease-out;
+}
+
+.pulse {
+  stroke: rgb(var(--color-signal));
+  stroke-width: 1.5;
+  stroke-linecap: square;
+  stroke-dasharray: 0.14 1;
+  stroke-dashoffset: 0.14;
+  animation: pulse 2.8s linear infinite;
+}
+
+.node {
+  fill: rgb(var(--color-canvas));
+  stroke: rgb(var(--color-signal-deep));
+  stroke-width: 1;
+  transition:
+    fill 240ms ease-out,
+    stroke 240ms ease-out;
+}
+
+.route[data-active] .track {
+  stroke: rgb(var(--color-signal) / 0.6);
+}
+
+.route[data-active] .node {
+  fill: rgb(var(--color-signal));
+  stroke: rgb(var(--color-signal));
+}
+
+.wordmark {
+  position: absolute;
+  top: 66.5%;
+  left: 50%;
+  translate: -50% 0;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 7.2cqw;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  color: rgb(var(--color-ink));
+  white-space: nowrap;
+}
+
+.labels {
+  position: absolute;
+  top: 86%;
+  left: 0;
+  right: 0;
+  height: 2.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.labels li {
+  position: absolute;
+  top: 0;
+  translate: -50% 0;
+}
+
+.label {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  padding-inline: 0.5rem;
+  border-radius: var(--radius-atelier);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  white-space: nowrap;
+  color: rgb(var(--color-ink-muted));
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 6px;
+  transition:
+    color 200ms ease-out,
+    text-decoration-color 200ms ease-out;
+}
+
+.label:hover,
+.label:focus-visible {
+  color: rgb(var(--color-ink));
+  text-decoration-color: rgb(var(--color-signal));
+}
+
+@media (min-width: 640px) {
+  .label {
+    font-size: 0.875rem;
+  }
+}
+
+.root[data-paused] *,
+.root[data-paused] {
+  animation-play-state: paused;
+}
+
+@keyframes assemble {
+  from {
+    --depth: 0;
+    --intro: -1.4;
+  }
+  to {
+    --depth: 1;
+    --intro: 0;
+  }
+}
+
+@keyframes pulse {
+  from {
+    stroke-dashoffset: 0.14;
+  }
+  to {
+    stroke-dashoffset: -1;
+  }
+}
+
+@keyframes drift {
+  0%,
+  100% {
+    --px: -0.55;
+    --py: 0.2;
+  }
+  50% {
+    --px: 0.55;
+    --py: -0.25;
+  }
+}
+
+/* Touch and stylus screens have no hover to steer the light, so it drifts slowly. */
+@media (hover: none), (pointer: coarse) {
+  .root {
+    animation:
+      assemble 1.8s cubic-bezier(0.16, 1, 0.3, 1) both,
+      drift 14s ease-in-out 1.8s infinite;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root,
+  .pulse {
+    animation: none;
+  }
+  .pulse {
+    stroke-dasharray: none;
+    stroke-dashoffset: 0;
+    opacity: 0.35;
+  }
+  .track,
+  .node,
+  .label {
+    transition: none;
+  }
+}

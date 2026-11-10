@@ -5,7 +5,7 @@ import { getPublishedPosts } from "@/lib/data";
 export const metadata: Metadata = {
   title: "Blog",
   description:
-    "Insights, tutorials and thoughts on AI, automation and the future of technology from the AorySoft team.",
+    "Notes from AorySoft on AI, automation, and building software that holds up in production.",
 };
 
 // Draft/publish toggles in /admin revalidate this route (plan §8).

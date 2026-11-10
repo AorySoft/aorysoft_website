@@ -1,0 +1,48 @@
+/* Vertical rail through the layer nodes, with a short pulse travelling down it. */
+.stack {
+  --rail-x: 7px;
+}
+
+@media (min-width: 768px) {
+  .stack {
+    --rail-x: 15px;
+  }
+}
+
+.signal {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--rail-x);
+  width: 1px;
+  overflow: hidden;
+  background: rgb(var(--color-line));
+}
+
+.signal::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 1px;
+  top: 0;
+  height: 18%;
+  background: linear-gradient(transparent, rgb(var(--color-signal)), transparent);
+  will-change: transform;
+  animation: travel 3.2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+/* Transform-only: the pulse is 18% of the rail, so 100/18 ≈ 5.56 heights clears it. */
+@keyframes travel {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(556%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .signal::after {
+    display: none;
+  }
+}

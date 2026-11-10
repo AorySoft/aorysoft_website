@@ -1,120 +1,64 @@
-"use client";
-
-import { motion } from "framer-motion";
-import { Building2, ShoppingCart, Heart, Banknote, GraduationCap, Factory } from "lucide-react";
-
-// Audit fixes: fabricated per-card project counts (12+ / 18+ / ...) and the
-// unverified stats box (6+ / 59+ / 98% / 4.9) removed (plan §12).
 const industries = [
   {
-    icon: Heart,
-    title: "Healthcare",
+    title: "Healthcare & clinical",
     description:
-      "AI-powered patient management, diagnostic tools, and healthcare automation solutions.",
-    color: "from-red-500 to-pink-500",
+      "Tools and platforms for clinics and care teams, with privacy and day-to-day workflow in mind.",
   },
   {
-    icon: ShoppingCart,
-    title: "E-commerce & Retail",
+    title: "E-commerce & retail",
     description:
-      "Intelligent recommendation engines, inventory management, and customer analytics.",
-    color: "from-blue-500 to-cyan-500",
+      "Storefronts, ops tooling, and customer-facing features that support how you sell and fulfill.",
   },
   {
-    icon: Banknote,
-    title: "Financial Services",
+    title: "Startups & product teams",
     description:
-      "Fraud detection, algorithmic trading, and risk assessment solutions.",
-    color: "from-green-500 to-emerald-500",
+      "From early MVPs to growing SaaS: product UI, admin systems, and automation that keep release cycles moving.",
   },
   {
-    icon: Building2,
-    title: "Real Estate",
+    title: "Education & services",
     description:
-      "Property valuation, market analysis, and automated property management.",
-    color: "from-purple-500 to-indigo-500",
-  },
-  {
-    icon: GraduationCap,
-    title: "Education",
-    description:
-      "Personalized learning platforms, student analytics, and educational automation.",
-    color: "from-orange-500 to-yellow-500",
-  },
-  {
-    icon: Factory,
-    title: "Manufacturing",
-    description:
-      "Predictive maintenance, quality control, and supply chain optimization.",
-    color: "from-gray-600 to-gray-700",
+      "Digital products and integrations for schools, training orgs, and service businesses updating how they deliver.",
   },
 ];
 
+/**
+ * A large serif index. Every description is always readable (no hover-only
+ * content); hover adds emphasis and a signal rule that sweeps along the row.
+ */
 const IndustriesSection = () => {
   return (
-    <section id="industries" className="py-20 bg-gray-800/30 backdrop-blur-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
-          <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-6">
-            Industries We Serve
+    <section id="industries" aria-labelledby="industries-title" className="section-y scroll-mt-16 border-t border-line bg-surface">
+      <div className="shell">
+        <div className="max-w-3xl">
+          <h2 id="industries-title" className="display-title">
+            Who we build for
           </h2>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            From healthcare to fintech, we deliver AI-powered solutions across
-            diverse industries, helping businesses transform their operations
-            and achieve sustainable growth.
+          <p className="body-lead mt-5">
+            We work with startups and established teams in healthcare,
+            commerce, education, and product companies that need a steady
+            engineering partner.
           </p>
-        </motion.div>
-
-        {/* Industries Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {industries.map((industry, index) => (
-            <motion.div
-              key={industry.title}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-              viewport={{ once: true }}
-              whileHover={{ y: -10, scale: 1.02 }}
-              className="group"
-            >
-              <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-8 h-full group-hover:border-cyan-500/50 transition-all duration-300 relative overflow-hidden">
-                {/* Background Gradient */}
-                <div
-                  className={`absolute inset-0 bg-gradient-to-br ${industry.color} opacity-0 group-hover:opacity-5 transition-opacity duration-300`}
-                />
-
-                {/* Icon */}
-                <div
-                  className={`w-16 h-16 bg-gradient-to-r ${industry.color} rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 relative z-10`}
-                >
-                  <industry.icon className="w-8 h-8 text-white" aria-hidden="true" />
-                </div>
-
-                {/* Content */}
-                <div className="relative z-10">
-                  <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-cyan-400 transition-colors duration-200">
-                    {industry.title}
-                  </h3>
-                  <p className="text-gray-300 leading-relaxed">
-                    {industry.description}
-                  </p>
-                </div>
-
-                {/* Bottom Border Effect */}
-                <div
-                  className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r ${industry.color} transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300`}
-                />
-              </div>
-            </motion.div>
-          ))}
         </div>
+
+        <ul className="mt-14 border-t border-line md:mt-16">
+          {industries.map((industry) => (
+            <li
+              key={industry.title}
+              className="group relative grid gap-3 border-b border-line py-8 md:grid-cols-12 md:items-baseline md:gap-8 md:py-10"
+            >
+              <span
+                className="absolute inset-x-0 -bottom-px h-px origin-left scale-x-0 bg-gradient-to-r from-signal-deep to-signal transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-x-100 motion-reduce:transition-none"
+                aria-hidden="true"
+              />
+              <h3 className="font-display text-[clamp(2rem,4.6vw,3.75rem)] leading-[1.05] tracking-[-0.02em] text-ink-muted transition-[color,transform] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-2 group-hover:text-ink motion-reduce:transition-none motion-reduce:group-hover:translate-x-0 md:col-span-7">
+                {industry.title}
+              </h3>
+              <p className="max-w-md text-base leading-relaxed text-ink-muted transition-colors duration-500 group-hover:text-ink md:col-span-5">
+                {industry.description}
+              </p>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );

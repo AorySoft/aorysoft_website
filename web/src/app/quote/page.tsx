@@ -4,7 +4,7 @@ import QuoteForm from "./QuoteForm";
 export const metadata: Metadata = {
   title: "Get a Quote",
   description:
-    "Tell us about your project and AorySoft will provide a detailed proposal through our multi-step quote form.",
+    "Share scope, timeline, and constraints. AorySoft will follow up with a clear proposal.",
 };
 
 export default function QuotePage() {

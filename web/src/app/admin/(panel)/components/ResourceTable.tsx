@@ -91,7 +91,7 @@ export default function ResourceTable({
       <div className="flex items-center gap-3">
         <div className="relative max-w-sm flex-1">
           <Search
-            className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500"
+            className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-subtle"
             aria-hidden="true"
           />
           <input
@@ -103,10 +103,10 @@ export default function ResourceTable({
             }}
             placeholder={`Search ${def.title.toLowerCase()}…`}
             aria-label={`Search ${def.title}`}
-            className="w-full rounded-lg border border-gray-700 bg-gray-800 py-2 pl-9 pr-3 text-sm text-white placeholder-gray-500 focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+            className="w-full rounded-atelier border border-line bg-surface-raised py-2 pl-9 pr-3 text-sm text-ink placeholder-ink-subtle focus:border-signal focus:outline-none focus:ring-2 focus:ring-signal/20"
           />
         </div>
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-ink-subtle">
           {filtered.length} of {rows.length}
         </p>
       </div>
@@ -114,32 +114,32 @@ export default function ResourceTable({
       {deleteError && (
         <p
           role="alert"
-          className="rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300"
+          className="rounded-atelier-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300"
         >
           {deleteError}
         </p>
       )}
 
       {rows.length === 0 ? (
-        <div className="rounded-2xl border border-gray-800 bg-gray-900/60 p-10 text-center">
-          <p className="font-medium text-white">No {def.title.toLowerCase()} yet</p>
-          <p className="mt-1 text-sm text-gray-400">
+        <div className="rounded-atelier-lg border border-line bg-surface/80 p-10 text-center">
+          <p className="font-medium text-ink">No {def.title.toLowerCase()} yet</p>
+          <p className="mt-1 text-sm text-ink-subtle">
             {canEdit
               ? `Create the first ${def.singular} — or apply supabase/0004_seed.sql for the placeholder set.`
               : "Nothing has been added yet."}
           </p>
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-gray-800">
+        <div className="overflow-x-auto rounded-atelier-lg border border-line">
           <table className="min-w-full text-left text-sm">
-            <thead className="bg-gray-900 text-xs uppercase text-gray-400">
+            <thead className="bg-surface text-xs uppercase text-ink-subtle">
               <tr>
                 {def.listColumns.map((column) => (
                   <th key={column} scope="col" className="px-4 py-3">
                     <button
                       type="button"
                       onClick={() => toggleSort(column)}
-                      className="inline-flex items-center gap-1 uppercase tracking-wide hover:text-white"
+                      className="inline-flex items-center gap-1 uppercase tracking-wide hover:text-ink"
                     >
                       {column.replace(/_/g, " ")}
                       {sortColumn === column && (
@@ -153,11 +153,11 @@ export default function ResourceTable({
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-800 bg-gray-950/50">
+            <tbody className="divide-y divide-gray-800 bg-canvas/50">
               {visible.map((row) => (
-                <tr key={String(row.id)} className="hover:bg-gray-900/60">
+                <tr key={String(row.id)} className="hover:bg-surface/80">
                   {def.listColumns.map((column) => (
-                    <td key={column} className="max-w-xs truncate px-4 py-3 text-gray-200">
+                    <td key={column} className="max-w-xs truncate px-4 py-3 text-ink-muted">
                       {cellText(row[column])}
                     </td>
                   ))}
@@ -166,7 +166,7 @@ export default function ResourceTable({
                       {canEdit && (
                         <Link
                           href={`/admin/${def.key}/${String(row.id)}`}
-                          className="text-cyan-400 transition-colors duration-200 hover:text-cyan-300"
+                          className="text-signal transition-colors duration-200 hover:text-signal"
                         >
                           Edit
                         </Link>
@@ -177,7 +177,7 @@ export default function ResourceTable({
                           onClick={() => handleDelete(row)}
                           disabled={deletingId === String(row.id)}
                           aria-label={`Delete ${String(row.title ?? row.name ?? "item")}`}
-                          className="text-gray-500 transition-colors duration-200 hover:text-red-400 disabled:opacity-50"
+                          className="text-ink-subtle transition-colors duration-200 hover:text-red-400 disabled:opacity-50"
                         >
                           <Trash2 className="h-4 w-4" aria-hidden="true" />
                         </button>
@@ -192,12 +192,12 @@ export default function ResourceTable({
       )}
 
       {pageCount > 1 && (
-        <div className="flex items-center justify-between text-sm text-gray-400">
+        <div className="flex items-center justify-between text-sm text-ink-subtle">
           <button
             type="button"
             onClick={() => setPage(Math.max(0, page - 1))}
             disabled={page === 0}
-            className="rounded-lg border border-gray-700 px-3 py-1.5 disabled:opacity-40"
+            className="rounded-atelier border border-line px-3 py-1.5 disabled:opacity-40"
           >
             Previous
           </button>
@@ -208,7 +208,7 @@ export default function ResourceTable({
             type="button"
             onClick={() => setPage(Math.min(pageCount - 1, page + 1))}
             disabled={page >= pageCount - 1}
-            className="rounded-lg border border-gray-700 px-3 py-1.5 disabled:opacity-40"
+            className="rounded-atelier border border-line px-3 py-1.5 disabled:opacity-40"
           >
             Next
           </button>

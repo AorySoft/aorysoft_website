@@ -1,0 +1,154 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-09T00:00:00.000Z",
+  "title": "Design System: AorySoft (Incumbent)",
+  "extensions": {
+    "colorMeta": {
+      "canvas": {
+        "role": "neutral",
+        "displayName": "Canvas Ink",
+        "canonical": "#111827",
+        "tonalRamp": ["#030712", "#111827", "#1f2937", "#374151", "#4b5563", "#9ca3af", "#d1d5db", "#f9fafb"]
+      },
+      "accent-blue": {
+        "role": "primary",
+        "displayName": "Signal Blue",
+        "canonical": "#2563eb",
+        "tonalRamp": ["#172554", "#1e3a8a", "#1d4ed8", "#2563eb", "#3b82f6", "#60a5fa", "#93c5fd", "#dbeafe"]
+      },
+      "accent-cyan": {
+        "role": "secondary",
+        "displayName": "Accent Cyan",
+        "canonical": "#06b6d4",
+        "tonalRamp": ["#083344", "#155e75", "#0e7490", "#0891b2", "#06b6d4", "#22d3ee", "#67e8f9", "#cffafe"]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "#ffffff",
+        "tonalRamp": ["#111827", "#374151", "#6b7280", "#9ca3af", "#d1d5db", "#e5e7eb", "#f3f4f6", "#ffffff"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Home hero H1 only; system sans bold." },
+      "headline": { "displayName": "Headline", "purpose": "Section and page titles." },
+      "body": { "displayName": "Body", "purpose": "Lead paragraphs and supporting copy." }
+    },
+    "shadows": [
+      {
+        "name": "nav-elevated",
+        "value": "0 25px 50px -12px rgba(59, 130, 246, 0.2)",
+        "purpose": "Fixed nav after scroll."
+      },
+      {
+        "name": "cta-glow",
+        "value": "0 10px 15px -3px rgba(59, 130, 246, 0.5)",
+        "purpose": "Primary CTA hover glow."
+      }
+    ],
+    "motion": [
+      {
+        "name": "section-enter",
+        "value": "opacity/y transition ~0.6–0.8s whileInView once",
+        "purpose": "Default section entrance via Framer Motion."
+      },
+      {
+        "name": "hover-scale",
+        "value": "scale 1.05 spring",
+        "purpose": "Buttons, nav links, logo tile."
+      }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Pill gradient CTA used for Quote and primary actions.",
+      "html": "<button class=\"ds-btn-primary\" type=\"button\">Get a Quote</button>",
+      "css": ".ds-btn-primary { background: linear-gradient(to right, #2563eb, #06b6d4); color: #fff; padding: 16px 32px; border: none; border-radius: 9999px; font-weight: 600; font-size: 1.125rem; cursor: pointer; transition: box-shadow 0.3s, transform 0.2s; } .ds-btn-primary:hover { box-shadow: 0 25px 50px -12px rgba(59, 130, 246, 0.5); transform: scale(1.05); } .ds-btn-primary:focus-visible { outline: 2px solid #22d3ee; outline-offset: 3px; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Cyan outline CTA (e.g. View Portfolio).",
+      "html": "<button class=\"ds-btn-secondary\" type=\"button\">View Portfolio</button>",
+      "css": ".ds-btn-secondary { background: transparent; color: #22d3ee; padding: 16px 32px; border: 1px solid #22d3ee; border-radius: 9999px; font-weight: 600; font-size: 1.125rem; cursor: pointer; transition: background 0.3s; } .ds-btn-secondary:hover { background: rgba(34, 211, 238, 0.1); } .ds-btn-secondary:focus-visible { outline: 2px solid #22d3ee; outline-offset: 3px; }"
+    },
+    {
+      "name": "Surface Card",
+      "kind": "card",
+      "refersTo": "card-surface",
+      "description": "Glassmorphic bordered card used across About/Services/Contact.",
+      "html": "<article class=\"ds-card\"><h3 class=\"ds-card-title\">Mission</h3><p class=\"ds-card-body\">Sample supporting copy for the incumbent card pattern.</p></article>",
+      "css": ".ds-card { background: rgba(17, 24, 39, 0.5); backdrop-filter: blur(8px); border: 1px solid #374151; border-radius: 16px; padding: 24px; color: #fff; max-width: 320px; transition: border-color 0.3s; } .ds-card:hover { border-color: rgba(6, 182, 212, 0.5); } .ds-card-title { margin: 0 0 12px; font-size: 1.25rem; font-weight: 600; } .ds-card-body { margin: 0; color: #9ca3af; line-height: 1.6; }"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "Contact/quote form field.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-label\">Email</span><input class=\"ds-input\" type=\"email\" placeholder=\"you@company.com\" /></label>",
+      "css": ".ds-field { display: flex; flex-direction: column; gap: 8px; max-width: 360px; } .ds-label { color: #d1d5db; font-size: 0.875rem; font-weight: 500; } .ds-input { background: #1f2937; border: 1px solid #374151; border-radius: 12px; padding: 12px 16px; color: #fff; font-size: 1rem; } .ds-input::placeholder { color: #9ca3af; } .ds-input:focus { outline: none; border-color: #22d3ee; box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.2); }"
+    },
+    {
+      "name": "Top Navigation",
+      "kind": "nav",
+      "refersTo": "nav-link-active",
+      "description": "Fixed dark nav with gradient brand and cyan active link.",
+      "html": "<nav class=\"ds-nav\"><div class=\"ds-brand\"><span class=\"ds-mark\"></span><span class=\"ds-wordmark\">AorySoft</span></div><a class=\"ds-link ds-link-active\" href=\"#\">Services</a><a class=\"ds-link\" href=\"#\">Blog</a></nav>",
+      "css": ".ds-nav { display: flex; align-items: center; gap: 32px; background: rgba(17, 24, 39, 0.95); backdrop-filter: blur(12px); padding: 12px 24px; color: #fff; } .ds-brand { display: flex; align-items: center; gap: 8px; margin-right: auto; } .ds-mark { width: 40px; height: 40px; border-radius: 8px; background: linear-gradient(to right, #3b82f6, #22d3ee); } .ds-wordmark { font-weight: 700; background: linear-gradient(to right, #60a5fa, #67e8f9); -webkit-background-clip: text; color: transparent; } .ds-link { color: #d1d5db; text-decoration: none; font-size: 0.95rem; } .ds-link:hover, .ds-link-active { color: #22d3ee; } .ds-link:focus-visible { outline: 2px solid #22d3ee; outline-offset: 4px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Neon Gradient Agency Kit",
+    "overview": "The incumbent site is a dark-mode marketing template: near-black canvas, blue→cyan gradient accents, glassmorphic bordered cards, pill CTAs, Lucide icons in gradient circles, and Framer Motion fade/slide reveals on almost every section. Typography is the browser/system sans stack — no custom display face is loaded. Atmosphere comes from animated particles, grid overlays, backdrop blur, and cyan glow shadows rather than photography or product craft. Density is medium-high: each home section repeats a centered headline + supporting sentence + card/grid pattern. Brand mark is a Zap icon in a rounded square plus gradient wordmark. The look reads as generic “AI SaaS agency 2024” more than a distinctive AorySoft identity.",
+    "keyCharacteristics": [
+      "Dark gray-900 canvas with alternating gray-800/30 section bands",
+      "Single accent axis: Tailwind blue ↔ cyan gradients",
+      "System sans, bold gradient-clipped headlines",
+      "Pill buttons + large-radius glass cards",
+      "Motion-first: particles, hover scale, per-section whileInView entrances",
+      "No design tokens in CSS variables; stock Tailwind 3 defaults only"
+    ],
+    "rules": [
+      {
+        "name": "The Gradient Everywhere Rule",
+        "body": "Blue→cyan gradients appear on CTAs, logos, icon wells, progress, and headline accents — rarity is not part of the incumbent system.",
+        "section": "colors"
+      },
+      {
+        "name": "The Dark-Only Rule",
+        "body": "Public marketing UI is dark-mode only; no light theme tokens exist.",
+        "section": "colors"
+      },
+      {
+        "name": "The One-Face Rule",
+        "body": "Incumbent uses a single system sans; personality is not carried by typography.",
+        "section": "typography"
+      },
+      {
+        "name": "The Glow-Not-Lift Rule",
+        "body": "Depth is communicated with cyan/blue glows and blur glass, not a neutral elevation ladder.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do treat this file as the current implementation record when refining without a redesign approval.",
+      "Do keep public writes, honesty rules, and content constraints from PRODUCT.md even when visuals change later.",
+      "Do note that tailwind.config.ts has an empty theme.extend — any new system must introduce tokens deliberately."
+    ],
+    "donts": [
+      "Don't treat Neon Gradient Agency Kit as the target brand identity for future work once a redesign direction is approved.",
+      "Don't invent CSS variables or custom fonts that are not in the codebase when describing the incumbent.",
+      "Don't document unverified portfolio/metrics content as visual proof assets — they are placeholders under PRODUCT.md."
+    ]
+  }
+}

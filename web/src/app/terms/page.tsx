@@ -11,16 +11,16 @@ const LAST_UPDATED = "November 2026";
 
 export default function TermsPage() {
   return (
-    <main className="min-h-screen bg-gray-900">
+    <main className="min-h-screen bg-canvas">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <h1 className="text-4xl md:text-5xl font-bold text-white mb-3">
+        <h1 className="display-title mb-3">
           Terms of Use
         </h1>
-        <p className="text-sm text-gray-400 mb-12">Last updated: {LAST_UPDATED}</p>
+        <p className="text-sm text-ink-subtle mb-12">Last updated: {LAST_UPDATED}</p>
 
-        <div className="space-y-10 text-gray-300 leading-relaxed">
+        <div className="space-y-10 text-ink-muted leading-relaxed">
           <section className="space-y-3">
-            <h2 className="text-2xl font-bold text-white">Acceptance</h2>
+            <h2 className="text-2xl font-bold text-ink">Acceptance</h2>
             <p>
               By using this website you agree to these terms. If you do not agree,
               please do not use the site. If you engage AorySoft for services, the
@@ -30,7 +30,7 @@ export default function TermsPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-2xl font-bold text-white">
+            <h2 className="text-2xl font-bold text-ink">
               Informational content
             </h2>
             <p>
@@ -42,7 +42,7 @@ export default function TermsPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-2xl font-bold text-white">
+            <h2 className="text-2xl font-bold text-ink">
               Intellectual property
             </h2>
             <p>
@@ -55,7 +55,7 @@ export default function TermsPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-2xl font-bold text-white">Acceptable use</h2>
+            <h2 className="text-2xl font-bold text-ink">Acceptable use</h2>
             <ul className="list-disc pl-6 space-y-2">
               <li>
                 Do not attempt to gain unauthorised access to any part of the site, its
@@ -74,7 +74,7 @@ export default function TermsPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-2xl font-bold text-white">
+            <h2 className="text-2xl font-bold text-ink">
               Information you submit
             </h2>
             <p>
@@ -86,7 +86,7 @@ export default function TermsPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-2xl font-bold text-white">
+            <h2 className="text-2xl font-bold text-ink">
               Third-party links
             </h2>
             <p>
@@ -97,7 +97,7 @@ export default function TermsPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-2xl font-bold text-white">
+            <h2 className="text-2xl font-bold text-ink">
               Availability and warranties
             </h2>
             <p>
@@ -109,7 +109,7 @@ export default function TermsPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-2xl font-bold text-white">
+            <h2 className="text-2xl font-bold text-ink">
               Limitation of liability
             </h2>
             <p>
@@ -121,7 +121,7 @@ export default function TermsPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-2xl font-bold text-white">Governing law</h2>
+            <h2 className="text-2xl font-bold text-ink">Governing law</h2>
             <p>
               These terms are governed by the laws applicable at AorySoft&apos;s
               principal place of business, without regard to conflict-of-law rules. Any
@@ -131,7 +131,7 @@ export default function TermsPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-2xl font-bold text-white">Changes</h2>
+            <h2 className="text-2xl font-bold text-ink">Changes</h2>
             <p>
               We may update these terms from time to time. Continued use of the site
               after a change means you accept the updated terms. The date at the top of
@@ -140,12 +140,12 @@ export default function TermsPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-2xl font-bold text-white">Contact</h2>
+            <h2 className="text-2xl font-bold text-ink">Contact</h2>
             <p>
               Questions about these terms can be sent to{" "}
               <a
                 href="mailto:info@aorysoft.com"
-                className="text-cyan-400 underline"
+                className="text-signal underline"
               >
                 info@aorysoft.com
               </a>

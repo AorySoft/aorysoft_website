@@ -65,14 +65,36 @@ export type FieldDef = {
   fieldset?: string;
 };
 
-export type ResourceKey = "posts" | "categories" | "services" | "jobs";
+export type ResourceKey =
+  | "posts"
+  | "categories"
+  | "services"
+  | "jobs"
+  | "reviews";
 
 export const RESOURCE_KEYS: readonly ResourceKey[] = [
   "posts",
   "categories",
   "services",
   "jobs",
+  "reviews",
 ];
+
+export const REVIEW_SOURCES = [
+  "fiverr",
+  "google",
+  "linkedin",
+  "website",
+  "email",
+  "other",
+] as const;
+
+export const REVIEW_STATUSES = [
+  "draft",
+  "pending",
+  "published",
+  "archived",
+] as const;
 
 /** Whitelist resolver for the /admin/[resource] dynamic segment. */
 export function resolveResourceKey(raw: string): ResourceKey | null {
@@ -83,7 +105,7 @@ export function resolveResourceKey(raw: string): ResourceKey | null {
 
 export type ResourceDef = {
   key: ResourceKey;
-  table: "posts" | "categories" | "services" | "jobs";
+  table: "posts" | "categories" | "services" | "jobs" | "reviews";
   title: string;
   singular: string;
   fields: FieldDef[];
@@ -217,6 +239,111 @@ export const resources: Record<ResourceKey, ResourceDef> = {
     searchColumns: ["title", "department", "location"],
     revalidate: ["/", "/careers"],
   },
+  reviews: {
+    key: "reviews",
+    table: "reviews",
+    title: "Reviews",
+    singular: "review",
+    fields: [
+      {
+        name: "display_name",
+        label: "Display name",
+        kind: "text",
+        required: true,
+        maxLength: 120,
+        fieldset: "Content",
+      },
+      {
+        name: "review_text",
+        label: "Review text",
+        kind: "textarea",
+        required: true,
+        maxLength: 4000,
+        fieldset: "Content",
+      },
+      {
+        name: "rating",
+        label: "Rating (1–5)",
+        kind: "number",
+        required: true,
+        fieldset: "Content",
+      },
+      {
+        name: "project_or_service",
+        label: "Project or service",
+        kind: "text",
+        maxLength: 200,
+        fieldset: "Content",
+      },
+      {
+        name: "source",
+        label: "Source / platform",
+        kind: "select",
+        options: REVIEW_SOURCES,
+        required: true,
+        fieldset: "Attribution",
+      },
+      {
+        name: "source_url",
+        label: "Source URL (optional)",
+        kind: "text",
+        maxLength: 500,
+        fieldset: "Attribution",
+        help: "Link to the original review when available.",
+      },
+      {
+        name: "attribution",
+        label: "Attribution line",
+        kind: "text",
+        maxLength: 200,
+        fieldset: "Attribution",
+        help: 'e.g. "Fiverr client" — shown publicly with the review.',
+      },
+      {
+        name: "profile_image_id",
+        label: "Profile image (optional)",
+        kind: "mediaRef",
+        fieldset: "Attribution",
+      },
+      {
+        name: "permission_confirmed",
+        label: "Display permission confirmed",
+        kind: "checkbox",
+        fieldset: "Publishing",
+        help: "Required before publish. Confirm the client allowed public display (critical for Fiverr).",
+      },
+      {
+        name: "status",
+        label: "Status",
+        kind: "select",
+        options: REVIEW_STATUSES,
+        required: true,
+        fieldset: "Publishing",
+      },
+      {
+        name: "featured",
+        label: "Featured on homepage",
+        kind: "checkbox",
+        fieldset: "Publishing",
+      },
+      {
+        name: "sort_order",
+        label: "Sort order",
+        kind: "number",
+        fieldset: "Publishing",
+      },
+    ],
+    listColumns: [
+      "display_name",
+      "source",
+      "rating",
+      "status",
+      "permission_confirmed",
+      "featured",
+    ],
+    searchColumns: ["display_name", "review_text", "project_or_service", "attribution"],
+    revalidate: ["/"],
+  },
 };
 
 /**
@@ -274,6 +401,17 @@ export function validateResourceInput(
       errors[field.name] = result.error;
     } else {
       value[field.name] = result.value;
+    }
+  }
+
+  if (key === "reviews") {
+    const rating = value.rating;
+    if (typeof rating === "number" && (rating < 1 || rating > 5)) {
+      errors.rating = "Rating must be between 1 and 5.";
+    }
+    if (value.status === "published" && value.permission_confirmed !== true) {
+      errors.permission_confirmed =
+        "Confirm display permission before publishing a review.";
     }
   }
 

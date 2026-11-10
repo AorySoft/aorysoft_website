@@ -16,17 +16,19 @@ function filterLink(
   status: string,
   label: string,
   active: boolean,
+  key: string,
 ) {
   const query =
     (type !== "all" ? `type=${type}` : "") +
     (status !== "all" ? `${type !== "all" ? "&" : ""}status=${status}` : "");
   return (
     <Link
+      key={key}
       href={`/admin/submissions${query ? `?${query}` : ""}`}
       className={`rounded-full px-4 py-1.5 text-sm transition-colors duration-200 ${
         active
-          ? "bg-gradient-to-r from-blue-600 to-cyan-500 text-white"
-          : "border border-gray-700 bg-gray-800 text-gray-300 hover:bg-gray-700"
+          ? "bg-signal text-canvas"
+          : "border border-line bg-surface-raised text-ink-muted hover:bg-surface-raised"
       }`}
     >
       {label}
@@ -67,7 +69,7 @@ export default async function SubmissionsPage({
 
   if (!canEdit(role, "submissions")) {
     return (
-      <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-6 text-sm text-amber-200">
+      <div className="rounded-atelier-lg border border-amber-500/30 bg-amber-500/10 p-6 text-sm text-amber-200">
         Your account has no role for the submissions inbox yet.
       </div>
     );
@@ -91,7 +93,7 @@ export default async function SubmissionsPage({
         <h1 className="text-2xl font-bold">Submissions</h1>
         <Link
           href={`/admin/submissions/export?type=${type}&status=${status}`}
-          className="rounded-xl border border-gray-700 px-4 py-2 text-sm text-gray-300 transition-colors duration-200 hover:border-cyan-500/50 hover:text-cyan-400"
+          className="rounded-atelier-lg border border-line px-4 py-2 text-sm text-ink-muted transition-colors duration-200 hover:border-signal/50 hover:text-signal"
         >
           Export CSV
         </Link>
@@ -99,24 +101,36 @@ export default async function SubmissionsPage({
 
       <div className="flex flex-wrap items-center gap-2">
         {TYPES.map((t) =>
-          filterLink(t, "all", t === "all" ? "All types" : t, type === t && status === "all"),
+          filterLink(
+            t,
+            "all",
+            t === "all" ? "All types" : t,
+            type === t && status === "all",
+            `type-${t}`,
+          ),
         )}
         <span className="mx-2 h-4 w-px bg-gray-700" aria-hidden="true" />
         {STATUSES.map((s) =>
-          filterLink("all", s, s === "all" ? "All statuses" : s, status === s && type === "all"),
+          filterLink(
+            "all",
+            s,
+            s === "all" ? "All statuses" : s,
+            status === s && type === "all",
+            `status-${s}`,
+          ),
         )}
       </div>
 
       {error && (
-        <p role="alert" className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300">
+        <p role="alert" className="rounded-atelier-lg border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300">
           Could not load submissions: {error.message}
         </p>
       )}
 
       {!error && submissions.length === 0 && (
-        <div className="rounded-2xl border border-gray-800 bg-gray-900/60 p-10 text-center">
-          <p className="font-medium text-white">No submissions match</p>
-          <p className="mt-1 text-sm text-gray-400">
+        <div className="rounded-atelier-lg border border-line bg-surface/80 p-10 text-center">
+          <p className="font-medium text-ink">No submissions match</p>
+          <p className="mt-1 text-sm text-ink-subtle">
             Contact/quote forms deliver here once the Phase 4 pipeline (Turnstile
             → Supabase → Resend) is connected.
           </p>
@@ -124,9 +138,9 @@ export default async function SubmissionsPage({
       )}
 
       {submissions.length > 0 && (
-        <div className="overflow-x-auto rounded-2xl border border-gray-800">
+        <div className="overflow-x-auto rounded-atelier-lg border border-line">
           <table className="min-w-full text-left text-sm">
-            <thead className="bg-gray-900 text-xs uppercase text-gray-400">
+            <thead className="bg-surface text-xs uppercase text-ink-subtle">
               <tr>
                 <th scope="col" className="px-4 py-3">Received</th>
                 <th scope="col" className="px-4 py-3">Type</th>
@@ -136,19 +150,19 @@ export default async function SubmissionsPage({
                 <th scope="col" className="px-4 py-3 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-800 bg-gray-950/50">
+            <tbody className="divide-y divide-gray-800 bg-canvas/50">
               {submissions.map((row) => (
-                <tr key={row.id} className="hover:bg-gray-900/60">
-                  <td className="px-4 py-3 text-gray-300">
+                <tr key={row.id} className="hover:bg-surface/80">
+                  <td className="px-4 py-3 text-ink-muted">
                     {new Date(row.created_at).toLocaleString()}
                   </td>
                   <td className="px-4 py-3">
-                    <span className="rounded-full bg-gray-800 px-2.5 py-0.5 text-xs text-cyan-400">
+                    <span className="rounded-full bg-surface-raised px-2.5 py-0.5 text-xs text-signal">
                       {row.type}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-gray-200">{row.name}</td>
-                  <td className="px-4 py-3 text-gray-300">{row.email}</td>
+                  <td className="px-4 py-3 text-ink-muted">{row.name}</td>
+                  <td className="px-4 py-3 text-ink-muted">{row.email}</td>
                   <td className="px-4 py-3">
                     <span
                       className={`rounded-full px-2.5 py-0.5 text-xs ${
@@ -156,7 +170,7 @@ export default async function SubmissionsPage({
                           ? "bg-blue-500/20 text-blue-300"
                           : row.status === "replied"
                             ? "bg-green-500/20 text-green-300"
-                            : "bg-gray-800 text-gray-400"
+                            : "bg-surface-raised text-ink-subtle"
                       }`}
                     >
                       {row.status}
@@ -166,13 +180,14 @@ export default async function SubmissionsPage({
                     <div className="inline-flex items-center gap-3">
                       <Link
                         href={`/admin/submissions/${row.id}`}
-                        className="text-cyan-400 transition-colors duration-200 hover:text-cyan-300"
+                        className="text-signal transition-colors duration-200 hover:text-signal"
                       >
                         View
                       </Link>
                       {mayDelete && (
                         <ConfirmDeleteButton
-                          remove={() => deleteSubmission(row.id)}
+                          action={deleteSubmission}
+                          id={row.id}
                           label={`Delete submission from ${row.name}`}
                           confirmMessage={`Delete the submission from ${row.name}? This cannot be undone.`}
                         />

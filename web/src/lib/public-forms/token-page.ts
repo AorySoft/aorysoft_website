@@ -35,7 +35,7 @@ export function page({ ok, heading, body }: Outcome): Response {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex" />
-    <title>${heading} — AorySoft</title>
+    <title>${heading} | AorySoft</title>
     <style>
       body { font-family: system-ui, sans-serif; background: #0f172a; color: #e2e8f0;
              display: grid; place-items: center; min-height: 100vh; margin: 0; padding: 1.5rem; }

@@ -4,7 +4,7 @@ import ContactContent from "./ContactContent";
 export const metadata: Metadata = {
   title: "Contact",
   description:
-    "Ready to transform your business with AI? Get in touch with AorySoft to discuss your project.",
+    "Contact AorySoft about a project, quote, or question. We reply through info@aorysoft.com.",
 };
 
 export default function ContactPage() {

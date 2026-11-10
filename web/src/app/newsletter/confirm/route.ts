@@ -13,7 +13,7 @@ import {
 const CONFIRMED = {
   ok: true,
   heading: "Subscription confirmed",
-  body: "You're on the list. We'll send occasional insights on AI and automation — never more than once a week.",
+  body: "You're on the list. We'll send occasional notes on AI and automation, never more than once a week.",
 };
 
 const WELCOME_BACK = {

@@ -1,30 +1,30 @@
 "use client";
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useCallback, useEffect, useMemo, useState, type KeyboardEvent } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
 import {
-  Bot,
-  Zap,
+  ArrowRight,
   BarChart3,
-  Cloud,
+  Bot,
   Brain,
+  Cloud,
   Code,
   Database,
   Shield,
-  ArrowRight,
-  X,
+  Zap,
   type LucideIcon,
 } from "lucide-react";
-import { COLOR_CHOICES } from "@/lib/admin/resources";
 import type { ServiceRow } from "@/lib/types";
+import CapabilityVignette from "@/components/capabilities/CapabilityVignettes";
+import styles from "@/components/capabilities/capabilities.module.css";
+import {
+  CAPABILITY_EVENT,
+  findCapabilityIndex,
+  toCapabilities,
+  vignetteFor,
+} from "@/components/capabilities/serviceModel";
 
-// Audit fix: the modal's "Get Started" button was a dead control — it now
-// links to the real /quote flow.
-//
-// When the public Supabase project is connected, the section renders the
-// admin-managed rows passed in as props; otherwise the placeholder set below
-// keeps visual parity with the original site.
 const ICONS: Record<string, LucideIcon> = {
   bot: Bot,
   zap: Zap,
@@ -36,268 +36,174 @@ const ICONS: Record<string, LucideIcon> = {
   shield: Shield,
 };
 
-const placeholderServices = [
-  {
-    icon: Bot,
-    title: "AI Automation",
-    subtitle: "Intelligent Process Automation",
-    description:
-      "Transform your business operations with cutting-edge AI automation solutions.",
-    features: [
-      "Robotic Process Automation (RPA)",
-      "Intelligent Document Processing",
-      "Workflow Optimization",
-      "Predictive Analytics",
-      "Natural Language Processing",
-    ],
-    color: "from-blue-600 to-cyan-500",
-  },
-  {
-    icon: Zap,
-    title: "Smart Integrations",
-    subtitle: "Seamless System Connectivity",
-    description:
-      "Connect disparate systems with intelligent integration solutions.",
-    features: [
-      "API Development & Integration",
-      "Cloud Platform Connectivity",
-      "Data Synchronization",
-      "Legacy System Modernization",
-      "Real-time Data Processing",
-    ],
-    color: "from-purple-600 to-pink-500",
-  },
-  {
-    icon: BarChart3,
-    title: "Data Analytics",
-    subtitle: "Actionable Business Intelligence",
-    description:
-      "Turn raw data into actionable insights with advanced analytics.",
-    features: [
-      "Business Intelligence Dashboards",
-      "Predictive Modeling",
-      "Data Visualization",
-      "Machine Learning Models",
-      "Custom Analytics Solutions",
-    ],
-    color: "from-green-600 to-teal-500",
-  },
-  {
-    icon: Cloud,
-    title: "Cloud Solutions",
-    subtitle: "Scalable Infrastructure",
-    description:
-      "Build robust, scalable applications on modern cloud platforms.",
-    features: [
-      "Cloud Migration Services",
-      "Serverless Architecture",
-      "Container Orchestration",
-      "DevOps Implementation",
-      "Security & Compliance",
-    ],
-    color: "from-orange-600 to-red-500",
-  },
-];
+const EASE = [0.16, 1, 0.3, 1] as const;
 
-type Service = (typeof placeholderServices)[number];
+const ServicesSection = ({ services: rows }: { services?: ServiceRow[] | null }) => {
+  const capabilities = useMemo(() => toCapabilities(rows), [rows]);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const active = capabilities[Math.min(activeIndex, capabilities.length - 1)];
+  const reduceMotion = useReducedMotion();
 
-function toService(row: ServiceRow): Service {
-  const fallback = placeholderServices[0];
-  return {
-    icon: ICONS[row.icon ?? ""] ?? Bot,
-    title: row.title,
-    subtitle: row.subtitle ?? "",
-    description: row.description ?? "",
-    features: Array.isArray(row.features)
-      ? row.features.map((feature) => String(feature))
-      : [],
-    color:
-      row.color && (COLOR_CHOICES as readonly string[]).includes(row.color)
-        ? row.color
-        : fallback.color,
+  const select = useCallback(
+    (index: number, tab?: HTMLElement | null, focus = false) => {
+      setActiveIndex(index);
+      if (!tab) return;
+      if (focus) tab.focus({ preventScroll: true });
+      // Keep the chosen tab in view inside the scrolling rail without moving the page.
+      const rail = tab.parentElement;
+      if (rail && rail.scrollWidth > rail.clientWidth) {
+        const left = tab.offsetLeft - (rail.clientWidth - tab.offsetWidth) / 2;
+        rail.scrollTo({ left, behavior: reduceMotion ? "auto" : "smooth" });
+      }
+    },
+    [reduceMotion],
+  );
+
+  // Hero nodes ask for a capability by icon key.
+  useEffect(() => {
+    const onRequest = (event: Event) => {
+      const keys = (event as CustomEvent<{ keys: string[] }>).detail?.keys ?? [];
+      const index = findCapabilityIndex(capabilities, keys);
+      if (index !== -1) select(index);
+    };
+    window.addEventListener(CAPABILITY_EVENT, onRequest);
+    return () => window.removeEventListener(CAPABILITY_EVENT, onRequest);
+  }, [capabilities, select]);
+
+  const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    const last = capabilities.length - 1;
+    const moves: Record<string, number> = {
+      ArrowDown: activeIndex === last ? 0 : activeIndex + 1,
+      ArrowRight: activeIndex === last ? 0 : activeIndex + 1,
+      ArrowUp: activeIndex === 0 ? last : activeIndex - 1,
+      ArrowLeft: activeIndex === 0 ? last : activeIndex - 1,
+      Home: 0,
+      End: last,
+    };
+    if (!(event.key in moves)) return;
+    event.preventDefault();
+    const next = moves[event.key];
+    const tabs = event.currentTarget.querySelectorAll<HTMLElement>('[role="tab"]');
+    select(next, tabs[next] ?? null, true);
   };
-}
 
-const ServicesSection = ({
-  services: data,
-}: {
-  services?: ServiceRow[] | null;
-}) => {
-  // null/undefined → Supabase not connected → placeholders.
-  const services: Service[] =
-    data && data.length > 0 ? data.map(toService) : placeholderServices;
-
-  const [selectedService, setSelectedService] = useState<number | null>(null);
-  const active =
-    selectedService !== null ? services[selectedService] : null;
+  const ActiveIcon = ICONS[active.iconKey] ?? Bot;
 
   return (
-    <section
-      id="services"
-      className="py-20 bg-gray-900 scroll-mt-16"
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
-          <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-6">
-            Our Services
+    <section id="services" aria-labelledby="services-title" className="section-y scroll-mt-16">
+      <div className="shell">
+        <div className="max-w-3xl">
+          <h2 id="services-title" className="display-title">
+            Capabilities
           </h2>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            Comprehensive AI-powered solutions designed to accelerate your
-            digital transformation and unlock new possibilities for your
-            business.
+          <p className="body-lead mt-5">
+            Product engineering, AI, and automation in one place. Pick what you
+            need, or ask us to help shape the first version.
           </p>
-        </motion.div>
-
-        {/* Services Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {services.map((service, index) => (
-            <motion.div
-              key={service.title}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-              viewport={{ once: true }}
-              whileHover={{ y: -10, scale: 1.02 }}
-              className="relative group cursor-pointer"
-              onClick={() => setSelectedService(index)}
-            >
-              <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-8 h-full group-hover:border-cyan-500/50 transition-all duration-300 relative overflow-hidden">
-                {/* Background Gradient */}
-                <div
-                  className={`absolute inset-0 bg-gradient-to-br ${service.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}
-                />
-
-                {/* Icon */}
-                <div
-                  className={`w-16 h-16 bg-gradient-to-r ${service.color} rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}
-                >
-                  <service.icon
-                    className="w-8 h-8 text-white"
-                    aria-hidden="true"
-                  />
-                </div>
-
-                {/* Content */}
-                <h3 className="text-2xl font-bold text-white mb-2">
-                  {service.title}
-                </h3>
-                <p className="text-cyan-400 text-sm font-medium mb-4">
-                  {service.subtitle}
-                </p>
-                <p className="text-gray-300 leading-relaxed mb-6">
-                  {service.description}
-                </p>
-
-                {/* Learn More Button */}
-                <div className="flex items-center text-cyan-400 group-hover:text-cyan-300 transition-colors duration-200">
-                  <span className="text-sm font-medium">Learn More</span>
-                  <ArrowRight
-                    size={16}
-                    className="ml-2 group-hover:translate-x-1 transition-transform duration-200"
-                    aria-hidden="true"
-                  />
-                </div>
-
-                {/* Hover Effect */}
-                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-cyan-500 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300" />
-              </div>
-            </motion.div>
-          ))}
         </div>
-      </div>
 
-      {/* Service Detail Modal */}
-      <AnimatePresence>
-        {active && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-            onClick={() => setSelectedService(null)}
+        <div className="mt-12 md:mt-16">
+          <div
+            role="tablist"
+            aria-label="Capabilities"
+            onKeyDown={onKeyDown}
+            className="relative -mx-4 flex snap-x overflow-x-auto border-b border-line px-4 [mask-image:linear-gradient(to_right,transparent,black_1rem,black_calc(100%-2.5rem),transparent)] [scrollbar-width:none] sm:-mx-6 sm:px-6 lg:mx-0 lg:px-0 [&::-webkit-scrollbar]:hidden"
           >
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.8, opacity: 0 }}
-              transition={{ type: "spring", duration: 0.5 }}
-              role="dialog"
-              aria-modal="true"
-              aria-label={`${active.title} details`}
-              className="bg-gray-800 border border-gray-700 rounded-3xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center space-x-4">
-                  <div
-                    className={`w-12 h-12 bg-gradient-to-r ${active.color} rounded-xl flex items-center justify-center`}
-                  >
-                    <active.icon
-                      className="w-6 h-6 text-white"
+            {capabilities.map((capability, index) => {
+              const selected = index === activeIndex;
+              const Icon = ICONS[capability.iconKey] ?? Bot;
+              return (
+                <button
+                  key={capability.id}
+                  id={`capability-tab-${capability.id}`}
+                  type="button"
+                  role="tab"
+                  aria-selected={selected}
+                  aria-controls="capability-panel"
+                  tabIndex={selected ? 0 : -1}
+                  onClick={(event) => select(index, event.currentTarget)}
+                  className={`group relative flex min-h-12 shrink-0 snap-start items-center gap-2.5 px-4 py-3 text-left transition-colors duration-200 lg:px-5 ${
+                    selected ? "text-ink" : "text-ink-muted hover:text-ink"
+                  }`}
+                >
+                  {selected ? (
+                    <motion.span
+                      layoutId={reduceMotion ? undefined : "capability-indicator"}
+                      transition={{ duration: 0.35, ease: EASE }}
+                      className="absolute inset-x-0 bottom-[-1px] h-px bg-signal"
                       aria-hidden="true"
                     />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-bold text-white">
-                      {active.title}
-                    </h3>
-                    <p className="text-cyan-400">{active.subtitle}</p>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setSelectedService(null)}
-                  aria-label="Close service details"
-                  className="w-8 h-8 bg-gray-700 hover:bg-gray-600 rounded-full flex items-center justify-center text-gray-400 hover:text-white transition-colors duration-200"
-                >
-                  <X size={20} aria-hidden="true" />
+                  ) : null}
+                  <Icon
+                    className={`h-4 w-4 shrink-0 transition-colors ${selected ? "text-signal" : "text-ink-subtle group-hover:text-ink-muted"}`}
+                    aria-hidden="true"
+                  />
+                  <span className="whitespace-nowrap font-display text-xl">{capability.title}</span>
                 </button>
-              </div>
+              );
+            })}
+          </div>
 
-              <p className="text-gray-300 mb-6 leading-relaxed">
-                {active.description}
-              </p>
-
-              <h4 className="text-lg font-semibold text-white mb-4">
-                Key Features:
-              </h4>
-              <ul className="space-y-3">
-                {active.features.map((feature) => (
-                  <li
-                    key={feature}
-                    className="flex items-center space-x-3"
-                  >
-                    <div
-                      className={`w-2 h-2 bg-gradient-to-r ${active.color} rounded-full`}
-                    />
-                    <span className="text-gray-300">{feature}</span>
-                  </li>
-                ))}
-              </ul>
-
+          <div
+            id="capability-panel"
+            role="tabpanel"
+            aria-labelledby={`capability-tab-${active.id}`}
+            tabIndex={0}
+            className="mt-10 rounded-atelier-lg md:mt-12"
+          >
+            <AnimatePresence mode="wait" initial={false}>
+              {/* Quick fade out, then a blur-to-sharp settle in. */}
               <motion.div
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="mt-8"
+                key={active.id}
+                initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 8, filter: "blur(6px)" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                exit={{ opacity: 0, transition: { duration: 0.1 } }}
+                transition={{ duration: reduceMotion ? 0.01 : 0.38, ease: EASE }}
+                className="grid grid-cols-[minmax(0,1fr)] gap-8 lg:grid-cols-12 lg:gap-12"
               >
-                <Link
-                  href="/quote"
-                  className={`block w-full text-center bg-gradient-to-r ${active.color} text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-300`}
+                <div className="flex flex-col lg:col-span-5">
+                  <h3 className="flex items-center gap-3 font-display text-3xl text-ink md:text-[2.25rem] md:leading-tight">
+                    <ActiveIcon className="h-5 w-5 shrink-0 text-signal" aria-hidden="true" />
+                    {active.title}
+                  </h3>
+                  {active.subtitle ? (
+                    <p className="mt-2 text-sm font-medium text-signal">{active.subtitle}</p>
+                  ) : null}
+                  {active.description ? (
+                    <p className="mt-5 text-pretty text-base leading-relaxed text-ink-muted">
+                      {active.description}
+                    </p>
+                  ) : null}
+                  {active.features.length > 0 ? (
+                    <>
+                      <h4 className="mt-8 text-sm font-semibold text-ink">What this can include</h4>
+                      <ul className="mt-3 divide-y divide-line border-y border-line">
+                        {active.features.map((feature) => (
+                          <li key={feature} className="flex items-center gap-3 py-2.5 text-sm text-ink-muted">
+                            <span className="h-1 w-1 shrink-0 bg-signal" aria-hidden="true" />
+                            {feature}
+                          </li>
+                        ))}
+                      </ul>
+                    </>
+                  ) : null}
+                  <Link href="/quote" className="btn-primary mt-8 self-start">
+                    Get started with {active.title}
+                    <ArrowRight size={16} aria-hidden="true" />
+                  </Link>
+                </div>
+
+                <div
+                  aria-hidden="true"
+                  className={`${styles.stage} min-w-0 lg:sticky lg:top-24 lg:col-span-7 lg:self-start`}
                 >
-                  Get Started with {active.title}
-                </Link>
+                  <CapabilityVignette kind={vignetteFor(active.iconKey)} />
+                </div>
               </motion.div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            </AnimatePresence>
+          </div>
+        </div>
+      </div>
     </section>
   );
 };

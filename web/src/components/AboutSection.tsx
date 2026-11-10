@@ -1,80 +1,60 @@
-"use client";
+import ProcessLine from "@/components/sections/ProcessLine";
 
-import { motion } from "framer-motion";
-import { Target, Eye, Heart } from "lucide-react";
-
-// Audit fixes folded in:
-// - "Team" value card removed (plan §12: no Team page, no Team references).
-// - Unverified stats row (15+ team members / 50+ projects / 25+ clients)
-//   removed until real numbers are confirmed (plan §12).
-// - Founder's Message block removed entirely (owner decision, Phase 3):
-//   no stock photo, no placeholder bio — nothing fabricated.
-const values = [
+const pillars = [
   {
-    icon: Target,
-    title: "Mission",
+    title: "Engineering",
     description:
-      "To democratize AI technology and make intelligent automation accessible to businesses of all sizes.",
+      "Websites, apps, and platforms that are clear to use and easier to maintain over time.",
   },
   {
-    icon: Eye,
-    title: "Vision",
+    title: "AI",
     description:
-      "A world where AI amplifies human potential and creates sustainable competitive advantages.",
+      "Chatbots, voice agents, and custom AI wired into the work your team already does. Not demos for demos' sake.",
   },
   {
-    icon: Heart,
-    title: "Values",
+    title: "Automation",
     description:
-      "Innovation, integrity, and impact drive everything we do. We believe in ethical AI solutions.",
+      "Workflows and integrations that cut repetitive work so people can spend time on the decisions that matter.",
   },
 ];
 
+/**
+ * "How we build": positioning copy, the three disciplines, and the process line.
+ * Rendered on the server; only the process line hydrates. No entrance animation
+ * on the copy, so server and client HTML always match (fixes the reduced-motion
+ * hydration mismatch).
+ */
 const AboutSection = () => {
   return (
-    <section id="about" className="py-20 bg-gray-800/50 backdrop-blur-sm scroll-mt-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
-          <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-6">
-            About AorySoft
-          </h2>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            We&apos;re not just another software company. We&apos;re AI-first
-            innovators building the future of intelligent automation and
-            seamless integrations.
-          </p>
-        </motion.div>
+    <section id="about" aria-labelledby="about-title" className="section-y scroll-mt-16 border-t border-line bg-surface">
+      <div className="shell">
+        <div className="grid gap-12 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:gap-20">
+          <div>
+            <h2 id="about-title" className="display-title">
+              How we build
+            </h2>
+            <p className="body-lead mt-5">
+              We help teams ship digital products, AI features, and automation
+              that hold up in day-to-day use. Software first, AI where it
+              earns its place, and a process you can follow without guesswork.
+            </p>
+            <p className="mt-4 max-w-measure text-base leading-relaxed text-ink-subtle">
+              We care about honest delivery: clear communication, realistic
+              timelines, and work we are willing to stand behind.
+            </p>
+          </div>
 
-        {/* Values Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {values.map((value, index) => (
-            <motion.div
-              key={value.title}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-              viewport={{ once: true }}
-              whileHover={{ y: -5 }}
-              className="bg-gray-900/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-6 text-center group hover:border-cyan-500/50 transition-all duration-300"
-            >
-              <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                <value.icon className="w-8 h-8 text-white" aria-hidden="true" />
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-3">
-                {value.title}
-              </h3>
-              <p className="text-gray-400 leading-relaxed">{value.description}</p>
-            </motion.div>
-          ))}
+          <ul className="space-y-8">
+            {pillars.map((pillar) => (
+              <li key={pillar.title} className="border-t border-line pt-6">
+                <h3 className="font-display text-2xl text-ink">{pillar.title}</h3>
+                <p className="mt-2 text-base leading-relaxed text-ink-muted">{pillar.description}</p>
+              </li>
+            ))}
+          </ul>
         </div>
 
+        <ProcessLine />
       </div>
     </section>
   );

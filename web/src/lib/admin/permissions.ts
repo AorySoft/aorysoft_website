@@ -17,6 +17,7 @@ export type Area =
   | "categories"
   | "services"
   | "jobs"
+  | "reviews"
   | "media"
   | "submissions"
   | "newsletter"
@@ -28,6 +29,7 @@ const EDITOR_AREAS: ReadonlySet<Area> = new Set([
   "categories",
   "services",
   "jobs",
+  "reviews",
   "media",
   "submissions",
 ]);
