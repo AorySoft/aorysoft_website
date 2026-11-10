@@ -31,6 +31,7 @@ import {
 import { checkRateLimit } from "./rate-limit";
 import { verifyTurnstile } from "./turnstile";
 import { signToken } from "./tokens";
+import { loadOpenInvite } from "./review-invites";
 import {
   validateContactForm,
   validateQuoteForm,
@@ -300,7 +301,8 @@ export async function subscribeNewsletter(
 }
 
 /**
- * Public review submission → `reviews` row with status=pending.
+ * Invite-only review submission → `reviews` row with status=pending.
+ * Requires a valid open invite token (no public homepage form).
  * Admin must confirm permission and publish before public display.
  */
 export async function submitReview(
@@ -313,6 +315,15 @@ export async function submitReview(
   }
 
   const fields = Object.fromEntries(formData.entries());
+  const invite = await loadOpenInvite(fields.inviteToken);
+  if (!invite.ok) {
+    return {
+      status: "error",
+      message:
+        "This feedback link is invalid or no longer available. Ask AorySoft for a new invite.",
+    };
+  }
+
   const validated = validateReviewForm(fields);
   if (!validated.ok) return fieldErrorState(validated.errors);
 
@@ -320,23 +331,44 @@ export async function submitReview(
   if (blocked) return blocked;
 
   const supabase = getServiceClient()!;
-  const { error } = await supabase.from("reviews").insert({
-    display_name: validated.value.displayName,
-    review_text: validated.value.reviewText,
-    rating: validated.value.rating,
-    source: "website",
-    project_or_service: validated.value.projectOrService,
-    attribution: "Website submission",
-    submitter_email: validated.value.email,
-    permission_confirmed: false,
-    featured: false,
-    status: "pending",
-    sort_order: 0,
-  });
+  const { data: review, error } = await supabase
+    .from("reviews")
+    .insert({
+      display_name: validated.value.displayName,
+      review_text: validated.value.reviewText,
+      rating: validated.value.rating,
+      source: "website",
+      project_or_service:
+        validated.value.projectOrService ?? invite.invite.project_or_service,
+      attribution: "Client invite",
+      submitter_email: validated.value.email,
+      permission_confirmed: false,
+      featured: false,
+      status: "pending",
+      sort_order: 0,
+    })
+    .select("id")
+    .single();
 
-  if (error) {
+  if (error || !review) {
     console.error("[forms] review insert failed:", error);
     return { status: "error", message: GENERIC_FAILURE };
+  }
+
+  const { error: inviteError } = await supabase
+    .from("review_invites")
+    .update({
+      status: "used",
+      used_at: new Date().toISOString(),
+      review_id: review.id,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", invite.invite.id)
+    .eq("status", "open");
+
+  if (inviteError) {
+    // Review is saved; invite mark-used failure is logged for ops.
+    console.error("[forms] review invite redeem failed:", inviteError);
   }
 
   revalidatePath("/admin/reviews");
@@ -344,6 +376,6 @@ export async function submitReview(
   return {
     status: "success",
     message:
-      "Thanks! Your review was received and will appear only after we confirm permission and publish it.",
+      "Thanks! Your feedback was received. It will appear on the site only after we review and publish it.",
   };
 }

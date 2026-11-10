@@ -10,7 +10,12 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/admin", "/newsletter/confirm", "/newsletter/unsubscribe"],
+        disallow: [
+          "/admin",
+          "/feedback",
+          "/newsletter/confirm",
+          "/newsletter/unsubscribe",
+        ],
       },
     ],
     sitemap: `${siteUrl}/sitemap.xml`,

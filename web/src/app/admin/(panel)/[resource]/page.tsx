@@ -7,6 +7,7 @@ import {
 } from "@/lib/admin/resources";
 import { canEdit, canDelete, canView, type Role } from "@/lib/admin/permissions";
 import ResourceTable from "../components/ResourceTable";
+import ReviewInvitePanel from "../components/ReviewInvitePanel";
 
 export default async function ResourceListPage({
   params,
@@ -76,6 +77,8 @@ export default async function ResourceListPage({
           Could not load {def.title.toLowerCase()}: {error.message}
         </p>
       )}
+
+      {key === "reviews" && canEdit(role, key) ? <ReviewInvitePanel /> : null}
 
       <ResourceTable
         def={def}

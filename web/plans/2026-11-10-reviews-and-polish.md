@@ -13,7 +13,7 @@
 
 - No fabricated review seed rows.
 - No Playwright E2E install.
-- Public review UX stays open form (Turnstile pipeline); invite/token deferred.
+- Reviews are invite-only: admin mints `/feedback?token=…`; no public homepage form.
 
 ## Verification
 
