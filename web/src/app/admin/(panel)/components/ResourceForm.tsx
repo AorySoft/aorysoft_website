@@ -12,9 +12,9 @@ import {
 const initialState: ActionState = { ok: true };
 
 const inputClasses =
-  "w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white placeholder-gray-500 focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-400/20";
+  "w-full rounded-atelier border border-line bg-surface-raised px-3 py-2 text-sm text-ink placeholder-ink-subtle focus:border-signal focus:outline-none focus:ring-2 focus:ring-signal/20";
 
-const labelClasses = "block text-sm font-medium text-gray-300 mb-1.5";
+const labelClasses = "block text-sm font-medium text-ink-muted mb-1.5";
 
 function Field({
   def,
@@ -56,7 +56,7 @@ function Field({
           id={def.name}
           name={def.name}
           defaultChecked={value === true}
-          className="h-4 w-4 rounded border-gray-600 bg-gray-800 text-cyan-500 focus:ring-cyan-400/40"
+          className="h-4 w-4 rounded border-gray-600 bg-surface-raised text-cyan-500 focus:ring-cyan-400/40"
         />
       );
       break;
@@ -181,7 +181,7 @@ function Field({
       </label>
       <div className={def.kind === "checkbox" ? "pt-1" : ""}>{control}</div>
       {def.help && (
-        <p className="mt-1 text-xs text-gray-500">{def.help}</p>
+        <p className="mt-1 text-xs text-ink-subtle">{def.help}</p>
       )}
       {error && (
         <p
@@ -230,7 +230,7 @@ export default function ResourceForm({
       {state.error && (
         <p
           role="alert"
-          className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300"
+          className="rounded-atelier-lg border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300"
         >
           {state.error}
         </p>
@@ -239,10 +239,10 @@ export default function ResourceForm({
       {fieldsets.map((fieldset) => (
         <section
           key={fieldset || "fields"}
-          className="space-y-4 rounded-2xl border border-gray-800 bg-gray-900/60 p-6"
+          className="space-y-4 rounded-atelier-lg border border-line bg-surface/80 p-6"
         >
           {fieldset && (
-            <h2 className="text-lg font-semibold text-white">{fieldset}</h2>
+            <h2 className="text-lg font-semibold text-ink">{fieldset}</h2>
           )}
           <div
             className={
@@ -281,13 +281,13 @@ export default function ResourceForm({
         <button
           type="submit"
           disabled={pending}
-          className="rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 px-6 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/50 disabled:opacity-60"
+          className="rounded-atelier-lg bg-signal px-6 py-2.5 text-sm font-semibold text-canvas transition-all duration-200 hover:shadow-lg hover:shadow-signal disabled:opacity-60"
         >
           {pending ? "Saving…" : isEdit ? "Save changes" : `Create ${def.singular}`}
         </button>
         <Link
           href={`/admin/${def.key}`}
-          className="text-sm text-gray-400 transition-colors duration-200 hover:text-white"
+          className="text-sm text-ink-subtle transition-colors duration-200 hover:text-ink"
         >
           Cancel
         </Link>

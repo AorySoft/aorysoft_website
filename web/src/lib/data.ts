@@ -4,7 +4,7 @@
 // and the admin panel shows the honest "connect Supabase" setup state.
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { isPublicSupabaseConfigured } from "@/lib/supabase/admin";
-import type { JobRow, PostRow, ServiceRow } from "@/lib/types";
+import type { JobRow, PostRow, ReviewRow, ServiceRow } from "@/lib/types";
 
 let anonClient: SupabaseClient | null = null;
 
@@ -94,5 +94,26 @@ export async function getActiveJobs(): Promise<JobRow[] | null> {
       )
       .eq("active", true)
       .order("created_at", { ascending: false }),
+  );
+}
+
+export type ReviewWithImage = ReviewRow & {
+  profile_image: { url: string; alt: string } | null;
+};
+
+/** Published reviews with confirmed display permission (RLS + filters). */
+export async function getPublishedReviews(): Promise<ReviewWithImage[] | null> {
+  return safeQuery((client) =>
+    client
+      .from("reviews")
+      .select(
+        "id, display_name, review_text, rating, source, source_url, project_or_service, attribution, profile_image_id, permission_confirmed, featured, status, submitter_email, sort_order, created_at, updated_at, profile_image:media!profile_image_id(url, alt)",
+      )
+      .eq("status", "published")
+      .eq("permission_confirmed", true)
+      .order("featured", { ascending: false })
+      .order("sort_order", { ascending: true })
+      .order("created_at", { ascending: false })
+      .returns<ReviewWithImage[]>(),
   );
 }

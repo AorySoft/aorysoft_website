@@ -34,6 +34,7 @@ import { signToken } from "./tokens";
 import {
   validateContactForm,
   validateQuoteForm,
+  validateReviewForm,
   validEmail,
   type ValidContact,
   type ValidQuote,
@@ -184,7 +185,7 @@ export async function submitContact(
 
   return {
     status: "success",
-    message: "Thanks! Your message is on its way — we'll reply within 24 hours.",
+    message: "Thanks! Your message is on its way. We'll reply within 24 hours.",
   };
 }
 
@@ -236,7 +237,7 @@ export async function submitQuote(
 
   return {
     status: "success",
-    message: "Thanks! Your quote request is in — we'll get back to you within 24 hours.",
+    message: "Thanks! Your quote request is in. We'll get back to you within 24 hours.",
   };
 }
 
@@ -295,5 +296,54 @@ export async function subscribeNewsletter(
   return {
     status: "success",
     message: "Thanks! Check your inbox to confirm your subscription.",
+  };
+}
+
+/**
+ * Public review submission → `reviews` row with status=pending.
+ * Admin must confirm permission and publish before public display.
+ */
+export async function submitReview(
+  _previous: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  if (!isSupabaseConfigured()) {
+    console.error("[forms] submitReview: Supabase is not configured.");
+    return { status: "error", message: GENERIC_FAILURE };
+  }
+
+  const fields = Object.fromEntries(formData.entries());
+  const validated = validateReviewForm(fields);
+  if (!validated.ok) return fieldErrorState(validated.errors);
+
+  const blocked = await guard(fields, validated.value.email);
+  if (blocked) return blocked;
+
+  const supabase = getServiceClient()!;
+  const { error } = await supabase.from("reviews").insert({
+    display_name: validated.value.displayName,
+    review_text: validated.value.reviewText,
+    rating: validated.value.rating,
+    source: "website",
+    project_or_service: validated.value.projectOrService,
+    attribution: "Website submission",
+    submitter_email: validated.value.email,
+    permission_confirmed: false,
+    featured: false,
+    status: "pending",
+    sort_order: 0,
+  });
+
+  if (error) {
+    console.error("[forms] review insert failed:", error);
+    return { status: "error", message: GENERIC_FAILURE };
+  }
+
+  revalidatePath("/admin/reviews");
+
+  return {
+    status: "success",
+    message:
+      "Thanks! Your review was received and will appear only after we confirm permission and publish it.",
   };
 }

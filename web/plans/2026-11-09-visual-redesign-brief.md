@@ -1,6 +1,6 @@
 # AorySoft Visual Redesign Brief
 
-**Status:** Planning only — **awaiting explicit approval** before any implementation, comps, or website code changes.  
+**Status:** Option A (**Signal Atelier**) approved and implemented in `web/` (2026-11-09).  
 **Date:** 2026-11-09  
 **Build path (workflow):** `comp` for public landing/showcase; code-first for admin/app screens (`.impeccable/config.json`).
 

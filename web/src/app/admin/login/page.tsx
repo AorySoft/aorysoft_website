@@ -3,7 +3,7 @@ import { LoginForm } from "./LoginForm";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Admin sign in — AorySoft",
+  title: "Admin sign in | AorySoft",
   robots: { index: false, follow: false },
 };
 

@@ -27,6 +27,7 @@ export default async function AdminDashboard() {
     draftPosts: Count;
     activeJobs: Count;
     activeServices: Count;
+    pendingReviews: Count;
     newSubmissions: Count;
     confirmedSubscribers: Count;
   } | null = null;
@@ -38,6 +39,7 @@ export default async function AdminDashboard() {
       draftPosts,
       activeJobs,
       activeServices,
+      pendingReviews,
       newSubmissions,
       confirmedSubscribers,
     ] = await Promise.all([
@@ -45,6 +47,7 @@ export default async function AdminDashboard() {
       count(supabase, "posts", ["status", "draft"]),
       count(supabase, "jobs", ["active", true]),
       count(supabase, "services", ["active", true]),
+      count(supabase, "reviews", ["status", "pending"]),
       count(supabase, "submissions", ["status", "new"]),
       count(supabase, "newsletter_subscribers", ["status", "confirmed"]),
     ]);
@@ -53,6 +56,7 @@ export default async function AdminDashboard() {
       draftPosts,
       activeJobs,
       activeServices,
+      pendingReviews,
       newSubmissions,
       confirmedSubscribers,
     };
@@ -61,6 +65,7 @@ export default async function AdminDashboard() {
   const cards: { label: string; value: Count; href: string }[] = counts
     ? [
         { label: "New submissions", value: counts.newSubmissions, href: "/admin/submissions" },
+        { label: "Pending reviews", value: counts.pendingReviews, href: "/admin/reviews" },
         { label: "Published posts", value: counts.publishedPosts, href: "/admin/posts" },
         { label: "Draft posts", value: counts.draftPosts, href: "/admin/posts" },
         { label: "Active services", value: counts.activeServices, href: "/admin/services" },
@@ -85,14 +90,14 @@ export default async function AdminDashboard() {
             <Link
               key={card.label}
               href={card.href}
-              className="rounded-2xl border border-gray-800 bg-gray-900/60 p-6 transition-colors duration-200 hover:border-cyan-500/50"
+              className="rounded-atelier-lg border border-line bg-surface/80 p-6 transition-colors duration-200 hover:border-signal/50"
             >
-              <p className="text-sm text-gray-400">{card.label}</p>
-              <p className="mt-2 text-3xl font-bold text-white">
+              <p className="text-sm text-ink-subtle">{card.label}</p>
+              <p className="mt-2 text-3xl font-bold text-ink">
                 {card.value ?? "—"}
               </p>
               {card.value === null && (
-                <p className="mt-1 text-xs text-gray-500">
+                <p className="mt-1 text-xs text-ink-subtle">
                   Not visible with your role (RLS).
                 </p>
               )}
@@ -102,7 +107,7 @@ export default async function AdminDashboard() {
       )}
 
       {configured && (
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-ink-subtle">
           Counts run under your session with RLS applied — a dash means that
           area is not visible to your role, not that something is broken.
         </p>

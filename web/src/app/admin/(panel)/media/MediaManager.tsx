@@ -135,11 +135,11 @@ export default function MediaManager({
       {editable && (
         <form
           onSubmit={handleUpload}
-          className="space-y-3 rounded-2xl border border-gray-800 bg-gray-900/60 p-6"
+          className="space-y-3 rounded-atelier-lg border border-line bg-surface/80 p-6"
         >
           <label
             htmlFor="media-file"
-            className="block text-sm font-medium text-gray-300"
+            className="block text-sm font-medium text-ink-muted"
           >
             Upload image
           </label>
@@ -149,17 +149,17 @@ export default function MediaManager({
               id="media-file"
               type="file"
               accept="image/*"
-              className="text-sm text-gray-400 file:mr-4 file:rounded-lg file:border-0 file:bg-gray-800 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white"
+              className="text-sm text-ink-subtle file:mr-4 file:rounded-atelier file:border-0 file:bg-surface-raised file:px-4 file:py-2 file:text-sm file:font-medium file:text-ink"
             />
             <button
               type="submit"
               disabled={busy}
-              className="rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 px-5 py-2 text-sm font-semibold text-white transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/50 disabled:opacity-60"
+              className="rounded-atelier-lg bg-signal px-5 py-2 text-sm font-semibold text-canvas transition-all duration-200 hover:shadow-lg hover:shadow-signal disabled:opacity-60"
             >
               {busy ? "Working…" : "Upload"}
             </button>
           </div>
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-ink-subtle">
             Images only, max 10 MB. Uploads go directly to Supabase Storage
             under your session — storage policies only allow admin writes.
           </p>
@@ -167,20 +167,20 @@ export default function MediaManager({
       )}
 
       {message && (
-        <p role="status" className="rounded-xl border border-cyan-500/30 bg-cyan-500/10 p-3 text-sm text-cyan-200">
+        <p role="status" className="rounded-atelier-lg border border-cyan-500/30 bg-cyan-500/10 p-3 text-sm text-cyan-200">
           {message}
         </p>
       )}
       {error && (
-        <p role="alert" className="rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">
+        <p role="alert" className="rounded-atelier-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">
           {error}
         </p>
       )}
 
       {items.length === 0 ? (
-        <div className="rounded-2xl border border-gray-800 bg-gray-900/60 p-10 text-center">
-          <p className="font-medium text-white">Media library is empty</p>
-          <p className="mt-1 text-sm text-gray-400">
+        <div className="rounded-atelier-lg border border-line bg-surface/80 p-10 text-center">
+          <p className="font-medium text-ink">Media library is empty</p>
+          <p className="mt-1 text-sm text-ink-subtle">
             Uploaded images appear here and can be attached to posts as cover
             images.
           </p>
@@ -190,7 +190,7 @@ export default function MediaManager({
           {items.map((item) => (
             <div
               key={item.id}
-              className="overflow-hidden rounded-2xl border border-gray-800 bg-gray-900/60"
+              className="overflow-hidden rounded-atelier-lg border border-line bg-surface/80"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -200,14 +200,14 @@ export default function MediaManager({
                 className="h-40 w-full object-cover"
               />
               <div className="space-y-3 p-4">
-                <p className="truncate text-xs text-gray-500">
+                <p className="truncate text-xs text-ink-subtle">
                   {item.storage_path}
                 </p>
                 {editable && (
                   <div className="space-y-2">
                     <label
                       htmlFor={`alt-${item.id}`}
-                      className="text-xs font-medium text-gray-400"
+                      className="text-xs font-medium text-ink-subtle"
                     >
                       Alt text
                     </label>
@@ -222,7 +222,7 @@ export default function MediaManager({
                           [item.id]: event.target.value,
                         })
                       }
-                      className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-1.5 text-sm text-white focus:border-cyan-400 focus:outline-none"
+                      className="w-full rounded-atelier border border-line bg-surface-raised px-3 py-1.5 text-sm text-ink focus:border-signal focus:outline-none"
                       placeholder="Describe the image"
                     />
                   </div>
@@ -233,7 +233,7 @@ export default function MediaManager({
                       type="button"
                       onClick={() => saveAlt(item)}
                       disabled={busy}
-                      className="rounded-lg bg-gray-800 px-3 py-1.5 text-xs text-gray-200 transition-colors duration-200 hover:bg-gray-700 disabled:opacity-50"
+                      className="rounded-atelier bg-surface-raised px-3 py-1.5 text-xs text-ink-muted transition-colors duration-200 hover:bg-surface-raised disabled:opacity-50"
                     >
                       Save alt
                     </button>
@@ -241,7 +241,7 @@ export default function MediaManager({
                   <button
                     type="button"
                     onClick={() => copyUrl(item.url)}
-                    className="rounded-lg bg-gray-800 px-3 py-1.5 text-xs text-gray-200 transition-colors duration-200 hover:bg-gray-700"
+                    className="rounded-atelier bg-surface-raised px-3 py-1.5 text-xs text-ink-muted transition-colors duration-200 hover:bg-surface-raised"
                   >
                     Copy URL
                   </button>
@@ -250,7 +250,7 @@ export default function MediaManager({
                       type="button"
                       onClick={() => removeItem(item)}
                       disabled={busy}
-                      className="rounded-lg border border-gray-700 px-3 py-1.5 text-xs text-gray-300 transition-colors duration-200 hover:border-red-500/50 hover:text-red-400 disabled:opacity-50"
+                      className="rounded-atelier border border-line px-3 py-1.5 text-xs text-ink-muted transition-colors duration-200 hover:border-red-500/50 hover:text-red-400 disabled:opacity-50"
                     >
                       Delete
                     </button>

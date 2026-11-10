@@ -19,6 +19,7 @@ const items: NavItem[] = [
   { href: "/admin/categories", label: "Categories", area: "categories" },
   { href: "/admin/services", label: "Services", area: "services" },
   { href: "/admin/jobs", label: "Jobs", area: "jobs" },
+  { href: "/admin/reviews", label: "Reviews", area: "reviews" },
   { href: "/admin/media", label: "Media", area: "media" },
   { href: "/admin/submissions", label: "Submissions", area: "submissions" },
   { href: "/admin/newsletter", label: "Newsletter", area: "newsletter" },
@@ -53,10 +54,10 @@ export default function AdminNav({
             key={item.href}
             href={item.href}
             aria-current={active ? "page" : undefined}
-            className={`block rounded-lg px-3 py-2 text-sm transition-colors duration-200 ${
+            className={`block rounded-atelier px-3 py-2 text-sm transition-colors duration-200 ${
               active
-                ? "bg-gradient-to-r from-blue-600/30 to-cyan-500/20 text-cyan-300 font-medium"
-                : "text-gray-300 hover:bg-gray-800 hover:text-white"
+                ? "bg-signal/15 font-medium text-signal"
+                : "text-ink-muted hover:bg-surface-raised hover:text-ink"
             }`}
           >
             {item.label}
@@ -70,7 +71,7 @@ export default function AdminNav({
     return (
       <div className="space-y-4">
         {nav}
-        <div className="border-t border-gray-800 pt-4 text-xs text-gray-500">
+        <div className="border-t border-line pt-4 text-xs text-ink-subtle">
           {email} · {role ?? "no role"}
         </div>
       </div>
@@ -79,18 +80,18 @@ export default function AdminNav({
 
   return (
     <div className="flex h-full flex-col">
-      <div className="mb-4 border-b border-gray-800 pb-4">
-        <p className="text-sm font-semibold text-white">AorySoft Admin</p>
-        <p className="mt-1 truncate text-xs text-gray-500">
+      <div className="mb-4 border-b border-line pb-4">
+        <p className="text-sm font-semibold text-ink">AorySoft Admin</p>
+        <p className="mt-1 truncate text-xs text-ink-subtle">
           {email} · {role ?? "no role assigned"}
         </p>
       </div>
       {nav}
-      <div className="mt-auto border-t border-gray-800 pt-4">
+      <div className="mt-auto border-t border-line pt-4">
         <form action={signOut}>
           <button
             type="submit"
-            className="w-full rounded-lg px-3 py-2 text-left text-sm text-gray-300 transition-colors duration-200 hover:bg-gray-800 hover:text-white"
+            className="w-full rounded-atelier px-3 py-2 text-left text-sm text-ink-muted transition-colors duration-200 hover:bg-surface-raised hover:text-ink"
           >
             Sign out
           </button>

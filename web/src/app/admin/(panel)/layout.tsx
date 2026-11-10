@@ -35,16 +35,14 @@ export default async function AdminPanelLayout({
     : null;
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className="min-h-screen bg-canvas text-ink">
       <div className="mx-auto flex max-w-7xl">
-        {/* Sidebar */}
-        <aside className="sticky top-16 hidden h-[calc(100vh-4rem)] w-60 shrink-0 flex-col border-r border-gray-800 p-4 md:flex">
+        <aside className="sticky top-16 hidden h-[calc(100vh-4rem)] w-60 shrink-0 flex-col border-r border-line bg-surface p-4 md:flex">
           <AdminNav role={role} email={user.email ?? ""} />
         </aside>
 
-        {/* Mobile nav */}
         <div className="flex-1">
-          <div className="border-b border-gray-800 p-4 md:hidden">
+          <div className="border-b border-line p-4 md:hidden">
             <AdminNav role={role} email={user.email ?? ""} mobile />
           </div>
           <main className="p-6 md:p-8">{children}</main>

@@ -21,7 +21,7 @@ export default async function SettingsPage() {
 
   if (!canView(role, "settings")) {
     return (
-      <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-6 text-sm text-amber-200">
+      <div className="rounded-atelier-lg border border-amber-500/30 bg-amber-500/10 p-6 text-sm text-amber-200">
         Site settings are owner-only (plan §5.5). Your account currently has
         the editor role.
       </div>
@@ -36,7 +36,7 @@ export default async function SettingsPage() {
 
   if (error) {
     return (
-      <p role="alert" className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300">
+      <p role="alert" className="rounded-atelier-lg border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300">
         Could not load settings: {error.message}
       </p>
     );
@@ -46,7 +46,7 @@ export default async function SettingsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold">Site Settings</h1>
-        <p className="mt-1 text-sm text-gray-500">
+        <p className="mt-1 text-sm text-ink-subtle">
           Hero copy, about text, industries, technologies, CTA and footer
           contact. Owner-only. These values drive the public pages once
           connected; placeholders render until settings exist.

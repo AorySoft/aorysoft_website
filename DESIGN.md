@@ -1,210 +1,159 @@
 ---
-name: AorySoft (incumbent)
-description: As-shipped dark blue–cyan marketing UI before redesign approval
+name: AorySoft
+description: Signal Atelier — premium AI-first technology marketing identity
 colors:
-  canvas: "#111827"
-  surface: "#1f2937"
-  surface-raised: "#374151"
-  ink: "#ffffff"
-  ink-muted: "#d1d5db"
-  ink-subtle: "#9ca3af"
-  accent-blue: "#2563eb"
-  accent-blue-mid: "#3b82f6"
-  accent-cyan: "#06b6d4"
-  accent-cyan-bright: "#22d3ee"
-  hero-blue-deep: "#1e3a8a"
+  canvas: "#000000"
+  surface: "#0b0f14"
+  surface-raised: "#121820"
+  line: "#1e2836"
+  ink: "#f4f7fa"
+  ink-muted: "#a8b3c2"
+  ink-subtle: "#7b8796"
+  signal: "#06b6d4"
+  signal-deep: "#2563eb"
 typography:
   display:
-    fontFamily: "ui-sans-serif, system-ui, sans-serif"
-    fontSize: "4.5rem"
-    fontWeight: 700
-    lineHeight: 1.25
-  headline:
-    fontFamily: "ui-sans-serif, system-ui, sans-serif"
-    fontSize: "3rem"
-    fontWeight: 700
-    lineHeight: 1.25
-  title:
-    fontFamily: "ui-sans-serif, system-ui, sans-serif"
-    fontSize: "1.25rem"
-    fontWeight: 600
-    lineHeight: 1.4
-  body:
-    fontFamily: "ui-sans-serif, system-ui, sans-serif"
-    fontSize: "1.25rem"
+    fontFamily: "Instrument Serif, Georgia, serif"
+    fontSize: "3.25rem"
     fontWeight: 400
-    lineHeight: 1.625
+    lineHeight: 1.12
+    letterSpacing: "-0.02em"
+  headline:
+    fontFamily: "Instrument Serif, Georgia, serif"
+    fontSize: "2.25rem"
+    fontWeight: 400
+    lineHeight: 1.2
+  title:
+    fontFamily: "Instrument Serif, Georgia, serif"
+    fontSize: "1.5rem"
+    fontWeight: 400
+    lineHeight: 1.3
+  body:
+    fontFamily: "DM Sans, system-ui, sans-serif"
+    fontSize: "1.125rem"
+    fontWeight: 400
+    lineHeight: 1.65
   label:
-    fontFamily: "ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "DM Sans, system-ui, sans-serif"
     fontSize: "0.875rem"
     fontWeight: 500
     lineHeight: 1.4
 rounded:
-  sm: "8px"
-  md: "12px"
-  lg: "16px"
-  xl: "24px"
-  pill: "9999px"
+  atelier: "6px"
+  atelier-lg: "10px"
 spacing:
   section-y: "80px"
   container-x: "32px"
-  stack-md: "24px"
-  stack-lg: "64px"
 components:
   button-primary:
-    backgroundColor: "linear-gradient(to right, {colors.accent-blue}, {colors.accent-cyan})"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.pill}"
-    padding: "16px 32px"
-  button-primary-hover:
-    backgroundColor: "linear-gradient(to right, {colors.accent-blue}, {colors.accent-cyan})"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.pill}"
+    backgroundColor: "{colors.signal}"
+    textColor: "{colors.canvas}"
+    rounded: "{rounded.atelier}"
+    padding: "12px 24px"
   button-secondary:
     backgroundColor: "transparent"
-    textColor: "{colors.accent-cyan-bright}"
-    rounded: "{rounded.pill}"
-    padding: "16px 32px"
-  card-surface:
-    backgroundColor: "rgba(17, 24, 39, 0.5)"
     textColor: "{colors.ink}"
-    rounded: "{rounded.lg}"
-    padding: "24px"
+    rounded: "{rounded.atelier}"
+    padding: "12px 24px"
   input-field:
-    backgroundColor: "{colors.surface}"
+    backgroundColor: "{colors.surface-raised}"
     textColor: "{colors.ink}"
-    rounded: "{rounded.md}"
+    rounded: "{rounded.atelier-lg}"
     padding: "12px 16px"
-  nav-link-active:
-    backgroundColor: "transparent"
-    textColor: "{colors.accent-cyan-bright}"
 ---
 
-# Design System: AorySoft (Incumbent)
-
-> **Status:** Documentation of the **as-shipped** public marketing UI in `web/`. This file is a baseline / anti-reference for redesign planning. It is **not** the approved future visual world. Admin (`/admin`) reuses the same dark gray + cyan vocabulary with denser tooling UI; tokens below describe the public site first.
+# Design System: AorySoft
 
 ## Overview
 
-**Creative North Star: "Neon Gradient Agency Kit"**
+**Creative North Star: "Signal Atelier"**
 
-The incumbent site is a dark-mode marketing template: near-black canvas, blue→cyan gradient accents, glassmorphic bordered cards, pill CTAs, Lucide icons in gradient circles, and Framer Motion fade/slide reveals on almost every section. Typography is the browser/system sans stack — no custom display face is loaded. Atmosphere comes from animated particles, grid overlays, backdrop blur, and cyan glow shadows rather than photography or product craft.
+AorySoft’s public identity is a precision AI engineering studio on a true-black stage. The official geometric **A** mark owns the blue→cyan gradient; UI samples those hues sparingly as signal accents. Instrument Serif carries authority in display and headings; DM Sans handles product UI and body. Geometry stays precise and restrained — not pill-chrome, not neon template noise.
 
-Density is medium-high: each home section repeats a centered headline + supporting sentence + card/grid pattern. Brand mark is a Zap icon in a rounded square plus gradient wordmark. The look reads as generic “AI SaaS agency 2024” more than a distinctive AorySoft identity.
+Admin (`/admin`) shares the same tokens in Operate mode: denser, quieter, without marketing atmosphere.
 
 **Key Characteristics:**
-- Dark gray-900 canvas with alternating gray-800/30 section bands
-- Single accent axis: Tailwind blue ↔ cyan gradients
-- System sans, bold gradient-clipped headlines
-- Pill buttons + large-radius glass cards
-- Motion-first: particles, hover scale, per-section whileInView entrances
-- No design tokens in CSS variables; stock Tailwind 3 defaults only (`tailwind.config.ts` intentionally unextended)
+- True black / graphite surfaces with cool mist text
+- Signal cyan (and deep blue) used rarely; logo keeps the full gradient
+- Sharp serif display + clean sans body
+- Editorial sections over card grids where possible
+- 2–3 intentional motions (hero field drift, content enter, CTA/focus)
 
 ## Colors
 
-A cool dark palette with one blue–cyan accent ramp used for almost every interactive and decorative moment.
+Deep black neutrals with a logo-derived signal accent.
 
 ### Primary
-- **Signal Blue** (#2563eb / Tailwind `blue-600`): Primary CTA fill start, icon wells, progress bars.
-- **Mid Blue** (#3b82f6 / `blue-500`): Logo tile and mid gradient stops.
-- **Hero Navy** (#1e3a8a / `blue-900`): Hero / page-header gradient origin.
-
-### Secondary
-- **Accent Cyan** (#06b6d4 / `cyan-500`): CTA fill end, glow shadows.
-- **Bright Cyan** (#22d3ee / `cyan-400`): Active nav, outline buttons, scroll cue, focus borders.
+- **Signal Cyan** (#06b6d4): Primary CTA fills, active links, focus rings, sparse accents.
+- **Signal Deep** (#2563eb): Logo gradient pole; optional deep accent — not default CTA fill.
 
 ### Neutral
-- **Canvas Ink** (#111827 / `gray-900`): Page background (`body`).
-- **Surface** (#1f2937 / `gray-800`): Inputs, card interiors, form shells.
-- **Raised Edge** (#374151 / `gray-700`): Borders and hairlines.
-- **Ink** (#ffffff): Primary text on dark.
-- **Ink Muted** (#d1d5db / `gray-300`): Subheads and section support copy.
-- **Ink Subtle** (#9ca3af / `gray-400`): Footer / secondary labels.
+- **Canvas** (#000000): Page background.
+- **Surface** (#0b0f14) / **Raised** (#121820): Section and panel grounds.
+- **Line** (#1e2836): Borders and rules.
+- **Ink** (#f4f7fa) / **Muted** (#a8b3c2) / **Subtle** (#7b8796): Text hierarchy.
 
 ### Named Rules
-**The Gradient Everywhere Rule.** Blue→cyan gradients appear on CTAs, logos, icon wells, progress, and headline accents — rarity is not part of the incumbent system.
+**The Logo Owns the Gradient Rule.** Full blue→cyan ramps belong on the mark (and rare hero moments), not on every button, card, and headline.
 
-**The Dark-Only Rule.** Public marketing UI is dark-mode only; no light theme tokens exist.
+**The Signal Rarity Rule.** Accent color stays roughly ≤10% of any marketing viewport.
 
 ## Typography
 
-**Display Font:** System UI sans (`ui-sans-serif, system-ui, sans-serif`) — no custom `@font-face` or Google Fonts in root layout  
-**Body Font:** Same stack  
-**Label/Mono Font:** None distinct
+**Display Font:** Instrument Serif  
+**Body Font:** DM Sans  
 
-**Character:** Neutral, template-default. Hierarchy is achieved by size and weight, not by typeface contrast. Headlines often use `bg-clip-text` white→gray or blue→cyan gradients.
+**Character:** Premium, precise, product-studio. Serif for promise; sans for clarity.
 
 ### Hierarchy
-- **Display** (700, ~3rem→4.5rem / `text-5xl md:text-7xl`, tight leading): Home hero H1.
-- **Headline** (700, ~2.25rem→3rem / `text-4xl md:text-5xl`): Section titles (“About”, “Services”, page heroes).
-- **Title** (600, ~1.25rem): Card titles, form step headings.
-- **Body** (400, ~1.25rem / `text-xl` common for lead copy): Section intros; form body closer to `text-sm`–`text-base`.
-- **Label** (500, ~0.875rem): Form labels, footer links, badges.
+- **Display:** Instrument Serif, ~2.5–4rem — hero and section titles.
+- **Title:** Instrument Serif, ~1.5–2rem — card/aside headings.
+- **Body:** DM Sans, ~1–1.125rem — supporting copy (measure ~65ch).
+- **Label:** DM Sans medium, ~0.875rem — forms and meta.
 
 ### Named Rules
-**The One-Face Rule.** Incumbent uses a single system sans; personality is not carried by typography.
+**The No Gradient Text Rule.** Emphasis comes from size and weight, not clipped gradient fills on headlines.
 
 ## Layout
 
-Centered marketing layout inside `max-w-7xl` with horizontal padding `px-4 sm:px-6 lg:px-8`. Sections typically use `py-20`. Home is a vertical stack of full-width sections (Hero → About → Services → Portfolio → Technologies → Industries → Careers preview). Navbar is fixed `h-16` with content offset `pt-16`. Mobile: hamburger drawer; desktop: centered link row + right-side Quote CTA.
-
-Rhythm is repetitive: centered header block (`mb-16`) then responsive grids (`md:grid-cols-2/3`, `lg:grid-cols-3`, tech up to `xl:grid-cols-6`).
+`max-w-7xl` shell with generous section rhythm (`py-20` / `md:py-28`). Home: Hero → How we build → Capabilities → Selected work → Technology → Who we build for → Careers → Final CTA. Left-weighted editorial bands preferred over centered template stacks after the hero.
 
 ## Elevation & Depth
 
-Hybrid of tonal layering and glow shadows. Cards sit on semi-transparent dark fills with `backdrop-blur` and `border-gray-700`. Depth cues include `shadow-2xl shadow-blue-500/20` on scrolled nav and `hover:shadow-blue-500/50` on primary CTAs — colored glow more than structural elevation.
-
-### Shadow Vocabulary
-- **Nav elevated** (`shadow-2xl shadow-blue-500/20`): Fixed nav after scroll.
-- **CTA glow** (`hover:shadow-lg` / `hover:shadow-2xl` + `shadow-blue-500/50`): Primary buttons.
-- **Card rest:** Usually border + blur only; no neutral drop shadow scale.
-
-### Named Rules
-**The Glow-Not-Lift Rule.** Depth is communicated with cyan/blue glows and blur glass, not a neutral elevation ladder.
+Mostly tonal: bordered surfaces on black. Primary CTA may use a soft signal shadow on hover. No decorative glass stacks.
 
 ## Shapes
 
-Soft, highly rounded vocabulary: logo tile `rounded-lg` (8px); inputs `rounded-xl` (12px); cards `rounded-2xl` / `rounded-3xl` (16–24px); CTAs and chips `rounded-full` (pill). Icon containers are frequently circular (`rounded-full` wells). Borders are 1px gray-700, shifting toward cyan on hover.
+`6px` / `10px` atelier radii. Prefer rules and panels over soft pills. Geometric A-mark angles inform precision, not sci-fi HUD chrome.
 
 ## Components
 
 ### Buttons
-- **Shape:** Pill (`rounded-full`) for marketing CTAs; `rounded-xl` for form submits.
-- **Primary:** Blue→cyan gradient fill, white text, generous padding; hover adds blue glow shadow and slight scale (Framer).
-- **Secondary / Ghost:** Transparent with cyan border/text (`border-cyan-400`).
-- **Hover / Focus:** Scale micro-interactions; inputs use `focus:border-cyan-400` + `focus:ring-2 focus:ring-cyan-400/20`.
+- **Primary:** Solid signal cyan, canvas text, atelier radius.
+- **Secondary:** Transparent with line border; signal on hover.
+- **Focus:** Signal outline, 3px offset.
 
 ### Cards / Containers
-- **Corner Style:** Large radius (`rounded-2xl` / `rounded-3xl`)
-- **Background:** `bg-gray-900/50` or `bg-gray-800/50` + backdrop blur
-- **Border:** `border-gray-700`, hover `border-cyan-500/50`
-- **Internal Padding:** Typically `p-6`–`p-8`
+- Thin line borders, surface fills, atelier-lg radius — used when interaction or grouping needs a container.
 
-### Inputs / Fields
-- **Style:** `bg-gray-800`, `border-gray-700`, `rounded-xl`, white text, gray placeholder
-- **Focus:** Cyan border + soft cyan ring
-- **Error / Disabled:** Ad-hoc per form; no shared tokenized error color system beyond Tailwind red utilities where used
+### Inputs
+- Raised surface, line border, signal focus ring.
 
 ### Navigation
-- Fixed top bar; transparent over hero, then `bg-gray-900/95 backdrop-blur-md` when scrolled
-- Links: gray-300 → cyan-400 active/hover with gradient underline grow
-- Brand: Zap-in-gradient-tile + gradient wordmark
-- Mobile: full-width overlay menu
+- Fixed, transparent over hero; blurred canvas + line when scrolled. Official BrandMark (A + wordmark). Quote CTA uses primary button.
 
-### Signature patterns (incumbent)
-- **Hero particle field:** Deterministic cyan dots + CSS grid overlay on blue/gray/cyan gradient plane
-- **Section header formula:** Gradient H2 + `text-xl text-gray-300` centered max-w-3xl
-- **Icon well:** Gradient circle + Lucide icon above card copy
-- **Tech “AI Core” hub:** Large gradient circle labeled “AI Core” above tech chip grid
+### Brand
+- Official logo asset: `brand/aorysoft-logo.jpg` / `web/public/brand/aorysoft-logo.jpg`. SVG `AoryMark` approximates the geometric A for crisp UI.
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** treat this file as the **current implementation record** when refining without a redesign approval.
-- **Do** keep public writes, honesty rules, and content constraints from PRODUCT.md even when visuals change later.
-- **Do** note that `tailwind.config.ts` has an empty `theme.extend` — any new system must introduce tokens deliberately.
+- **Do** keep AorySoft hero-level in the first viewport.
+- **Do** hide unverified phone/address and unpublished case studies.
+- **Do** respect `prefers-reduced-motion` for field drift and entrances.
 
 ### Don't:
-- **Don't** treat Neon Gradient Agency Kit as the target brand identity for future work once a redesign direction is approved.
-- **Don't** invent CSS variables or custom fonts that are not in the codebase when describing the incumbent.
-- **Don't** document unverified portfolio/metrics content as visual “proof” assets — they are placeholders under PRODUCT.md.
+- **Don't** use the Lucide Zap placeholder as a brand mark.
+- **Don't** fabricate metrics, reviews, or portfolio projects.
+- **Don't** spray blue→cyan gradients across UI chrome.
+- **Don't** default to Inter, purple AI kits, or pill-everywhere SaaS patterns.

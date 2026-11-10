@@ -9,7 +9,7 @@ import type { ActionState } from "@/lib/admin/actions";
 const initialState: ActionState = { ok: true };
 
 const inputClasses =
-  "w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white placeholder-gray-500 focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-400/20";
+  "w-full rounded-atelier border border-line bg-surface-raised px-3 py-2 text-sm text-ink placeholder-ink-subtle focus:border-signal focus:outline-none focus:ring-2 focus:ring-signal/20";
 
 function Labeled({
   label,
@@ -20,7 +20,7 @@ function Labeled({
 }) {
   return (
     <div>
-      <label className="mb-1.5 block text-sm font-medium text-gray-300">
+      <label className="mb-1.5 block text-sm font-medium text-ink-muted">
         {label}
       </label>
       {children}
@@ -130,7 +130,7 @@ export default function SettingsForm({ initial }: { initial: SiteSettingsData })
             type="button"
             onClick={() => setter(list.filter((_, i) => i !== index))}
             aria-label={`Remove row ${index + 1}`}
-            className="rounded-lg border border-gray-700 px-3 py-2 text-xs text-gray-400 hover:border-red-500/50 hover:text-red-400"
+            className="rounded-atelier border border-line px-3 py-2 text-xs text-ink-subtle hover:border-red-500/50 hover:text-red-400"
           >
             Remove
           </button>
@@ -141,7 +141,7 @@ export default function SettingsForm({ initial }: { initial: SiteSettingsData })
         onClick={() =>
           setter([...list, { keyA, keyB, a: "", b: "", key: `${keyA}-${Date.now()}` } as Pair])
         }
-        className="rounded-lg bg-gray-800 px-3 py-1.5 text-xs text-gray-200 hover:bg-gray-700"
+        className="rounded-atelier bg-surface-raised px-3 py-1.5 text-xs text-ink-muted hover:bg-surface-raised"
       >
         + Add row
       </button>
@@ -153,13 +153,13 @@ export default function SettingsForm({ initial }: { initial: SiteSettingsData })
       <input type="hidden" name="payload" value={JSON.stringify(buildPayload())} />
 
       {state.error && (
-        <p role="alert" className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300">
+        <p role="alert" className="rounded-atelier-lg border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300">
           {state.error}
         </p>
       )}
 
-      <section className="space-y-4 rounded-2xl border border-gray-800 bg-gray-900/60 p-6">
-        <h2 className="text-lg font-semibold text-white">Hero</h2>
+      <section className="space-y-4 rounded-atelier-lg border border-line bg-surface/80 p-6">
+        <h2 className="text-lg font-semibold text-ink">Hero</h2>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <Labeled label="Badge">
             <input
@@ -192,8 +192,8 @@ export default function SettingsForm({ initial }: { initial: SiteSettingsData })
         </div>
       </section>
 
-      <section className="space-y-4 rounded-2xl border border-gray-800 bg-gray-900/60 p-6">
-        <h2 className="text-lg font-semibold text-white">About</h2>
+      <section className="space-y-4 rounded-atelier-lg border border-line bg-surface/80 p-6">
+        <h2 className="text-lg font-semibold text-ink">About</h2>
         <Labeled label="Heading">
           <input
             value={form.aboutHeading}
@@ -211,18 +211,18 @@ export default function SettingsForm({ initial }: { initial: SiteSettingsData })
         </Labeled>
       </section>
 
-      <section className="space-y-4 rounded-2xl border border-gray-800 bg-gray-900/60 p-6">
-        <h2 className="text-lg font-semibold text-white">Industries</h2>
+      <section className="space-y-4 rounded-atelier-lg border border-line bg-surface/80 p-6">
+        <h2 className="text-lg font-semibold text-ink">Industries</h2>
         {editPairs(industries, setIndustries, "title", "description")}
       </section>
 
-      <section className="space-y-4 rounded-2xl border border-gray-800 bg-gray-900/60 p-6">
-        <h2 className="text-lg font-semibold text-white">Technologies</h2>
+      <section className="space-y-4 rounded-atelier-lg border border-line bg-surface/80 p-6">
+        <h2 className="text-lg font-semibold text-ink">Technologies</h2>
         {editPairs(technologies, setTechnologies, "name", "category")}
       </section>
 
-      <section className="space-y-4 rounded-2xl border border-gray-800 bg-gray-900/60 p-6">
-        <h2 className="text-lg font-semibold text-white">CTA</h2>
+      <section className="space-y-4 rounded-atelier-lg border border-line bg-surface/80 p-6">
+        <h2 className="text-lg font-semibold text-ink">CTA</h2>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <Labeled label="CTA title">
             <input
@@ -241,8 +241,8 @@ export default function SettingsForm({ initial }: { initial: SiteSettingsData })
         </div>
       </section>
 
-      <section className="space-y-4 rounded-2xl border border-gray-800 bg-gray-900/60 p-6">
-        <h2 className="text-lg font-semibold text-white">Footer contact</h2>
+      <section className="space-y-4 rounded-atelier-lg border border-line bg-surface/80 p-6">
+        <h2 className="text-lg font-semibold text-ink">Footer contact</h2>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <Labeled label="Email">
             <input
@@ -268,8 +268,8 @@ export default function SettingsForm({ initial }: { initial: SiteSettingsData })
         </div>
       </section>
 
-      <section className="space-y-4 rounded-2xl border border-gray-800 bg-gray-900/60 p-6">
-        <h2 className="text-lg font-semibold text-white">Social links</h2>
+      <section className="space-y-4 rounded-atelier-lg border border-line bg-surface/80 p-6">
+        <h2 className="text-lg font-semibold text-ink">Social links</h2>
         <div className="space-y-2">
           {socialLinks.map((link, index) => (
             <div key={index} className="flex items-center gap-2">
@@ -303,7 +303,7 @@ export default function SettingsForm({ initial }: { initial: SiteSettingsData })
                 type="button"
                 onClick={() => setSocialLinks(socialLinks.filter((_, i) => i !== index))}
                 aria-label={`Remove social link ${index + 1}`}
-                className="rounded-lg border border-gray-700 px-3 py-2 text-xs text-gray-400 hover:border-red-500/50 hover:text-red-400"
+                className="rounded-atelier border border-line px-3 py-2 text-xs text-ink-subtle hover:border-red-500/50 hover:text-red-400"
               >
                 Remove
               </button>
@@ -312,7 +312,7 @@ export default function SettingsForm({ initial }: { initial: SiteSettingsData })
           <button
             type="button"
             onClick={() => setSocialLinks([...socialLinks, { label: "", url: "" }])}
-            className="rounded-lg bg-gray-800 px-3 py-1.5 text-xs text-gray-200 hover:bg-gray-700"
+            className="rounded-atelier bg-surface-raised px-3 py-1.5 text-xs text-ink-muted hover:bg-surface-raised"
           >
             + Add social link
           </button>
@@ -322,7 +322,7 @@ export default function SettingsForm({ initial }: { initial: SiteSettingsData })
       <button
         type="submit"
         disabled={pending}
-        className="rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 px-6 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/50 disabled:opacity-60"
+        className="rounded-atelier-lg bg-signal px-6 py-2.5 text-sm font-semibold text-canvas transition-all duration-200 hover:shadow-lg hover:shadow-signal disabled:opacity-60"
       >
         {pending ? "Saving…" : "Save settings"}
       </button>

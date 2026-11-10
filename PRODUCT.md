@@ -1,5 +1,7 @@
 # Product
 
+<!-- impeccable:product-schema 1 -->
+
 
 
 ## Platform
@@ -67,7 +69,7 @@ Confirmed product functionality (shipped or planned as product truth):
 
 - Public marketing site with services, portfolio area, industries, technologies, blog, careers, contact, quote, privacy, terms
 - Admin CMS over Supabase (posts, categories, services, jobs, media, submissions, newsletter, site settings, users)
-- **Reviews management (required, not yet built):** full admin CRUD for client reviews — client name/display name, review text, rating, source/platform, project or service, optional profile image; add/edit/delete; publish/unpublish; feature; public submission path with admin approval before publication; genuine Fiverr reviews may be entered manually with appropriate attribution and permission
+- **Reviews management (shipped):** full admin CRUD for client reviews — display name, review text, rating, source/platform, project or service, optional profile image; add/edit/delete; publish/unpublish; feature; public submission → pending moderation; Fiverr/manual entries require `permission_confirmed` before publish is publicly visible
 
 Hard constraints:
 
@@ -88,7 +90,6 @@ Open decisions (explicitly undecided):
 - Which portfolio projects replace the current unverified placeholders, and when
 - Which items from the technology coverage list are “demonstrable” enough to feature prominently vs list lightly
 - Verified phone and address (remain undisclosed until confirmed)
-- Accessibility standard beyond baseline good practice (none product-specified yet)
 
 ## Brand Commitments
 
@@ -105,7 +106,7 @@ Open decisions (explicitly undecided):
 - Confirmed intent: genuine Fiverr client reviews exist and will be entered manually via admin once Reviews management ships; display requires attribution and permission
 - Absent / must not fabricate: verified phone, address, client logos with permission, published case-study metrics, team/founder content, invented testimonials
 - Current Featured Projects copy and stock imagery in the portfolio section are unverified and must not be treated as real client evidence until replaced or confirmed
-- No reviews/testimonials table or admin CRUD exists in the codebase yet
+- Reviews table + `/admin/reviews` + homepage Reviews section shipped; apply `web/supabase/0009_reviews.sql` on the project before using
 
 ## Product Principles
 
@@ -114,3 +115,9 @@ Open decisions (explicitly undecided):
 3. **AI-first substance** — position around engineering + AI + automation that solves business problems, not buzzword decoration.
 4. **Honest operations** — empty states, form errors, and unpublished content tell the truth; never fake success or invent metrics.
 5. **One system** — marketing site and admin share one stack and one auth model; new capabilities (e.g. reviews) extend that model rather than adding parallel vendors.
+
+## Accessibility & Inclusion
+
+- Required standard (confirmed 2026-11-09): **WCAG 2.2 AA** across the public site and `/admin`.
+- This applies to text and non-text contrast, full keyboard operation with visible focus, accessible names and errors on forms (contact, quote, admin CRUD), and honoring `prefers-reduced-motion`.
+- The audience includes healthcare and education organizations, so accessibility is part of being credible to them, not only a compliance item.

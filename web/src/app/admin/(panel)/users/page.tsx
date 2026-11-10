@@ -20,7 +20,7 @@ export default async function UsersPage() {
 
   if (!canView(role, "users")) {
     return (
-      <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-6 text-sm text-amber-200">
+      <div className="rounded-atelier-lg border border-amber-500/30 bg-amber-500/10 p-6 text-sm text-amber-200">
         User management is owner-only (plan §5.5).
       </div>
     );
@@ -40,7 +40,7 @@ export default async function UsersPage() {
 
   if (authResult.error) {
     return (
-      <p role="alert" className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300">
+      <p role="alert" className="rounded-atelier-lg border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300">
         Could not list users: {authResult.error.message}
       </p>
     );
@@ -54,7 +54,7 @@ export default async function UsersPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold">Admin users</h1>
-        <p className="mt-1 max-w-2xl text-sm text-gray-500">
+        <p className="mt-1 max-w-2xl text-sm text-ink-subtle">
           New admins are created in the Supabase dashboard (Users → Create new
           user, <strong>Auto Confirm</strong> enabled; public signups stay
           disabled). A profile row with the editor role is created on first
@@ -63,9 +63,9 @@ export default async function UsersPage() {
         </p>
       </div>
 
-      <div className="overflow-x-auto rounded-2xl border border-gray-800">
+      <div className="overflow-x-auto rounded-atelier-lg border border-line">
         <table className="min-w-full text-left text-sm">
-          <thead className="bg-gray-900 text-xs uppercase text-gray-400">
+          <thead className="bg-surface text-xs uppercase text-ink-subtle">
             <tr>
               <th scope="col" className="px-4 py-3">Email</th>
               <th scope="col" className="px-4 py-3">Role</th>
@@ -73,26 +73,26 @@ export default async function UsersPage() {
               <th scope="col" className="px-4 py-3 text-right">Change role</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-800 bg-gray-950/50">
+          <tbody className="divide-y divide-gray-800 bg-canvas/50">
             {authResult.data.users.map((authUser) => {
               const current = roleById.get(authUser.id) ?? null;
               return (
-                <tr key={authUser.id} className="hover:bg-gray-900/60">
-                  <td className="px-4 py-3 text-gray-200">
+                <tr key={authUser.id} className="hover:bg-surface/80">
+                  <td className="px-4 py-3 text-ink-muted">
                     {authUser.email ?? authUser.id}
                   </td>
                   <td className="px-4 py-3">
                     {current ? (
-                      <span className="rounded-full bg-gray-800 px-2.5 py-0.5 text-xs text-cyan-400">
+                      <span className="rounded-full bg-surface-raised px-2.5 py-0.5 text-xs text-signal">
                         {current}
                       </span>
                     ) : (
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-ink-subtle">
                         no profile yet (signs in once)
                       </span>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-gray-400">
+                  <td className="px-4 py-3 text-ink-subtle">
                     {authUser.created_at
                       ? new Date(authUser.created_at).toLocaleDateString()
                       : "—"}
@@ -109,14 +109,14 @@ export default async function UsersPage() {
                         id={`role-${authUser.id}`}
                         name="role"
                         defaultValue={current ?? "editor"}
-                        className="rounded-lg border border-gray-700 bg-gray-800 px-2 py-1.5 text-xs text-white focus:border-cyan-400 focus:outline-none"
+                        className="rounded-atelier border border-line bg-surface-raised px-2 py-1.5 text-xs text-ink focus:border-signal focus:outline-none"
                       >
                         <option value="editor">editor</option>
                         <option value="owner">owner</option>
                       </select>
                       <button
                         type="submit"
-                        className="rounded-lg bg-gray-800 px-3 py-1.5 text-xs text-gray-200 transition-colors duration-200 hover:bg-gray-700"
+                        className="rounded-atelier bg-surface-raised px-3 py-1.5 text-xs text-ink-muted transition-colors duration-200 hover:bg-surface-raised"
                       >
                         Apply
                       </button>

@@ -93,6 +93,35 @@ export type SubscriberRow = {
   created_at: string;
 };
 
+export type ReviewSource =
+  | "fiverr"
+  | "google"
+  | "linkedin"
+  | "website"
+  | "email"
+  | "other";
+
+export type ReviewStatus = "draft" | "pending" | "published" | "archived";
+
+export type ReviewRow = {
+  id: string;
+  display_name: string;
+  review_text: string;
+  rating: number;
+  source: ReviewSource;
+  source_url: string | null;
+  project_or_service: string | null;
+  attribution: string | null;
+  profile_image_id: string | null;
+  permission_confirmed: boolean;
+  featured: boolean;
+  status: ReviewStatus;
+  submitter_email: string | null;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+};
+
 export type MediaListRow = MediaRow;
 
 /** Shape of the single site_settings.data JSONB row (owner-edited). */

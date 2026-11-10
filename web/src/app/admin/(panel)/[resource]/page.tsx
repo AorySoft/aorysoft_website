@@ -37,7 +37,7 @@ export default async function ResourceListPage({
 
   if (!canView(role, key)) {
     return (
-      <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-6 text-sm text-amber-200">
+      <div className="rounded-atelier-lg border border-amber-500/30 bg-amber-500/10 p-6 text-sm text-amber-200">
         Your account has no role for this area yet. An owner can assign roles
         in Supabase (see supabase/0002_rls.sql bootstrap notes).
       </div>
@@ -61,7 +61,7 @@ export default async function ResourceListPage({
         {canEdit(role, key) && (
           <Link
             href={`/admin/${def.key}/new`}
-            className="rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 px-5 py-2 text-sm font-semibold text-white transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/50"
+            className="rounded-atelier-lg bg-signal px-5 py-2 text-sm font-semibold text-canvas transition-all duration-200 hover:shadow-lg hover:shadow-signal"
           >
             New {def.singular}
           </Link>
@@ -71,7 +71,7 @@ export default async function ResourceListPage({
       {error && (
         <p
           role="alert"
-          className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300"
+          className="rounded-atelier-lg border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300"
         >
           Could not load {def.title.toLowerCase()}: {error.message}
         </p>

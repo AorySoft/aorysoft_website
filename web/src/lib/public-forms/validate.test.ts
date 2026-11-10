@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   validateContactForm,
   validateQuoteForm,
+  validateReviewForm,
   validEmail,
 } from "./validate";
 
@@ -185,6 +186,30 @@ describe("validateQuoteForm", () => {
       integrations: [{ evil: true }],
     });
     expect(result.ok).toBe(false);
+  });
+});
+
+describe("validateReviewForm", () => {
+  const validReview = {
+    displayName: "Jordan",
+    email: "jordan@example.com",
+    reviewText: "Clear delivery and solid communication.",
+    rating: "5",
+    projectOrService: "Automation",
+    consent: "yes",
+  };
+
+  it("accepts a consented review submission", () => {
+    const result = validateReviewForm(validReview);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.value.rating).toBe(5);
+    expect(result.value.consent).toBe(true);
+  });
+
+  it("requires consent and a 1–5 rating", () => {
+    expect(validateReviewForm({ ...validReview, consent: "" }).ok).toBe(false);
+    expect(validateReviewForm({ ...validReview, rating: "9" }).ok).toBe(false);
   });
 });
 

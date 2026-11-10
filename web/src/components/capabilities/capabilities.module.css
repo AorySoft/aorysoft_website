@@ -1,0 +1,111 @@
+/* Soft top light on the vignette frame (accepted in live mode at 0.4). */
+.stage > div {
+  background:
+    radial-gradient(ellipse 85% 60% at 50% 0%, rgb(var(--color-signal-deep) / 0.1), transparent 70%),
+    rgb(var(--color-canvas));
+}
+
+/* The rail layout gives the stage seven columns: go wider and give scenes side room. */
+@media (min-width: 1024px) {
+  .stage > div {
+    aspect-ratio: 16 / 10;
+  }
+  .stage > div > div {
+    inset: 2rem 10%;
+  }
+}
+
+.reveal {
+  animation: rise 560ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(var(--i, 0) * 120ms);
+}
+
+.grow {
+  transform-origin: left center;
+  animation: grow 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(var(--i, 0) * 110ms);
+}
+
+.typing span {
+  width: 6px;
+  height: 6px;
+  background: rgb(var(--color-ink-muted));
+  animation: blink 1.2s ease-in-out infinite;
+}
+.typing span:nth-child(2) {
+  animation-delay: 160ms;
+}
+.typing span:nth-child(3) {
+  animation-delay: 320ms;
+}
+
+.beacon {
+  animation: blink 1.6s ease-in-out infinite;
+}
+
+/* A short bright segment that travels down the pipeline connector. */
+.flow {
+  overflow: hidden;
+}
+.flow::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 1px;
+  top: 0;
+  height: 22%;
+  background: linear-gradient(transparent, rgb(var(--color-signal)), transparent);
+  animation: travel 2.4s linear 600ms infinite;
+}
+
+.link {
+  fill: none;
+  stroke: rgb(var(--color-line));
+  stroke-width: 1;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@keyframes grow {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Transform-only: the segment is 22% of the line, so 100/22 ≈ 4.55 heights clears it. */
+@keyframes travel {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(455%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .grow,
+  .typing span,
+  .beacon,
+  .flow::after {
+    animation: none;
+  }
+  .flow::after {
+    display: none;
+  }
+}

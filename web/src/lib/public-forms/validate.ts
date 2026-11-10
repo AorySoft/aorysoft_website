@@ -219,6 +219,79 @@ function cleanList(
   return { ok: true, value: cleaned };
 }
 
+export type ValidReview = {
+  displayName: string;
+  email: string;
+  reviewText: string;
+  rating: number;
+  projectOrService: string | null;
+  consent: true;
+};
+
+/** Public review submission (lands as pending until admin publishes). */
+export function validateReviewForm(input: unknown): ValidResult<ValidReview> {
+  const raw = (input ?? {}) as Record<string, unknown>;
+  const errors: FieldError[] = [];
+
+  const displayName = requiredText(
+    raw.displayName,
+    120,
+    "displayName",
+    "Display name",
+  );
+  if (!displayName.ok) errors.push(...displayName.errors);
+
+  const email = validEmail(raw.email);
+  if (!email.ok) errors.push(...email.errors);
+
+  const reviewText = requiredText(
+    raw.reviewText,
+    4000,
+    "reviewText",
+    "Review",
+  );
+  if (!reviewText.ok) errors.push(...reviewText.errors);
+
+  const projectOrService = optionalText(
+    raw.projectOrService,
+    200,
+    "projectOrService",
+    "Project or service",
+  );
+  if (!projectOrService.ok) errors.push(...projectOrService.errors);
+
+  const ratingRaw =
+    typeof raw.rating === "string" || typeof raw.rating === "number"
+      ? Number(raw.rating)
+      : NaN;
+  if (!Number.isInteger(ratingRaw) || ratingRaw < 1 || ratingRaw > 5) {
+    errors.push({ field: "rating", message: "Choose a rating from 1 to 5." });
+  }
+
+  const consent =
+    raw.consent === "yes" || raw.consent === "on" || raw.consent === true;
+  if (!consent) {
+    errors.push({
+      field: "consent",
+      message: "Consent to publish is required.",
+    });
+  }
+
+  if (errors.length > 0) return { ok: false, errors };
+
+  return {
+    ok: true,
+    value: {
+      displayName: valueOf(displayName, "displayName"),
+      email: valueOf(email, "email"),
+      reviewText: valueOf(reviewText, "reviewText"),
+      rating: ratingRaw,
+      projectOrService: valueOf(projectOrService, "projectOrService"),
+      consent: true,
+    },
+  };
+}
+
 export function validateQuoteForm(input: unknown): ValidResult<ValidQuote> {
   const raw = (input ?? {}) as Record<string, unknown>;
   const errors: FieldError[] = [];

@@ -1,7 +1,14 @@
 import { describe, expect, it } from "vitest";
 import { canDelete, canEdit, canView, type Area } from "./permissions";
 
-const CONTENT_AREAS: Area[] = ["posts", "categories", "services", "jobs", "media"];
+const CONTENT_AREAS: Area[] = [
+  "posts",
+  "categories",
+  "services",
+  "jobs",
+  "reviews",
+  "media",
+];
 
 describe("permission matrix (plan §5.5)", () => {
   it("denies everything for null role", () => {
@@ -10,6 +17,7 @@ describe("permission matrix (plan §5.5)", () => {
       "categories",
       "services",
       "jobs",
+      "reviews",
       "media",
       "submissions",
       "newsletter",
@@ -29,6 +37,7 @@ describe("permission matrix (plan §5.5)", () => {
       "categories",
       "services",
       "jobs",
+      "reviews",
       "media",
       "submissions",
       "newsletter",
