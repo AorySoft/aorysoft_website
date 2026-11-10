@@ -5,12 +5,24 @@ import TurnstileField from "@/components/TurnstileField";
 import { submitReview } from "@/lib/public-forms/actions";
 import { idleFormState } from "@/lib/public-forms/state";
 
-export default function ReviewSubmitForm() {
+type Prefill = {
+  displayName?: string;
+  email?: string;
+  projectOrService?: string;
+};
+
+/** Invite-only feedback form. Requires a signed invite token (no public homepage entry). */
+export default function ReviewSubmitForm({
+  inviteToken,
+  prefill,
+}: {
+  inviteToken: string;
+  prefill?: Prefill;
+}) {
   const [state, formAction, pending] = useActionState(
     submitReview,
     idleFormState,
   );
-  const [open, setOpen] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const turnstileConfigured = Boolean(
     process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
@@ -28,17 +40,10 @@ export default function ReviewSubmitForm() {
     );
   }
 
-  // Keep the homepage free of Turnstile / form height until the visitor asks.
-  if (!open) {
-    return (
-      <button type="button" className="btn-secondary" onClick={() => setOpen(true)}>
-        Write a review
-      </button>
-    );
-  }
-
   return (
     <form action={formAction} className="relative space-y-4">
+      <input type="hidden" name="inviteToken" value={inviteToken} />
+
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
           <label htmlFor="review-name" className="mb-2 block text-sm text-ink-muted">
@@ -49,6 +54,7 @@ export default function ReviewSubmitForm() {
             name="displayName"
             required
             maxLength={120}
+            defaultValue={prefill?.displayName ?? ""}
             className="field-input"
             autoComplete="nickname"
           />
@@ -66,6 +72,7 @@ export default function ReviewSubmitForm() {
             type="email"
             required
             maxLength={254}
+            defaultValue={prefill?.email ?? ""}
             className="field-input"
             autoComplete="email"
           />
@@ -102,6 +109,7 @@ export default function ReviewSubmitForm() {
             id="review-service"
             name="projectOrService"
             maxLength={200}
+            defaultValue={prefill?.projectOrService ?? ""}
             className="field-input"
           />
         </div>

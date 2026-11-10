@@ -1,6 +1,5 @@
 import Image from "next/image";
 import type { ReviewWithImage } from "@/lib/data";
-import ReviewSubmitForm from "@/components/ReviewSubmitForm";
 
 function Stars({ rating }: { rating: number }) {
   return (
@@ -13,7 +12,7 @@ function Stars({ rating }: { rating: number }) {
 
 /**
  * Client reviews — published + permission_confirmed only.
- * Honest empty state until real reviews are cleared in /admin.
+ * Feedback is invite-only (`/feedback?token=…`); no public form here.
  */
 export default function ReviewsSection({
   reviews,
@@ -41,17 +40,13 @@ export default function ReviewsSection({
 
         {items.length === 0 ? (
           <p className="mt-12 max-w-2xl text-base leading-relaxed text-ink-muted">
-            Nothing published yet. If you have worked with us and want to share
-            feedback, use the form below. We review every submission before it
-            goes live.
+            Nothing published yet. After a project wraps, we send the client a
+            private feedback link. Approved reviews appear here.
           </p>
         ) : (
           <ul className="mt-14 grid grid-cols-1 gap-10 md:grid-cols-2">
             {items.map((review) => (
-              <li
-                key={review.id}
-                className="border-t border-line pt-8"
-              >
+              <li key={review.id} className="border-t border-line pt-8">
                 <Stars rating={review.rating} />
                 <blockquote className="mt-4 text-lg leading-relaxed text-ink">
                   “{review.review_text}”
@@ -92,17 +87,6 @@ export default function ReviewsSection({
             ))}
           </ul>
         )}
-
-        <div className="mt-16 max-w-xl border-t border-line pt-10">
-          <h3 className="font-display text-2xl text-ink">Share your experience</h3>
-          <p className="mt-3 text-sm leading-relaxed text-ink-muted">
-            We keep submissions private until we check permission and publish.
-            Only send feedback you are okay seeing on the site.
-          </p>
-          <div className="mt-6">
-            <ReviewSubmitForm />
-          </div>
-        </div>
       </div>
     </section>
   );
