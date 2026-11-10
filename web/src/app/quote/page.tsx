@@ -5,6 +5,7 @@ export const metadata: Metadata = {
   title: "Get a Quote",
   description:
     "Share scope, timeline, and constraints. AorySoft will follow up with a clear proposal.",
+  alternates: { canonical: "/quote" },
 };
 
 export default function QuotePage() {
