@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: "Blog",
   description:
     "Notes from AorySoft on AI, automation, and building software that holds up in production.",
+  alternates: { canonical: "/blog" },
 };
 
 // Draft/publish toggles in /admin revalidate this route (plan §8).

@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: "Careers",
   description:
     "Build software, AI systems, and automation with AorySoft. See open roles or get in touch.",
+  alternates: { canonical: "/careers" },
 };
 
 // Job edits in /admin revalidate this route (plan §8).

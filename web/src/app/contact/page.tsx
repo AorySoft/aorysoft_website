@@ -5,6 +5,7 @@ export const metadata: Metadata = {
   title: "Contact",
   description:
     "Contact AorySoft about a project, quote, or question. We reply through info@aorysoft.com.",
+  alternates: { canonical: "/contact" },
 };
 
 export default function ContactPage() {

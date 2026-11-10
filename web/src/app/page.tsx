@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import HeroSection from "@/components/HeroSection";
 import AboutSection from "@/components/AboutSection";
 import ServicesSection from "@/components/ServicesSection";
@@ -9,6 +10,10 @@ import FinalCtaSection from "@/components/FinalCtaSection";
 import { getActiveServices, getPublishedReviews } from "@/lib/data";
 
 export const revalidate = 60;
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 // Selected work is not rendered until real case studies are cleared; its note
 // and the #work anchor live in FinalCtaSection (PortfolioSection is kept for then).
