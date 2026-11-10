@@ -8,14 +8,23 @@
   );
 }
 
-/* Signal underline that draws in beneath the italic phrase; clones across line wraps. */
+/* Signal underline that draws in beneath the italic phrase (transform, not background-size). */
 .phrase {
-  background-image: linear-gradient(90deg, rgb(var(--color-signal-deep)), rgb(var(--color-signal)));
-  background-repeat: no-repeat;
-  background-position: 0 94%;
-  background-size: 100% 2px;
+  position: relative;
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
+}
+
+.phrase::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0.06em;
+  height: 2px;
+  background: linear-gradient(90deg, rgb(var(--color-signal-deep)), rgb(var(--color-signal)));
+  transform: scaleX(0);
+  transform-origin: left center;
   animation: draw 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.5s both;
 }
 
@@ -46,7 +55,10 @@
 
 @keyframes draw {
   from {
-    background-size: 0% 2px;
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
   }
 }
 
@@ -57,9 +69,12 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .phrase,
+  .phrase::after,
   .sheen {
     animation: none;
+  }
+  .phrase::after {
+    transform: scaleX(1);
   }
   .cta .arrow {
     transition: none;

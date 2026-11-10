@@ -19,7 +19,9 @@ const display = Instrument_Serif({
   weight: "400",
   style: ["normal", "italic"],
   variable: "--font-display",
-  display: "swap",
+  // optional: avoid late Instrument Serif swaps shifting the hero/footer (CLS).
+  display: "optional",
+  adjustFontFallback: true,
 });
 
 export const metadata: Metadata = {
