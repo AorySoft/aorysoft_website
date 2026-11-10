@@ -10,6 +10,7 @@ export default function ReviewSubmitForm() {
     submitReview,
     idleFormState,
   );
+  const [open, setOpen] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const turnstileConfigured = Boolean(
     process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
@@ -24,6 +25,15 @@ export default function ReviewSubmitForm() {
       >
         {state.message}
       </p>
+    );
+  }
+
+  // Keep the homepage free of Turnstile / form height until the visitor asks.
+  if (!open) {
+    return (
+      <button type="button" className="btn-secondary" onClick={() => setOpen(true)}>
+        Write a review
+      </button>
     );
   }
 

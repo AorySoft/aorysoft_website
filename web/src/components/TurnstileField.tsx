@@ -42,18 +42,10 @@ export default function TurnstileField({
   }, [onTokenChange]);
 
   useEffect(() => {
-    if (!siteKey) return;
-
-    // Inject the Cloudflare script once per page, even across components.
-    if (!window.__turnstileLoaded) {
-      window.__turnstileLoaded = true;
-      const script = document.createElement("script");
-      script.src = SCRIPT_SRC;
-      script.async = true;
-      document.head.appendChild(script);
-    }
+    if (!siteKey || !containerRef.current) return;
 
     let cancelled = false;
+    let poll = 0;
 
     const renderWidget = () => {
       if (cancelled || !containerRef.current || widgetIdRef.current) return;
@@ -68,22 +60,43 @@ export default function TurnstileField({
       });
     };
 
-    if (window.turnstile) renderWidget();
-    else {
-      const poll = window.setInterval(() => {
-        if (window.turnstile) {
-          window.clearInterval(poll);
-          renderWidget();
-        }
-      }, 50);
-      return () => {
-        window.clearInterval(poll);
-        cancelled = true;
-      };
-    }
+    const start = () => {
+      // Inject the Cloudflare script once per page, even across components.
+      if (!window.__turnstileLoaded) {
+        window.__turnstileLoaded = true;
+        const script = document.createElement("script");
+        script.src = SCRIPT_SRC;
+        script.async = true;
+        document.head.appendChild(script);
+      }
+
+      if (window.turnstile) renderWidget();
+      else {
+        poll = window.setInterval(() => {
+          if (window.turnstile) {
+            window.clearInterval(poll);
+            renderWidget();
+          }
+        }, 50);
+      }
+    };
+
+    // Defer script + widget until the field is near the viewport so homepage
+    // PSI is not charged for Turnstile reflow / third-party work above the fold.
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry?.isIntersecting) return;
+        observer.disconnect();
+        start();
+      },
+      { rootMargin: "200px 0px" },
+    );
+    observer.observe(containerRef.current);
 
     return () => {
       cancelled = true;
+      observer.disconnect();
+      if (poll) window.clearInterval(poll);
     };
   }, [siteKey, handleToken]);
 
@@ -94,7 +107,12 @@ export default function TurnstileField({
 
   return (
     <>
-      <div ref={containerRef} data-testid="turnstile-widget" />
+      {/* Reserved height avoids CLS when the widget paints in. */}
+      <div
+        ref={containerRef}
+        data-testid="turnstile-widget"
+        className="min-h-[65px]"
+      />
       {/* Mirrors the widget's current token into the form payload. Empty until
           the callback fires, and cleared again when the token expires. */}
       <input type="hidden" name="turnstileToken" value={token ?? ""} />
