@@ -67,9 +67,11 @@ export default function PrivacyPage() {
               hashes expire automatically.
             </p>
             <p>
-              We use Cloudflare Web Analytics, which is cookie-free and reports only
-              aggregated, anonymous usage statistics (page views, referrers, country,
-              device type). We do not use advertising or cross-site tracking cookies.
+              We use Cloudflare Web Analytics and Vercel Analytics on the public
+              site only. Both report aggregated, anonymous usage statistics (page
+              views, referrers, country, device type). Staff activity under
+              /admin is not tracked. We do not use advertising or cross-site
+              tracking cookies.
             </p>
           </section>
 
