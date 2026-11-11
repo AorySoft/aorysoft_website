@@ -29,6 +29,9 @@ export type CategoryRow = {
   updated_at: string;
 };
 
+export type ServiceProcessStep = { title: string; text: string };
+export type ServiceFaq = { question: string; answer: string };
+
 export type ServiceRow = {
   id: string;
   title: string;
@@ -39,6 +42,25 @@ export type ServiceRow = {
   color: string | null;
   sort_order: number;
   active: boolean;
+  slug: string | null;
+  seo_title: string | null;
+  seo_description: string | null;
+  deliverables: string[];
+  process_steps: ServiceProcessStep[];
+  technologies: string[];
+  faqs: ServiceFaq[];
+  created_at: string;
+  updated_at: string;
+};
+
+export type CaseStudyRow = {
+  id: string;
+  title: string;
+  slug: string;
+  summary: string | null;
+  body: string;
+  status: "draft" | "published";
+  published_at: string | null;
   created_at: string;
   updated_at: string;
 };

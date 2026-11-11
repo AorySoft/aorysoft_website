@@ -14,10 +14,7 @@ export function LoginForm() {
   return (
     <form action={formAction} className="space-y-4">
       <div>
-        <label
-          htmlFor="email"
-          className="block text-sm font-medium text-slate-700"
-        >
+        <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-ink-muted">
           Email
         </label>
         <input
@@ -26,13 +23,13 @@ export function LoginForm() {
           type="email"
           required
           autoComplete="email"
-          className="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm"
+          className="field-input"
         />
       </div>
       <div>
         <label
           htmlFor="password"
-          className="block text-sm font-medium text-slate-700"
+          className="mb-1.5 block text-sm font-medium text-ink-muted"
         >
           Password
         </label>
@@ -42,19 +39,15 @@ export function LoginForm() {
           type="password"
           required
           autoComplete="current-password"
-          className="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm"
+          className="field-input"
         />
       </div>
       {state.error ? (
-        <p role="alert" className="text-sm text-red-600">
+        <p role="alert" className="text-sm text-red-300">
           {state.error}
         </p>
       ) : null}
-      <button
-        type="submit"
-        disabled={isPending}
-        className="w-full rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
-      >
+      <button type="submit" disabled={isPending} className="btn-primary w-full">
         {isPending ? "Signing in…" : "Sign in"}
       </button>
     </form>

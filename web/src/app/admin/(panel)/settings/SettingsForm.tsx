@@ -5,45 +5,15 @@ import { useActionState } from "react";
 import type { SiteSettingsData } from "@/lib/types";
 import { saveSettings } from "./actions";
 import type { ActionState } from "@/lib/admin/actions";
+import {
+  Labeled,
+  PairEditor,
+  pairsFrom,
+  settingsInputClasses,
+  type Pair,
+} from "./SettingsFields";
 
 const initialState: ActionState = { ok: true };
-
-const inputClasses =
-  "w-full rounded-atelier border border-line bg-surface-raised px-3 py-2 text-sm text-ink placeholder-ink-subtle focus:border-signal focus:outline-none focus:ring-2 focus:ring-signal/20";
-
-function Labeled({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div>
-      <label className="mb-1.5 block text-sm font-medium text-ink-muted">
-        {label}
-      </label>
-      {children}
-    </div>
-  );
-}
-
-type Pair = { keyA: string; keyB: string; a: string; b: string };
-
-function pairsFrom(
-  list: { [k: string]: string }[] | undefined,
-  keyA: string,
-  keyB: string,
-): Pair[] {
-  if (!Array.isArray(list)) return [];
-  return list.map((item, index) => ({
-    keyA: keyA,
-    keyB: keyB,
-    a: String(item[keyA] ?? ""),
-    b: String(item[keyB] ?? ""),
-    key: `${keyA}-${index}`,
-  })) as Pair[];
-}
 
 export default function SettingsForm({ initial }: { initial: SiteSettingsData }) {
   const [form, setForm] = useState<SiteSettingsData>({
@@ -91,63 +61,6 @@ export default function SettingsForm({ initial }: { initial: SiteSettingsData })
     socialLinks: socialLinks.filter((link) => link.label && link.url),
   });
 
-  const editPairs = (
-    list: Pair[],
-    setter: (next: Pair[]) => void,
-    keyA: string,
-    keyB: string,
-  ) => (
-    <div className="space-y-2">
-      {list.map((item, index) => (
-        <div key={index} className="flex items-center gap-2">
-          <input
-            aria-label={`${keyA} ${index + 1}`}
-            value={item.a}
-            onChange={(event) =>
-              setter(
-                list.map((other, i) =>
-                  i === index ? { ...other, a: event.target.value } : other,
-                ),
-              )
-            }
-            className={inputClasses}
-            placeholder={keyA}
-          />
-          <input
-            aria-label={`${keyB} ${index + 1}`}
-            value={item.b}
-            onChange={(event) =>
-              setter(
-                list.map((other, i) =>
-                  i === index ? { ...other, b: event.target.value } : other,
-                ),
-              )
-            }
-            className={inputClasses}
-            placeholder={keyB}
-          />
-          <button
-            type="button"
-            onClick={() => setter(list.filter((_, i) => i !== index))}
-            aria-label={`Remove row ${index + 1}`}
-            className="rounded-atelier border border-line px-3 py-2 text-xs text-ink-subtle hover:border-red-500/50 hover:text-red-400"
-          >
-            Remove
-          </button>
-        </div>
-      ))}
-      <button
-        type="button"
-        onClick={() =>
-          setter([...list, { keyA, keyB, a: "", b: "", key: `${keyA}-${Date.now()}` } as Pair])
-        }
-        className="rounded-atelier bg-surface-raised px-3 py-1.5 text-xs text-ink-muted hover:bg-surface-raised"
-      >
-        + Add row
-      </button>
-    </div>
-  );
-
   return (
     <form action={formAction} className="space-y-8">
       <input type="hidden" name="payload" value={JSON.stringify(buildPayload())} />
@@ -161,32 +74,36 @@ export default function SettingsForm({ initial }: { initial: SiteSettingsData })
       <section className="space-y-4 rounded-atelier-lg border border-line bg-surface/80 p-6">
         <h2 className="text-lg font-semibold text-ink">Hero</h2>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <Labeled label="Badge">
+          <Labeled label="Badge" htmlFor="settings-hero-badge">
             <input
+              id="settings-hero-badge"
               value={form.heroBadge}
               onChange={(e) => set("heroBadge")(e.target.value)}
-              className={inputClasses}
+              className={settingsInputClasses}
             />
           </Labeled>
-          <Labeled label="Subtitle">
+          <Labeled label="Subtitle" htmlFor="settings-hero-subtitle">
             <input
+              id="settings-hero-subtitle"
               value={form.heroSubtitle}
               onChange={(e) => set("heroSubtitle")(e.target.value)}
-              className={inputClasses}
+              className={settingsInputClasses}
             />
           </Labeled>
-          <Labeled label="Title line 1">
+          <Labeled label="Title line 1" htmlFor="settings-hero-title-1">
             <input
+              id="settings-hero-title-1"
               value={form.heroTitleLine1}
               onChange={(e) => set("heroTitleLine1")(e.target.value)}
-              className={inputClasses}
+              className={settingsInputClasses}
             />
           </Labeled>
-          <Labeled label="Title line 2">
+          <Labeled label="Title line 2" htmlFor="settings-hero-title-2">
             <input
+              id="settings-hero-title-2"
               value={form.heroTitleLine2}
               onChange={(e) => set("heroTitleLine2")(e.target.value)}
-              className={inputClasses}
+              className={settingsInputClasses}
             />
           </Labeled>
         </div>
@@ -194,48 +111,62 @@ export default function SettingsForm({ initial }: { initial: SiteSettingsData })
 
       <section className="space-y-4 rounded-atelier-lg border border-line bg-surface/80 p-6">
         <h2 className="text-lg font-semibold text-ink">About</h2>
-        <Labeled label="Heading">
+        <Labeled label="Heading" htmlFor="settings-about-heading">
           <input
+            id="settings-about-heading"
             value={form.aboutHeading}
             onChange={(e) => set("aboutHeading")(e.target.value)}
-            className={inputClasses}
+            className={settingsInputClasses}
           />
         </Labeled>
-        <Labeled label="Text">
+        <Labeled label="Text" htmlFor="settings-about-text">
           <textarea
+            id="settings-about-text"
             rows={4}
             value={form.aboutText}
             onChange={(e) => set("aboutText")(e.target.value)}
-            className={`${inputClasses} resize-y`}
+            className={`${settingsInputClasses} resize-y`}
           />
         </Labeled>
       </section>
 
       <section className="space-y-4 rounded-atelier-lg border border-line bg-surface/80 p-6">
         <h2 className="text-lg font-semibold text-ink">Industries</h2>
-        {editPairs(industries, setIndustries, "title", "description")}
+        <PairEditor
+          list={industries}
+          setter={setIndustries}
+          keyA="title"
+          keyB="description"
+        />
       </section>
 
       <section className="space-y-4 rounded-atelier-lg border border-line bg-surface/80 p-6">
         <h2 className="text-lg font-semibold text-ink">Technologies</h2>
-        {editPairs(technologies, setTechnologies, "name", "category")}
+        <PairEditor
+          list={technologies}
+          setter={setTechnologies}
+          keyA="name"
+          keyB="category"
+        />
       </section>
 
       <section className="space-y-4 rounded-atelier-lg border border-line bg-surface/80 p-6">
         <h2 className="text-lg font-semibold text-ink">CTA</h2>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <Labeled label="CTA title">
+          <Labeled label="CTA title" htmlFor="settings-cta-title">
             <input
+              id="settings-cta-title"
               value={form.ctaTitle}
               onChange={(e) => set("ctaTitle")(e.target.value)}
-              className={inputClasses}
+              className={settingsInputClasses}
             />
           </Labeled>
-          <Labeled label="CTA text">
+          <Labeled label="CTA text" htmlFor="settings-cta-text">
             <input
+              id="settings-cta-text"
               value={form.ctaText}
               onChange={(e) => set("ctaText")(e.target.value)}
-              className={inputClasses}
+              className={settingsInputClasses}
             />
           </Labeled>
         </div>
@@ -244,25 +175,28 @@ export default function SettingsForm({ initial }: { initial: SiteSettingsData })
       <section className="space-y-4 rounded-atelier-lg border border-line bg-surface/80 p-6">
         <h2 className="text-lg font-semibold text-ink">Footer contact</h2>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          <Labeled label="Email">
+          <Labeled label="Email" htmlFor="settings-footer-email">
             <input
+              id="settings-footer-email"
               value={form.footerEmail}
               onChange={(e) => set("footerEmail")(e.target.value)}
-              className={inputClasses}
+              className={settingsInputClasses}
             />
           </Labeled>
-          <Labeled label="Phone">
+          <Labeled label="Phone" htmlFor="settings-footer-phone">
             <input
+              id="settings-footer-phone"
               value={form.footerPhone}
               onChange={(e) => set("footerPhone")(e.target.value)}
-              className={inputClasses}
+              className={settingsInputClasses}
             />
           </Labeled>
-          <Labeled label="Address">
+          <Labeled label="Address" htmlFor="settings-footer-address">
             <input
+              id="settings-footer-address"
               value={form.footerAddress}
               onChange={(e) => set("footerAddress")(e.target.value)}
-              className={inputClasses}
+              className={settingsInputClasses}
             />
           </Labeled>
         </div>
@@ -284,7 +218,7 @@ export default function SettingsForm({ initial }: { initial: SiteSettingsData })
                     ),
                   )
                 }
-                className={inputClasses}
+                className={settingsInputClasses}
               />
               <input
                 aria-label={`Social URL ${index + 1}`}
@@ -297,7 +231,7 @@ export default function SettingsForm({ initial }: { initial: SiteSettingsData })
                     ),
                   )
                 }
-                className={inputClasses}
+                className={settingsInputClasses}
               />
               <button
                 type="button"

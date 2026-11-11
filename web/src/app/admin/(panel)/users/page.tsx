@@ -2,7 +2,13 @@ import { canView } from "@/lib/admin/permissions";
 import { getSessionRole } from "@/lib/admin/session";
 import { getServiceClient, isSupabaseConfigured } from "@/lib/supabase/admin";
 import SetupNotice from "../SetupNotice";
-import { setUserRoleAction } from "./actions";
+import {
+  AdminEmptyState,
+  AdminTableBody,
+  AdminTableHead,
+  AdminTableShell,
+} from "../components/AdminTableShell";
+import UserRoleForm from "./UserRoleForm";
 
 export const metadata = { title: "Admin — Users" };
 
@@ -50,6 +56,8 @@ export default async function UsersPage() {
     (profilesResult.data ?? []).map((row) => [row.id, row.role as string]),
   );
 
+  const users = authResult.data.users;
+
   return (
     <div className="space-y-6">
       <div>
@@ -63,27 +71,31 @@ export default async function UsersPage() {
         </p>
       </div>
 
-      <div className="overflow-x-auto rounded-atelier-lg border border-line">
-        <table className="min-w-full text-left text-sm">
-          <thead className="bg-surface text-xs uppercase text-ink-subtle">
+      {users.length === 0 ? (
+        <AdminEmptyState
+          title="No users yet"
+          description="Create an admin in the Supabase dashboard, then sign in once to create a profile row."
+        />
+      ) : (
+        <AdminTableShell>
+          <AdminTableHead>
             <tr>
               <th scope="col" className="px-4 py-3">Email</th>
               <th scope="col" className="px-4 py-3">Role</th>
               <th scope="col" className="px-4 py-3">Created</th>
               <th scope="col" className="px-4 py-3 text-right">Change role</th>
             </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-800 bg-canvas/50">
-            {authResult.data.users.map((authUser) => {
+          </AdminTableHead>
+          <AdminTableBody>
+            {users.map((authUser) => {
               const current = roleById.get(authUser.id) ?? null;
+              const email = authUser.email ?? authUser.id;
               return (
                 <tr key={authUser.id} className="hover:bg-surface/80">
-                  <td className="px-4 py-3 text-ink-muted">
-                    {authUser.email ?? authUser.id}
-                  </td>
+                  <td className="px-4 py-3 text-ink-muted">{email}</td>
                   <td className="px-4 py-3">
                     {current ? (
-                      <span className="rounded-full bg-surface-raised px-2.5 py-0.5 text-xs text-signal">
+                      <span className="rounded-atelier bg-surface-raised px-2.5 py-0.5 text-xs text-signal">
                         {current}
                       </span>
                     ) : (
@@ -98,36 +110,18 @@ export default async function UsersPage() {
                       : "—"}
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <form
-                      action={setUserRoleAction.bind(null, authUser.id)}
-                      className="inline-flex items-center gap-2"
-                    >
-                      <label htmlFor={`role-${authUser.id}`} className="sr-only">
-                        New role for {authUser.email ?? authUser.id}
-                      </label>
-                      <select
-                        id={`role-${authUser.id}`}
-                        name="role"
-                        defaultValue={current ?? "editor"}
-                        className="rounded-atelier border border-line bg-surface-raised px-2 py-1.5 text-xs text-ink focus:border-signal focus:outline-none"
-                      >
-                        <option value="editor">editor</option>
-                        <option value="owner">owner</option>
-                      </select>
-                      <button
-                        type="submit"
-                        className="rounded-atelier bg-surface-raised px-3 py-1.5 text-xs text-ink-muted transition-colors duration-200 hover:bg-surface-raised"
-                      >
-                        Apply
-                      </button>
-                    </form>
+                    <UserRoleForm
+                      userId={authUser.id}
+                      email={email}
+                      currentRole={current}
+                    />
                   </td>
                 </tr>
               );
             })}
-          </tbody>
-        </table>
-      </div>
+          </AdminTableBody>
+        </AdminTableShell>
+      )}
     </div>
   );
 }

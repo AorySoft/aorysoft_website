@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
@@ -9,22 +9,31 @@ import BrandMark from "@/components/BrandMark";
 type NavItem = {
   name: string;
   path: string;
-  sectionId?: string;
 };
 
-const navItems: NavItem[] = [
-  { name: "Home", path: "/" },
-  { name: "About", path: "/", sectionId: "about" },
-  { name: "Services", path: "/", sectionId: "services" },
-  { name: "Blog", path: "/blog" },
-  { name: "Careers", path: "/careers" },
-  { name: "Contact", path: "/contact" },
-];
-
-const Navbar = () => {
+const Navbar = ({
+  showBlog = false,
+  showWork = false,
+}: {
+  showBlog?: boolean;
+  showWork?: boolean;
+}) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
+  const menuId = useId();
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const menuPanelRef = useRef<HTMLDivElement>(null);
+
+  const navItems: NavItem[] = [
+    { name: "Home", path: "/" },
+    { name: "Services", path: "/services" },
+    { name: "About", path: "/about" },
+    ...(showBlog ? [{ name: "Blog", path: "/blog" }] : []),
+    ...(showWork ? [{ name: "Case studies", path: "/work" }] : []),
+    { name: "Careers", path: "/careers" },
+    { name: "Contact", path: "/contact" },
+  ];
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 24);
@@ -41,17 +50,59 @@ const Navbar = () => {
 
   useEffect(() => {
     if (!isMobileMenuOpen) return;
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setIsMobileMenuOpen(false);
+
+    const panel = menuPanelRef.current;
+    const menuButton = menuButtonRef.current;
+    const firstLink = panel?.querySelector<HTMLElement>("a, button");
+    firstLink?.focus({ preventScroll: true });
+
+    const main = document.getElementById("main-content");
+    const footer = document.querySelector("footer");
+    main?.setAttribute("inert", "");
+    footer?.setAttribute("inert", "");
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setIsMobileMenuOpen(false);
+        return;
+      }
+      if (event.key !== "Tab" || !panel) return;
+      // The close (X) toggle is part of the cycle so keyboard users can reach
+      // it, not only Escape. It precedes the panel in DOM order.
+      const focusable = [
+        ...(menuButton ? [menuButton] : []),
+        ...panel.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      ];
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement as HTMLElement | null;
+      if (!active || !focusable.includes(active)) {
+        event.preventDefault();
+        (event.shiftKey ? last : first).focus();
+      } else if (event.shiftKey && active === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && active === last) {
+        event.preventDefault();
+        first.focus();
+      }
     };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      main?.removeAttribute("inert");
+      footer?.removeAttribute("inert");
+      menuButton?.focus({ preventScroll: true });
+    };
   }, [isMobileMenuOpen]);
 
   // Active state is carried by underline + aria-current, not colour alone (WCAG 1.4.1).
   const isActive = (item: NavItem) =>
-    !item.sectionId &&
-    (item.path === "/" ? pathname === "/" : pathname.startsWith(item.path));
+    item.path === "/" ? pathname === "/" : pathname.startsWith(item.path);
 
   const linkClasses = (active: boolean) =>
     `text-sm underline-offset-[6px] transition-colors duration-200 ${
@@ -63,7 +114,7 @@ const Navbar = () => {
   return (
     <nav
       aria-label="Main"
-      className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 pt-[env(safe-area-inset-top,0px)] transition-colors duration-300 ${
         isScrolled
           ? "border-b border-line bg-canvas/90 backdrop-blur-md"
           : "bg-transparent"
@@ -77,7 +128,7 @@ const Navbar = () => {
             {navItems.map((item) => (
               <Link
                 key={item.name}
-                href={item.sectionId ? `/#${item.sectionId}` : item.path}
+                href={item.path}
                 aria-current={isActive(item) ? "page" : undefined}
                 className={`py-2 ${linkClasses(isActive(item))}`}
               >
@@ -93,11 +144,12 @@ const Navbar = () => {
           </div>
 
           <button
+            ref={menuButtonRef}
             type="button"
             className="inline-flex h-10 w-10 items-center justify-center rounded-atelier text-ink-muted transition hover:bg-surface hover:text-ink md:hidden"
             aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
             aria-expanded={isMobileMenuOpen}
-            aria-controls="mobile-menu"
+            aria-controls={menuId}
             onClick={() => setIsMobileMenuOpen((open) => !open)}
           >
             {isMobileMenuOpen ? (
@@ -111,14 +163,15 @@ const Navbar = () => {
 
       {isMobileMenuOpen ? (
         <div
-          id="mobile-menu"
+          id={menuId}
+          ref={menuPanelRef}
           className="border-t border-line bg-canvas/95 backdrop-blur-md md:hidden"
         >
           <div className="shell space-y-1 py-4">
             {navItems.map((item) => (
               <Link
                 key={item.name}
-                href={item.sectionId ? `/#${item.sectionId}` : item.path}
+                href={item.path}
                 onClick={() => setIsMobileMenuOpen(false)}
                 aria-current={isActive(item) ? "page" : undefined}
                 className={`block rounded-atelier px-3 py-2.5 ${linkClasses(

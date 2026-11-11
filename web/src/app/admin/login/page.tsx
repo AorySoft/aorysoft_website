@@ -14,21 +14,19 @@ export default async function LoginPage() {
   );
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-slate-50">
-      <div className="w-full max-w-sm rounded-lg border border-slate-200 bg-white p-8 shadow-sm">
-        <h1 className="text-lg font-semibold text-slate-900">
-          AorySoft admin
-        </h1>
-        <p className="mt-1 text-sm text-slate-500">Sign in to continue</p>
+    <main className="flex min-h-screen items-center justify-center bg-canvas px-4">
+      <div className="surface-panel w-full max-w-sm p-8">
+        <h1 className="font-display text-2xl text-ink">AorySoft admin</h1>
+        <p className="mt-1 text-sm text-ink-muted">Sign in to continue</p>
         <div className="mt-6">
           {envConfigured ? (
             <LoginForm />
           ) : (
-            <p className="rounded border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800">
+            <p className="rounded-atelier-lg border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-200">
               Supabase is not configured yet. Copy{" "}
-              <code className="font-mono">web/.env.example</code> to{" "}
-              <code className="font-mono">web/.env.local</code> and fill in
-              your project values.
+              <code className="font-mono text-ink">web/.env.example</code> to{" "}
+              <code className="font-mono text-ink">web/.env.local</code> and fill
+              in your project values.
             </p>
           )}
         </div>

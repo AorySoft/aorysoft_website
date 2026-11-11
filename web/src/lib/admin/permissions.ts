@@ -6,8 +6,8 @@
 //   owner  = everything, including all deletions, users/roles, site settings,
 //            newsletter subscriber management.
 //   editor = create/edit on content areas (posts, categories, services, jobs,
-//            media) plus submission status transitions; NO deletions, NO
-//            users/roles, NO site settings, NO newsletter subscriber access.
+//            media, case studies) plus submission status transitions; NO
+//            deletions, NO users/roles, NO site settings, NO newsletter.
 // (Loosening "editor can delete content" is an owner decision on request.)
 
 export type Role = "owner" | "editor";
@@ -18,6 +18,7 @@ export type Area =
   | "services"
   | "jobs"
   | "reviews"
+  | "cases"
   | "media"
   | "submissions"
   | "newsletter"
@@ -30,6 +31,7 @@ const EDITOR_AREAS: ReadonlySet<Area> = new Set([
   "services",
   "jobs",
   "reviews",
+  "cases",
   "media",
   "submissions",
 ]);

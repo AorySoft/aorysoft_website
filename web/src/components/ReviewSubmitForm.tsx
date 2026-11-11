@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 import TurnstileField from "@/components/TurnstileField";
+import HoneypotField from "@/components/HoneypotField";
 import { submitReview } from "@/lib/public-forms/actions";
 import { idleFormState } from "@/lib/public-forms/state";
 
@@ -28,6 +29,9 @@ export default function ReviewSubmitForm({
     process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
   );
   const turnstileMissing = turnstileConfigured && !turnstileToken;
+  const fieldError = (name: string) => state.fieldErrors?.[name];
+  const describedBy = (name: string) =>
+    fieldError(name) ? `review-${name}-error` : undefined;
 
   if (state.status === "success") {
     return (
@@ -57,9 +61,13 @@ export default function ReviewSubmitForm({
             defaultValue={prefill?.displayName ?? ""}
             className="field-input"
             autoComplete="nickname"
+            aria-invalid={Boolean(fieldError("displayName"))}
+            aria-describedby={describedBy("displayName")}
           />
-          {state.fieldErrors?.displayName ? (
-            <p className="mt-1 text-xs text-red-300">{state.fieldErrors.displayName}</p>
+          {fieldError("displayName") ? (
+            <p id="review-displayName-error" className="mt-1 text-xs text-red-300">
+              {fieldError("displayName")}
+            </p>
           ) : null}
         </div>
         <div>
@@ -75,9 +83,13 @@ export default function ReviewSubmitForm({
             defaultValue={prefill?.email ?? ""}
             className="field-input"
             autoComplete="email"
+            aria-invalid={Boolean(fieldError("email"))}
+            aria-describedby={describedBy("email")}
           />
-          {state.fieldErrors?.email ? (
-            <p className="mt-1 text-xs text-red-300">{state.fieldErrors.email}</p>
+          {fieldError("email") ? (
+            <p id="review-email-error" className="mt-1 text-xs text-red-300">
+              {fieldError("email")}
+            </p>
           ) : null}
         </div>
       </div>
@@ -93,6 +105,8 @@ export default function ReviewSubmitForm({
             required
             defaultValue="5"
             className="field-input"
+            aria-invalid={Boolean(fieldError("rating"))}
+            aria-describedby={describedBy("rating")}
           >
             {[5, 4, 3, 2, 1].map((n) => (
               <option key={n} value={n}>
@@ -100,6 +114,11 @@ export default function ReviewSubmitForm({
               </option>
             ))}
           </select>
+          {fieldError("rating") ? (
+            <p id="review-rating-error" className="mt-1 text-xs text-red-300">
+              {fieldError("rating")}
+            </p>
+          ) : null}
         </div>
         <div>
           <label htmlFor="review-service" className="mb-2 block text-sm text-ink-muted">
@@ -111,7 +130,17 @@ export default function ReviewSubmitForm({
             maxLength={200}
             defaultValue={prefill?.projectOrService ?? ""}
             className="field-input"
+            aria-invalid={Boolean(fieldError("projectOrService"))}
+            aria-describedby={describedBy("projectOrService")}
           />
+          {fieldError("projectOrService") ? (
+            <p
+              id="review-projectOrService-error"
+              className="mt-1 text-xs text-red-300"
+            >
+              {fieldError("projectOrService")}
+            </p>
+          ) : null}
         </div>
       </div>
 
@@ -126,9 +155,13 @@ export default function ReviewSubmitForm({
           rows={5}
           maxLength={4000}
           className="field-input resize-none"
+          aria-invalid={Boolean(fieldError("reviewText"))}
+          aria-describedby={describedBy("reviewText")}
         />
-        {state.fieldErrors?.reviewText ? (
-          <p className="mt-1 text-xs text-red-300">{state.fieldErrors.reviewText}</p>
+        {fieldError("reviewText") ? (
+          <p id="review-reviewText-error" className="mt-1 text-xs text-red-300">
+            {fieldError("reviewText")}
+          </p>
         ) : null}
       </div>
 
@@ -139,31 +172,21 @@ export default function ReviewSubmitForm({
           value="yes"
           required
           className="mt-1 rounded-atelier border-line-strong bg-surface-raised text-signal focus:ring-signal"
+          aria-invalid={Boolean(fieldError("consent"))}
+          aria-describedby={describedBy("consent")}
         />
         <span>
           I consent to AorySoft publishing this review on the website after
           moderation. *
         </span>
       </label>
-      {state.fieldErrors?.consent ? (
-        <p className="text-xs text-red-300">{state.fieldErrors.consent}</p>
+      {fieldError("consent") ? (
+        <p id="review-consent-error" className="text-xs text-red-300">
+          {fieldError("consent")}
+        </p>
       ) : null}
 
-      <div
-        aria-hidden="true"
-        className="absolute -left-[9999px] h-px w-px overflow-hidden"
-      >
-        <label htmlFor="review-website">Website</label>
-        <input
-          id="review-website"
-          name="website"
-          type="text"
-          tabIndex={-1}
-          autoComplete="off"
-          defaultValue=""
-        />
-      </div>
-
+      <HoneypotField id="review-website" />
       <TurnstileField onTokenChange={setTurnstileToken} />
 
       {state.status === "error" ? (

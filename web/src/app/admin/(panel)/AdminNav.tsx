@@ -18,12 +18,14 @@ const items: NavItem[] = [
   { href: "/admin/posts", label: "Blog Posts", area: "posts" },
   { href: "/admin/categories", label: "Categories", area: "categories" },
   { href: "/admin/services", label: "Services", area: "services" },
+  { href: "/admin/cases", label: "Case studies", area: "cases" },
   { href: "/admin/jobs", label: "Jobs", area: "jobs" },
   { href: "/admin/reviews", label: "Reviews", area: "reviews" },
   { href: "/admin/media", label: "Media", area: "media" },
   { href: "/admin/submissions", label: "Submissions", area: "submissions" },
   { href: "/admin/newsletter", label: "Newsletter", area: "newsletter" },
   { href: "/admin/settings", label: "Site Settings", area: "settings" },
+  { href: "/admin/csp-reports", label: "CSP reports", area: "settings" },
   { href: "/admin/users", label: "Users", area: "users" },
 ];
 
@@ -71,8 +73,18 @@ export default function AdminNav({
     return (
       <div className="space-y-4">
         {nav}
-        <div className="border-t border-line pt-4 text-xs text-ink-subtle">
-          {email} · {role ?? "no role"}
+        <div className="space-y-3 border-t border-line pt-4">
+          <p className="text-xs text-ink-subtle">
+            {email} · {role ?? "no role"}
+          </p>
+          <form action={signOut}>
+            <button
+              type="submit"
+              className="w-full rounded-atelier border border-line px-3 py-2 text-left text-sm text-ink-muted transition-colors duration-200 hover:bg-surface-raised hover:text-ink"
+            >
+              Sign out
+            </button>
+          </form>
         </div>
       </div>
     );

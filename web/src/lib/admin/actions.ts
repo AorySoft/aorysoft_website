@@ -8,6 +8,13 @@ import {
   validateResourceInput,
   type ResourceKey,
 } from "./resources";
+import { revalidationTargets } from "./revalidation";
+import {
+  SLUG_LOCKED_MESSAGE,
+  SLUG_LOCK_RESOURCES,
+  friendlySlugError,
+  isSlugLocked,
+} from "./slug-lock";
 
 export type ActionState = {
   ok: boolean;
@@ -53,13 +60,13 @@ function formDataToRecord(formData: FormData): Record<string, unknown> {
   return record;
 }
 
+// Publish/unpublish must not wait for the 60 s ISR window or a redeploy:
+// targets include the public layout (nav gates) and the sitemap (N1).
 function revalidateFor(key: ResourceKey) {
-  for (const path of resources[key].revalidate) revalidatePath(path);
-  // Blog article pages are dynamic routes; the "page" form revalidates every
-  // instance of the pattern so edits/renames/unpublishes are reflected without
-  // waiting for the 60 s ISR window (plan §8).
-  if (key === "posts") revalidatePath("/blog/[slug]", "page");
-  revalidatePath(`/admin/${key}`);
+  for (const target of revalidationTargets(key)) {
+    if (target.type) revalidatePath(target.path, target.type);
+    else revalidatePath(target.path);
+  }
 }
 
 export async function createResource(
@@ -76,7 +83,11 @@ export async function createResource(
   if (!validated.ok) return { ok: false, errors: validated.errors };
 
   const { error } = await supabase.from(resources[key].table).insert(validated.value);
-  if (error) return { ok: false, error: `Save failed: ${error.message}` };
+  if (error) {
+    const slugErrors = friendlySlugError(error, resources[key].singular);
+    if (slugErrors) return { ok: false, errors: slugErrors };
+    return { ok: false, error: `Save failed: ${error.message}` };
+  }
 
   revalidateFor(key);
   return { ok: true };
@@ -95,11 +106,39 @@ export async function updateResource(
   const validated = validateResourceInput(key, formDataToRecord(formData));
   if (!validated.ok) return { ok: false, errors: validated.errors };
 
+  const payload = { ...validated.value };
+
+  // Services/cases: the slug locks once the page has been published, so a
+  // public URL never changes (simpler than redirects). select("*") works
+  // whether or not migration 0016 (slug_locked_at) is applied yet; the 0016
+  // trigger enforces the same rule in the database.
+  if (SLUG_LOCK_RESOURCES.has(key)) {
+    const { data: existing } = await supabase
+      .from(resources[key].table)
+      .select("*")
+      .eq("id", id)
+      .maybeSingle();
+    if (existing && isSlugLocked(key, existing as Record<string, unknown>)) {
+      const currentSlug = (existing as { slug?: string | null }).slug ?? null;
+      if ((payload.slug ?? null) !== currentSlug) {
+        return { ok: false, errors: { slug: SLUG_LOCKED_MESSAGE } };
+      }
+    }
+  }
+
+  if (key === "cases" && payload.status === "published" && !payload.published_at) {
+    payload.published_at = new Date().toISOString().slice(0, 10);
+  }
+
   const { error } = await supabase
     .from(resources[key].table)
-    .update({ ...validated.value, updated_at: new Date().toISOString() })
+    .update({ ...payload, updated_at: new Date().toISOString() })
     .eq("id", id);
-  if (error) return { ok: false, error: `Save failed: ${error.message}` };
+  if (error) {
+    const slugErrors = friendlySlugError(error, resources[key].singular);
+    if (slugErrors) return { ok: false, errors: slugErrors };
+    return { ok: false, error: `Save failed: ${error.message}` };
+  }
 
   revalidateFor(key);
   return { ok: true };

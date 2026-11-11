@@ -86,18 +86,19 @@ function Workflow() {
   );
 }
 
+// Honesty: generic groups and sample bar lengths only — no real metric, period, or value.
 function Insight() {
   const bars = [
-    ["Web", "78%"],
-    ["Mobile app", "62%"],
-    ["Marketplace", "41%"],
-    ["In-store", "24%"],
+    ["Group A", "78%"],
+    ["Group B", "62%"],
+    ["Group C", "41%"],
+    ["Group D", "24%"],
   ];
   return (
     <div className="flex h-full flex-col justify-center gap-4 text-sm">
       <Reveal i={0} className="text-ink">
-        Orders by channel
-        <span className="mt-1 block font-mono text-xs text-ink-subtle">group by channel · last 8 weeks</span>
+        Report view
+        <span className="mt-1 block font-mono text-xs text-ink-subtle">sample shapes · no real data</span>
       </Reveal>
       {bars.map(([label, width], index) => (
         <div key={label} className="grid grid-cols-[6.5rem_1fr] items-center gap-3">

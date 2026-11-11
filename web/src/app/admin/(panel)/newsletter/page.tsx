@@ -4,6 +4,12 @@ import { getSessionRole } from "@/lib/admin/session";
 import { isPublicSupabaseConfigured } from "@/lib/supabase/admin";
 import SetupNotice from "../SetupNotice";
 import ConfirmDeleteButton from "../components/ConfirmDeleteButton";
+import {
+  AdminEmptyState,
+  AdminTableBody,
+  AdminTableHead,
+  AdminTableShell,
+} from "../components/AdminTableShell";
 import { deleteSubscriber } from "./actions";
 
 export const metadata = { title: "Admin — Newsletter" };
@@ -51,8 +57,8 @@ export default async function NewsletterPage() {
 
       <p className="text-sm text-ink-subtle">
         Double opt-in: subscribers land as <em>pending</em> and only flip to{" "}
-        <em>confirmed</em> via the emailed token link (Phase 4). Unconfirmed
-        addresses never receive newsletter email.
+        <em>confirmed</em> via the emailed token link. Unconfirmed addresses
+        never receive newsletter email.
       </p>
 
       {error && (
@@ -62,64 +68,60 @@ export default async function NewsletterPage() {
       )}
 
       {!error && subscribers.length === 0 && (
-        <div className="rounded-atelier-lg border border-line bg-surface/80 p-10 text-center">
-          <p className="font-medium text-ink">No subscribers yet</p>
-          <p className="mt-1 text-sm text-ink-subtle">
-            The signup flow goes live with the Phase 4 newsletter pipeline.
-          </p>
-        </div>
+        <AdminEmptyState
+          title="No subscribers yet"
+          description="Confirmed newsletter signups from the blog will appear here."
+        />
       )}
 
       {subscribers.length > 0 && (
-        <div className="overflow-x-auto rounded-atelier-lg border border-line">
-          <table className="min-w-full text-left text-sm">
-            <thead className="bg-surface text-xs uppercase text-ink-subtle">
-              <tr>
-                <th scope="col" className="px-4 py-3">Added</th>
-                <th scope="col" className="px-4 py-3">Email</th>
-                <th scope="col" className="px-4 py-3">Status</th>
-                <th scope="col" className="px-4 py-3">Consent</th>
-                <th scope="col" className="px-4 py-3 text-right">Actions</th>
+        <AdminTableShell>
+          <AdminTableHead>
+            <tr>
+              <th scope="col" className="px-4 py-3">Added</th>
+              <th scope="col" className="px-4 py-3">Email</th>
+              <th scope="col" className="px-4 py-3">Status</th>
+              <th scope="col" className="px-4 py-3">Consent</th>
+              <th scope="col" className="px-4 py-3 text-right">Actions</th>
+            </tr>
+          </AdminTableHead>
+          <AdminTableBody>
+            {subscribers.map((row) => (
+              <tr key={row.id} className="hover:bg-surface/80">
+                <td className="px-4 py-3 text-ink-muted">
+                  {new Date(row.created_at).toLocaleDateString()}
+                </td>
+                <td className="px-4 py-3 text-ink-muted">{row.email}</td>
+                <td className="px-4 py-3">
+                  <span
+                    className={`rounded-atelier px-2.5 py-0.5 text-xs ${
+                      row.status === "confirmed"
+                        ? "bg-emerald-500/20 text-emerald-300"
+                        : row.status === "pending"
+                          ? "bg-amber-500/20 text-amber-300"
+                          : "bg-surface-raised text-ink-subtle"
+                    }`}
+                  >
+                    {row.status}
+                  </span>
+                </td>
+                <td className="px-4 py-3 text-ink-subtle">
+                  {row.consent_at
+                    ? new Date(row.consent_at).toLocaleDateString()
+                    : "—"}
+                </td>
+                <td className="px-4 py-3 text-right">
+                  <ConfirmDeleteButton
+                    action={deleteSubscriber}
+                    id={row.id}
+                    label={`Delete subscriber ${row.email}`}
+                    confirmMessage={`Delete ${row.email} from the subscriber list?`}
+                  />
+                </td>
               </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-800 bg-canvas/50">
-              {subscribers.map((row) => (
-                <tr key={row.id} className="hover:bg-surface/80">
-                  <td className="px-4 py-3 text-ink-muted">
-                    {new Date(row.created_at).toLocaleDateString()}
-                  </td>
-                  <td className="px-4 py-3 text-ink-muted">{row.email}</td>
-                  <td className="px-4 py-3">
-                    <span
-                      className={`rounded-full px-2.5 py-0.5 text-xs ${
-                        row.status === "confirmed"
-                          ? "bg-green-500/20 text-green-300"
-                          : row.status === "pending"
-                            ? "bg-amber-500/20 text-amber-300"
-                            : "bg-surface-raised text-ink-subtle"
-                      }`}
-                    >
-                      {row.status}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-ink-subtle">
-                    {row.consent_at
-                      ? new Date(row.consent_at).toLocaleDateString()
-                      : "—"}
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    <ConfirmDeleteButton
-                      action={deleteSubscriber}
-                      id={row.id}
-                      label={`Delete subscriber ${row.email}`}
-                      confirmMessage={`Delete ${row.email} from the subscriber list?`}
-                    />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </AdminTableBody>
+        </AdminTableShell>
       )}
     </div>
   );

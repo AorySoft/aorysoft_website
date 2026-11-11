@@ -1,5 +1,6 @@
-// Server-only helper: option lists for relational form fields (posts' category
-// and cover image). Reads run under the caller's session, so RLS applies.
+// Server-only helper: option lists for relational form fields (categoryRef /
+// mediaRef — posts cover image, review profile image, etc.). Reads run under
+// the caller's session, so RLS applies.
 import type { createClient } from "@/lib/supabase/server";
 
 export type SupabaseServer = Awaited<ReturnType<typeof createClient>>;

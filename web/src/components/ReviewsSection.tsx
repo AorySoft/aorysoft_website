@@ -1,5 +1,6 @@
 import Image from "next/image";
 import type { ReviewWithImage } from "@/lib/data";
+import SectionHeader from "@/components/patterns/SectionHeader";
 
 function Stars({ rating }: { rating: number }) {
   return (
@@ -25,18 +26,15 @@ export default function ReviewsSection({
     <section
       id="reviews"
       aria-labelledby="reviews-title"
-      className="section-y scroll-mt-16 border-t border-line bg-surface"
+      className="section-y scroll-mt-16 border-t border-line"
     >
       <div className="shell">
-        <div className="max-w-3xl">
-          <h2 id="reviews-title" className="display-title">
-            Client reviews
-          </h2>
-          <p className="body-lead mt-5">
-            Only real client feedback we have permission to show. No made-up
-            quotes.
-          </p>
-        </div>
+        <SectionHeader split
+          id="reviews-title"
+          eyebrow="Client feedback"
+          title="Client reviews"
+          lead="Only real client feedback we have permission to show. No made-up quotes."
+        />
 
         {items.length === 0 ? (
           <p className="mt-12 max-w-2xl text-base leading-relaxed text-ink-muted">
@@ -44,9 +42,9 @@ export default function ReviewsSection({
             private feedback link. Approved reviews appear here.
           </p>
         ) : (
-          <ul className="mt-14 grid grid-cols-1 gap-10 md:grid-cols-2">
+          <ul className="mt-[clamp(1.5rem,5svh,3.5rem)] grid grid-cols-1 gap-[clamp(1.5rem,4svh,2.5rem)] md:grid-cols-2">
             {items.map((review) => (
-              <li key={review.id} className="border-t border-line pt-8">
+              <li key={review.id} className="border-t border-line pt-[clamp(1.25rem,3svh,2rem)]">
                 <Stars rating={review.rating} />
                 <blockquote className="mt-4 text-lg leading-relaxed text-ink">
                   “{review.review_text}”

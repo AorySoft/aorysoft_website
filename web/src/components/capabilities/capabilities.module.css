@@ -109,3 +109,29 @@
     display: none;
   }
 }
+
+/* Active-tab underline: draws in from the left (CSS replacement for the Framer layout animation). */
+.indicator {
+  transform-origin: left center;
+  animation: grow 350ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .indicator {
+    animation: none;
+  }
+}
+
+/* Sizing rule: the example frame is capped by viewport height as well as width,
+   keeping its aspect ratio (5:4 stacked, 16:10 beside the copy). */
+.stage > div {
+  max-width: min(100%, calc(52svh * 1.25));
+  min-height: min(17rem, 48svh);
+}
+
+@media (min-width: 1024px) {
+  .stage > div {
+    /* Leave room for the section header and tabs on 720–768px-tall laptops. */
+    max-width: min(100%, calc((var(--avail-h) - 20rem) * 1.6));
+  }
+}

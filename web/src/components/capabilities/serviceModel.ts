@@ -1,4 +1,5 @@
 import type { ServiceRow } from "@/lib/types";
+import { isServiceDetailPublished } from "@/lib/services-publish";
 
 export type VignetteKind =
   | "chat"
@@ -17,6 +18,8 @@ export type Capability = {
   subtitle: string;
   description: string;
   features: string[];
+  /** Detail page URL when the service meets the publish threshold, else null. */
+  href: string | null;
 };
 
 /** Admin icon choice → the illustrative vignette shown in the switchboard. */
@@ -35,69 +38,6 @@ export function vignetteFor(iconKey: string): VignetteKind {
   return VIGNETTES[iconKey] ?? "build";
 }
 
-export const PLACEHOLDER_CAPABILITIES: Capability[] = [
-  {
-    id: "placeholder-ai-automation",
-    iconKey: "bot",
-    title: "AI Automation",
-    subtitle: "Cut repetitive work with practical AI workflows",
-    description:
-      "Automate the busywork: document handling, workflows, and ops tools that save time without adding ceremony.",
-    features: [
-      "Robotic Process Automation (RPA)",
-      "Intelligent Document Processing",
-      "Workflow Optimization",
-      "Predictive Analytics",
-      "Natural Language Processing",
-    ],
-  },
-  {
-    id: "placeholder-custom-software",
-    iconKey: "code",
-    title: "Custom Software",
-    subtitle: "Web, mobile, and SaaS products",
-    description:
-      "Websites, apps, and product platforms shaped around how your team actually works.",
-    features: [
-      "Website Design & Development",
-      "Custom Web Applications",
-      "Mobile Applications",
-      "SaaS Product Development",
-      "Admin Panels & Dashboards",
-    ],
-  },
-  {
-    id: "placeholder-ai-agents",
-    iconKey: "brain",
-    title: "AI Agents & Chat",
-    subtitle: "Assistants that work in context",
-    description:
-      "Chatbots, voice agents, and custom agents connected to your data and tools, with humans in the loop where it matters.",
-    features: [
-      "AI Chatbot Development",
-      "AI Voice Agents",
-      "AI Agent Development",
-      "OpenAI and model integrations",
-      "Human-in-the-loop workflows",
-    ],
-  },
-  {
-    id: "placeholder-integrations-cloud",
-    iconKey: "cloud",
-    title: "Integrations & Cloud",
-    subtitle: "Connect systems and keep them running",
-    description:
-      "APIs, third-party integrations, cloud deploy, and maintenance so the stack stays reliable.",
-    features: [
-      "API Development & Integrations",
-      "Business Process Automation",
-      "Backend & Database Development",
-      "Cloud Deployment & Maintenance",
-      "n8n and workflow tooling",
-    ],
-  },
-];
-
 export function toCapability(row: ServiceRow): Capability {
   return {
     id: row.id,
@@ -106,11 +46,30 @@ export function toCapability(row: ServiceRow): Capability {
     subtitle: row.subtitle ?? "",
     description: row.description ?? "",
     features: Array.isArray(row.features) ? row.features.map(String) : [],
+    href: isServiceDetailPublished(row) && row.slug ? `/services/${row.slug}` : null,
   };
 }
 
-export function toCapabilities(rows?: ServiceRow[] | null): Capability[] {
-  return rows && rows.length > 0 ? rows.map(toCapability) : PLACEHOLDER_CAPABILITIES;
+/** Published detail page for the first service whose icon matches, in key priority order. */
+export function serviceHrefFor(rows: ServiceRow[] | null | undefined, keys: readonly string[]): string | null {
+  const published = (rows ?? []).map(toCapability).filter((item) => item.href);
+  const index = findCapabilityIndex(published, keys);
+  return index === -1 ? null : published[index].href;
+}
+
+/**
+ * Maps CMS service rows to UI capabilities.
+ *
+ * Empty/null CMS results yield an empty list — never silent placeholder
+ * catalog copy (FRONTEND_AUDIT F02 / PRODUCT trust rules). Tests may pass
+ * `{ placeholders }` to exercise the switchboard without a CMS.
+ */
+export function toCapabilities(
+  rows?: ServiceRow[] | null,
+  options?: { placeholders?: Capability[] },
+): Capability[] {
+  if (rows && rows.length > 0) return rows.map(toCapability);
+  return options?.placeholders ?? [];
 }
 
 /** First capability whose icon matches the requested keys, in key priority order. */

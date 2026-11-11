@@ -7,6 +7,7 @@ import {
   validateOptionalDate,
   validateOptionalUuid,
   validateRequiredText,
+  validateOptionalSlug,
   validateSlug,
   validateStringList,
 } from "./validate";
@@ -44,6 +45,20 @@ describe("validateSlug", () => {
     for (const bad of ["-lead", "trail-", "has space", "under_score", "", "double--hyphen"]) {
       expect(validateSlug(bad).ok, bad).toBe(false);
     }
+  });
+});
+
+describe("validateOptionalSlug", () => {
+  it("allows empty as null", () => {
+    expect(validateOptionalSlug("")).toMatchObject({ ok: true, value: null });
+    expect(validateOptionalSlug(undefined)).toMatchObject({
+      ok: true,
+      value: null,
+    });
+  });
+
+  it("still rejects invalid non-empty values", () => {
+    expect(validateOptionalSlug("Bad Slug").ok).toBe(false);
   });
 });
 

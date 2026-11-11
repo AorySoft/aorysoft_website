@@ -4,17 +4,13 @@ import { useEffect, useId, useRef, useState } from "react";
 import { MARK_PATHS, MARK_STOPS } from "@/components/brand/markGeometry";
 import { requestCapability } from "@/components/capabilities/serviceModel";
 import styles from "./HeroSculpture.module.css";
+import { HERO_NODES } from "./nodes";
 
 /** Mark placement inside the 600 × 600 scene: base lands on the horizon (y ≈ 399). */
 const MARK_TRANSFORM = "translate(130 90) scale(8)";
 const DEPTH_LAYERS = [7, 6, 5, 4, 3, 2, 1];
 
-const NODES = [
-  { label: "Web", x: 70, path: "M150 399V460L70 540", keys: ["code"] },
-  { label: "Apps", x: 235, path: "M185 399V490L235 540", keys: ["code", "database"] },
-  { label: "AI agents", x: 365, path: "M415 399V490L365 540", keys: ["brain", "bot"] },
-  { label: "Automation", x: 530, path: "M450 399V460L530 540", keys: ["zap", "bot"] },
-] as const;
+const NODES = HERO_NODES;
 
 function MarkPaths(props: React.SVGProps<SVGPathElement>) {
   return (
@@ -31,7 +27,12 @@ function MarkPaths(props: React.SVGProps<SVGPathElement>) {
  * toward the pointer, a light sweep across the filled mark, and signal lines
  * carrying pulses out to the four disciplines.
  */
-export default function HeroSculpture() {
+export default function HeroSculpture({
+  nodeHrefs = [],
+}: {
+  /** Per node (same order as NODES): a published service page, or null to open the capability tab. */
+  nodeHrefs?: readonly (string | null)[];
+}) {
   const rootRef = useRef<HTMLDivElement>(null);
   // Per-instance SVG ids: duplicate ids would point every copy at the first (possibly hidden) one.
   const uid = useId().replace(/[^a-zA-Z0-9_-]/g, "");
@@ -184,21 +185,24 @@ export default function HeroSculpture() {
       </span>
 
       <ul className={styles.labels} aria-label="What we build">
-        {NODES.map((node, index) => (
-          <li key={node.label} style={{ left: `${(node.x / 600) * 100}%` }}>
-            <a
-              href="#services"
-              className={styles.label}
-              onPointerEnter={() => setActiveNode(index)}
-              onPointerLeave={() => setActiveNode(null)}
-              onFocus={() => setActiveNode(index)}
-              onBlur={() => setActiveNode(null)}
-              onClick={() => requestCapability(node.keys)}
-            >
-              {node.label}
-            </a>
-          </li>
-        ))}
+        {NODES.map((node, index) => {
+          const href = nodeHrefs[index] ?? null;
+          return (
+            <li key={node.label} style={{ left: `${(node.x / 600) * 100}%` }}>
+              <a
+                href={href ?? "#services"}
+                className={styles.label}
+                onPointerEnter={() => setActiveNode(index)}
+                onPointerLeave={() => setActiveNode(null)}
+                onFocus={() => setActiveNode(index)}
+                onBlur={() => setActiveNode(null)}
+                onClick={href ? undefined : () => requestCapability(node.keys)}
+              >
+                {node.label}
+              </a>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

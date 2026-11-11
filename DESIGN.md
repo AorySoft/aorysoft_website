@@ -116,7 +116,19 @@ Deep black neutrals with a logo-derived signal accent.
 
 ## Layout
 
-`max-w-7xl` shell with generous section rhythm (`py-20` / `md:py-28`). Home: Hero → How we build → Capabilities → Selected work → Technology → Who we build for → Careers → Final CTA. Left-weighted editorial bands preferred over centered template stacks after the hero.
+`max-w-7xl` shell (gutters respect safe-area insets) with `section-y` rhythm. Home: Hero → Capabilities → How a project runs → Technology → Who we build for → Client reviews (only when ≥1 published) → Final CTA. Left-weighted editorial bands preferred over centered template stacks after the hero; every inner page opens with the shared `PageHero`, left-aligned at the shell edge.
+
+### Named Rules
+**The Viewport Fit Rule.** Size to the visible screen, not a fixed height.
+- **Hero.** The home hero (nav, h1, lead, CTAs, sculpture + wordmark) fits the first screen on laptops, including at 150% zoom.
+  - It fills `--avail-h` (`100svh` minus the nav), capped at 60rem.
+  - The sculpture's width derives from the height left over.
+- **Sections.** A section fits one viewport when its content allows. It grows only for real content: lists, forms, articles.
+  - Spacing and type use `clamp(min, min(vw, svh), max)`. `section-y`, `display-title` and `body-lead` already do.
+  - Illustrations and example frames are capped by viewport height as well as width.
+- **Page height.** No `min-h-screen` on public `<main>`.
+
+**The Example Label Rule.** Every illustrative scene sits in `ExampleFrame` with a visible "Illustrative example" caption. Scenes never show metrics, money, periods, client names, or results; a test enforces this.
 
 ## Elevation & Depth
 
@@ -144,6 +156,30 @@ Mostly tonal: bordered surfaces on black. Primary CTA may use a soft signal shad
 
 ### Brand
 - Official logo asset: `brand/aorysoft-logo.jpg` / `web/public/brand/aorysoft-logo.jpg`. SVG `AoryMark` approximates the geometric A for crisp UI.
+- **Mark geometry:** `components/brand/markGeometry.ts` (traced from `brand/aorysoft-mark.svg`) feeds:
+  - `AoryMark`
+  - the hero sculpture
+  - `GhostMark` (faint outline behind heroes)
+  - `lib/brand/mark-svg.ts` (plain-HTML newsletter pages)
+  - the OG image (Instrument Serif TTF in `src/app/fonts`)
+- The wordmark is text (Instrument Serif), never an image.
+
+### Shared patterns (`components/patterns/`)
+All of these are server components plus CSS, with no client JS.
+
+| Pattern | Use |
+|---|---|
+| `PageHero` | Inner-page hero: eyebrow, display h1, lead, optional back link and CTAs, GhostMark field. |
+| `SectionHeader` | Section eyebrow, h2 and lead. `split` puts the lead beside the title from lg up. |
+| `Eyebrow` | Small uppercase label with a signal node. |
+| `ExampleFrame` | Honesty frame for illustrative scenes (see the Example Label Rule). |
+| `StepRoute` | Ordered steps on a signal rail with a CSS pulse; static under reduced motion. Used for process and "how it works". |
+| `StackRows` | Technology as labeled layers; tools as text, never vendor logos. |
+| `ServiceRow` | Catalog row (services, related services) instead of a card grid. |
+| `EmptyState` | One honest sentence and one action on a short rail; never a tall empty band. |
+| `PageEndCta` | Closing band: "Get a Quote" plus one contextual secondary link. |
+
+**CTA wording:** the primary is always "Get a Quote" (`/quote`); the secondary is "Contact us" or a specific "View …" / "Explore …" link.
 
 ## Do's and Don'ts
 

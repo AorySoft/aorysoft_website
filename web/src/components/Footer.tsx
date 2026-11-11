@@ -1,32 +1,48 @@
+// Server component on marketing pages (no client JS, no hydration of the
+// year). The client error boundary (MarketingChromeClient) also renders it;
+// there it runs on the client only, so the year cannot mismatch (R4).
 import Link from "next/link";
 import { Mail } from "lucide-react";
 import BrandMark from "@/components/BrandMark";
 import { SOCIAL_LINKS } from "@/lib/social";
+import { SITE_DESCRIPTION } from "@/lib/site";
 
-const quickLinks = [
-  { name: "Home", path: "/" },
-  { name: "About", path: "/#about" },
-  { name: "Services", path: "/#services" },
-  { name: "Work", path: "/#work" },
-];
+export default function Footer({
+  showBlog = false,
+  showWork = false,
+  year = new Date().getFullYear(),
+  services = [],
+}: {
+  showBlog?: boolean;
+  showWork?: boolean;
+  /** Published service detail pages (title + href); the column is hidden when empty. */
+  services?: { title: string; href: string }[];
+  /** Copyright year; defaults to the current year at render time. */
+  year?: number;
+}) {
+  const explore = [
+    { name: "Home", path: "/" },
+    { name: "About", path: "/about" },
+    { name: "Services", path: "/services" },
+    ...(showWork ? [{ name: "Case studies", path: "/work" }] : []),
+    ...(showBlog ? [{ name: "Blog", path: "/blog" }] : []),
+  ];
 
-const companyLinks = [
-  { name: "Careers", path: "/careers" },
-  { name: "Blog", path: "/blog" },
-  { name: "Contact", path: "/contact" },
-  { name: "Get a Quote", path: "/quote" },
-];
+  const company = [
+    { name: "Careers", path: "/careers" },
+    { name: "Contact", path: "/contact" },
+    { name: "Get a Quote", path: "/quote" },
+  ];
 
-const Footer = () => {
   return (
-    <footer className="border-t border-line bg-surface">
-      <div className="shell py-14">
-        <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-3">
+    <footer className="border-t border-line bg-surface pb-[env(safe-area-inset-bottom,0px)]">
+      <div className="shell py-[clamp(2.5rem,7svh,3.5rem)]">
+        <div className={`grid grid-cols-1 gap-10 md:grid-cols-2 ${services.length > 0 ? "lg:grid-cols-4" : "lg:grid-cols-3"}`}>
           <div className="space-y-4">
             <BrandMark size="sm" />
+            {/* Same brand line as metadata, JSON-LD, and llms.txt. */}
             <p className="max-w-sm text-sm leading-6 text-ink-muted">
-              Software, AI, and automation for teams that need systems that
-              ship and stay maintainable.
+              {SITE_DESCRIPTION}
             </p>
             <ul className="flex flex-wrap gap-4 pt-1">
               {SOCIAL_LINKS.map((link) => (
@@ -47,7 +63,7 @@ const Footer = () => {
           <div className="space-y-4">
             <h2 className="text-sm font-semibold text-ink">Explore</h2>
             <div className="space-y-2">
-              {quickLinks.map((link) => (
+              {explore.map((link) => (
                 <Link
                   key={link.name}
                   href={link.path}
@@ -59,10 +75,27 @@ const Footer = () => {
             </div>
           </div>
 
+          {services.length > 0 ? (
+            <div className="space-y-4">
+              <h2 className="text-sm font-semibold text-ink">Services</h2>
+              <div className="space-y-2">
+                {services.map((service) => (
+                  <Link
+                    key={service.href}
+                    href={service.href}
+                    className="block text-sm text-ink-muted transition hover:text-signal"
+                  >
+                    {service.title}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          ) : null}
+
           <div className="space-y-4">
             <h2 className="text-sm font-semibold text-ink">Company</h2>
             <div className="space-y-2">
-              {companyLinks.map((link) => (
+              {company.map((link) => (
                 <Link
                   key={link.name}
                   href={link.path}
@@ -82,21 +115,13 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col items-start justify-between gap-4 border-t border-line pt-8 sm:flex-row sm:items-center">
-          <p className="text-sm text-ink-subtle">
-            © {new Date().getFullYear()} AorySoft. All rights reserved.
-          </p>
-          <div className="flex items-center gap-6 text-sm">
-            <Link
-              href="/privacy"
-              className="text-ink-muted transition hover:text-signal"
-            >
+        <div className="mt-12 flex flex-col gap-3 border-t border-line pt-6 text-xs text-ink-subtle sm:flex-row sm:items-center sm:justify-between">
+          <p>© {year} AorySoft. All rights reserved.</p>
+          <div className="flex gap-4">
+            <Link href="/privacy" className="hover:text-signal">
               Privacy
             </Link>
-            <Link
-              href="/terms"
-              className="text-ink-muted transition hover:text-signal"
-            >
+            <Link href="/terms" className="hover:text-signal">
               Terms
             </Link>
           </div>
@@ -104,6 +129,4 @@ const Footer = () => {
       </div>
     </footer>
   );
-};
-
-export default Footer;
+}

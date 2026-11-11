@@ -4,7 +4,38 @@
 // and the admin panel shows the honest "connect Supabase" setup state.
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { isPublicSupabaseConfigured } from "@/lib/supabase/admin";
-import type { JobRow, PostRow, ReviewRow, ServiceRow } from "@/lib/types";
+import {
+  isServiceDetailPublished,
+  normalizeDeliverables,
+  normalizeFaqs,
+  normalizeProcessSteps,
+} from "@/lib/services-publish";
+import type {
+  CaseStudyRow,
+  JobRow,
+  PostRow,
+  ReviewRow,
+  ServiceRow,
+} from "@/lib/types";
+
+const SERVICE_COLUMNS =
+  "id, title, subtitle, description, features, icon, color, sort_order, active, slug, seo_title, seo_description, deliverables, process_steps, technologies, faqs, created_at, updated_at";
+
+function normalizeServiceRow(row: ServiceRow): ServiceRow {
+  return {
+    ...row,
+    features: Array.isArray(row.features) ? row.features.map(String) : [],
+    deliverables: normalizeDeliverables(row.deliverables),
+    process_steps: normalizeProcessSteps(row.process_steps),
+    technologies: Array.isArray(row.technologies)
+      ? row.technologies.map(String).filter(Boolean)
+      : [],
+    faqs: normalizeFaqs(row.faqs),
+    slug: row.slug ?? null,
+    seo_title: row.seo_title ?? null,
+    seo_description: row.seo_description ?? null,
+  };
+}
 
 let anonClient: SupabaseClient | null = null;
 
@@ -35,7 +66,7 @@ async function safeQuery<T>(
 }
 
 export type PostWithRelations = PostRow & {
-  cover_image: { url: string } | null;
+  cover_image: { url: string; alt: string | null } | null;
   category: { name: string } | null;
 };
 
@@ -44,7 +75,7 @@ export async function getPublishedPosts(): Promise<PostWithRelations[] | null> {
     client
       .from("posts")
       .select(
-        "id, title, slug, excerpt, body_html, cover_image_id, author, publish_date, featured, status, seo_title, seo_description, seo_og_image_url, category_id, created_at, updated_at, cover_image:media!cover_image_id(url), category:categories(name)",
+        "id, title, slug, excerpt, body_html, cover_image_id, author, publish_date, featured, status, seo_title, seo_description, seo_og_image_url, category_id, created_at, updated_at, cover_image:media!cover_image_id(url, alt), category:categories(name)",
       )
       .eq("status", "published")
       .order("publish_date", { ascending: false })
@@ -64,7 +95,7 @@ export async function getPublishedPostBySlug(
     client
       .from("posts")
       .select(
-        "id, title, slug, excerpt, body_html, cover_image_id, author, publish_date, featured, status, seo_title, seo_description, seo_og_image_url, category_id, created_at, updated_at, cover_image:media!cover_image_id(url), category:categories(name)",
+        "id, title, slug, excerpt, body_html, cover_image_id, author, publish_date, featured, status, seo_title, seo_description, seo_og_image_url, category_id, created_at, updated_at, cover_image:media!cover_image_id(url, alt), category:categories(name)",
       )
       .eq("slug", slug)
       .eq("status", "published")
@@ -74,14 +105,67 @@ export async function getPublishedPostBySlug(
 }
 
 export async function getActiveServices(): Promise<ServiceRow[] | null> {
-  return safeQuery((client) =>
+  const rows = await safeQuery((client) =>
     client
       .from("services")
-      .select(
-        "id, title, subtitle, description, features, icon, color, sort_order, active, created_at, updated_at",
-      )
+      .select(SERVICE_COLUMNS)
       .eq("active", true)
-      .order("sort_order", { ascending: true }),
+      .order("sort_order", { ascending: true })
+      .returns<ServiceRow[]>(),
+  );
+  return rows ? rows.map(normalizeServiceRow) : null;
+}
+
+/** Active services that meet the public detail-page publish threshold. */
+export async function getPublishedServiceDetails(): Promise<ServiceRow[] | null> {
+  const rows = await getActiveServices();
+  if (!rows) return null;
+  return rows.filter(isServiceDetailPublished);
+}
+
+export async function getPublishedServiceBySlug(
+  slug: string,
+): Promise<ServiceRow | null> {
+  const row = await safeQuery((client) =>
+    client
+      .from("services")
+      .select(SERVICE_COLUMNS)
+      .eq("slug", slug)
+      .eq("active", true)
+      .maybeSingle()
+      .returns<ServiceRow | null>(),
+  );
+  if (!row) return null;
+  const normalized = normalizeServiceRow(row);
+  return isServiceDetailPublished(normalized) ? normalized : null;
+}
+
+export async function getPublishedCaseStudies(): Promise<CaseStudyRow[] | null> {
+  return safeQuery((client) =>
+    client
+      .from("case_studies")
+      .select(
+        "id, title, slug, summary, body, status, published_at, created_at, updated_at",
+      )
+      .eq("status", "published")
+      .order("published_at", { ascending: false })
+      .returns<CaseStudyRow[]>(),
+  );
+}
+
+export async function getPublishedCaseStudyBySlug(
+  slug: string,
+): Promise<CaseStudyRow | null> {
+  return safeQuery((client) =>
+    client
+      .from("case_studies")
+      .select(
+        "id, title, slug, summary, body, status, published_at, created_at, updated_at",
+      )
+      .eq("slug", slug)
+      .eq("status", "published")
+      .maybeSingle()
+      .returns<CaseStudyRow | null>(),
   );
 }
 
@@ -97,18 +181,25 @@ export async function getActiveJobs(): Promise<JobRow[] | null> {
   );
 }
 
-export type ReviewWithImage = ReviewRow & {
+/**
+ * Public review shape — never includes submitter_email (PII). Anon has no
+ * SELECT on that column after migration 0013, so it must not be requested.
+ */
+export type PublicReviewRow = Omit<ReviewRow, "submitter_email">;
+
+export type ReviewWithImage = PublicReviewRow & {
   profile_image: { url: string; alt: string } | null;
 };
+
+export const PUBLIC_REVIEW_COLUMNS =
+  "id, display_name, review_text, rating, source, source_url, project_or_service, attribution, profile_image_id, permission_confirmed, featured, status, sort_order, created_at, updated_at, profile_image:media!profile_image_id(url, alt)";
 
 /** Published reviews with confirmed display permission (RLS + filters). */
 export async function getPublishedReviews(): Promise<ReviewWithImage[] | null> {
   return safeQuery((client) =>
     client
       .from("reviews")
-      .select(
-        "id, display_name, review_text, rating, source, source_url, project_or_service, attribution, profile_image_id, permission_confirmed, featured, status, submitter_email, sort_order, created_at, updated_at, profile_image:media!profile_image_id(url, alt)",
-      )
+      .select(PUBLIC_REVIEW_COLUMNS)
       .eq("status", "published")
       .eq("permission_confirmed", true)
       .order("featured", { ascending: false })

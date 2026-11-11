@@ -6,6 +6,13 @@ import { useRouter } from "next/navigation";
 import { Search, Trash2 } from "lucide-react";
 import type { ResourceDef } from "@/lib/admin/resources";
 import { deleteResource, type ActionState } from "@/lib/admin/actions";
+import ConfirmDialog from "@/components/ConfirmDialog";
+import {
+  AdminEmptyState,
+  AdminTableBody,
+  AdminTableHead,
+  AdminTableShell,
+} from "./AdminTableShell";
 
 type Row = Record<string, unknown>;
 
@@ -36,6 +43,7 @@ export default function ResourceTable({
   const [page, setPage] = useState(0);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<Row | null>(null);
 
   const filtered = useMemo(() => {
     const needle = search.trim().toLowerCase();
@@ -72,9 +80,9 @@ export default function ResourceTable({
     }
   };
 
-  const handleDelete = async (row: Row) => {
-    const label = String(row.title ?? row.name ?? row.slug ?? "this item");
-    if (!window.confirm(`Delete "${label}"? This cannot be undone.`)) return;
+  const handleDelete = async () => {
+    if (!pendingDelete) return;
+    const row = pendingDelete;
     setDeletingId(String(row.id));
     setDeleteError(null);
     const result: ActionState = await deleteResource(def.key, String(row.id));
@@ -83,8 +91,13 @@ export default function ResourceTable({
       setDeleteError(result.error ?? "Delete failed.");
       return;
     }
+    setPendingDelete(null);
     router.refresh();
   };
+
+  const pendingLabel = pendingDelete
+    ? String(pendingDelete.title ?? pendingDelete.name ?? pendingDelete.slug ?? "this item")
+    : "";
 
   return (
     <div className="space-y-4">
@@ -111,7 +124,7 @@ export default function ResourceTable({
         </p>
       </div>
 
-      {deleteError && (
+      {deleteError && !pendingDelete && (
         <p
           role="alert"
           className="rounded-atelier-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300"
@@ -121,60 +134,67 @@ export default function ResourceTable({
       )}
 
       {rows.length === 0 ? (
-        <div className="rounded-atelier-lg border border-line bg-surface/80 p-10 text-center">
-          <p className="font-medium text-ink">No {def.title.toLowerCase()} yet</p>
-          <p className="mt-1 text-sm text-ink-subtle">
-            {canEdit
-              ? `Create the first ${def.singular} — or apply supabase/0004_seed.sql for the placeholder set.`
-              : "Nothing has been added yet."}
-          </p>
-        </div>
+        <AdminEmptyState
+          title={`No ${def.title.toLowerCase()} yet`}
+          description={
+            canEdit
+              ? `Create the first ${def.singular}.`
+              : "Nothing has been added yet."
+          }
+        />
+      ) : filtered.length === 0 ? (
+        <AdminEmptyState
+          title="No matches"
+          description="Try a different search term."
+        />
       ) : (
-        <div className="overflow-x-auto rounded-atelier-lg border border-line">
-          <table className="min-w-full text-left text-sm">
-            <thead className="bg-surface text-xs uppercase text-ink-subtle">
-              <tr>
-                {def.listColumns.map((column) => (
-                  <th key={column} scope="col" className="px-4 py-3">
-                    <button
-                      type="button"
-                      onClick={() => toggleSort(column)}
-                      className="inline-flex items-center gap-1 uppercase tracking-wide hover:text-ink"
-                    >
-                      {column.replace(/_/g, " ")}
-                      {sortColumn === column && (
-                        <span aria-hidden="true">{sortAsc ? "▲" : "▼"}</span>
-                      )}
-                    </button>
-                  </th>
-                ))}
-                <th scope="col" className="px-4 py-3 text-right">
-                  Actions
+        <AdminTableShell>
+          <AdminTableHead>
+            <tr>
+              {def.listColumns.map((column) => (
+                <th key={column} scope="col" className="px-4 py-3">
+                  <button
+                    type="button"
+                    onClick={() => toggleSort(column)}
+                    className="inline-flex items-center gap-1 uppercase tracking-wide hover:text-ink"
+                  >
+                    {column.replace(/_/g, " ")}
+                    {sortColumn === column && (
+                      <span aria-hidden="true">{sortAsc ? "▲" : "▼"}</span>
+                    )}
+                  </button>
                 </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-800 bg-canvas/50">
-              {visible.map((row) => (
-                <tr key={String(row.id)} className="hover:bg-surface/80">
-                  {def.listColumns.map((column) => (
-                    <td key={column} className="max-w-xs truncate px-4 py-3 text-ink-muted">
-                      {cellText(row[column])}
-                    </td>
-                  ))}
-                  <td className="px-4 py-3 text-right">
-                    <div className="inline-flex items-center gap-3">
-                      {canEdit && (
-                        <Link
-                          href={`/admin/${def.key}/${String(row.id)}`}
-                          className="text-signal transition-colors duration-200 hover:text-signal"
-                        >
-                          Edit
-                        </Link>
-                      )}
+              ))}
+              <th scope="col" className="px-4 py-3 text-right">
+                Actions
+              </th>
+            </tr>
+          </AdminTableHead>
+          <AdminTableBody>
+            {visible.map((row) => (
+              <tr key={String(row.id)} className="hover:bg-surface/80">
+                {def.listColumns.map((column) => (
+                  <td key={column} className="max-w-xs truncate px-4 py-3 text-ink-muted">
+                    {cellText(row[column])}
+                  </td>
+                ))}
+                <td className="px-4 py-3 text-right">
+                  <div className="inline-flex items-center gap-3">
+                    {canEdit && (
+                      <Link
+                        href={`/admin/${def.key}/${String(row.id)}`}
+                        className="text-signal transition-colors duration-200 hover:text-signal"
+                      >
+                        Edit
+                      </Link>
+                    )}
                       {canDelete && (
                         <button
                           type="button"
-                          onClick={() => handleDelete(row)}
+                          onClick={() => {
+                            setDeleteError(null);
+                            setPendingDelete(row);
+                          }}
                           disabled={deletingId === String(row.id)}
                           aria-label={`Delete ${String(row.title ?? row.name ?? "item")}`}
                           className="text-ink-subtle transition-colors duration-200 hover:text-red-400 disabled:opacity-50"
@@ -182,13 +202,12 @@ export default function ResourceTable({
                           <Trash2 className="h-4 w-4" aria-hidden="true" />
                         </button>
                       )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </AdminTableBody>
+        </AdminTableShell>
       )}
 
       {pageCount > 1 && (
@@ -214,6 +233,19 @@ export default function ResourceTable({
           </button>
         </div>
       )}
+
+      <ConfirmDialog
+        open={Boolean(pendingDelete)}
+        title="Confirm delete"
+        message={`Delete "${pendingLabel}"? This cannot be undone.`}
+        confirmLabel="Delete"
+        pending={deletingId !== null}
+        error={deleteError}
+        onCancel={() => {
+          if (deletingId === null) setPendingDelete(null);
+        }}
+        onConfirm={handleDelete}
+      />
     </div>
   );
 }

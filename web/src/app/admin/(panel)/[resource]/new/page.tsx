@@ -43,10 +43,12 @@ export default async function NewResourcePage({
     );
   }
 
-  const options =
-    key === "posts"
-      ? await getFormOptions(supabase)
-      : { categories: [], media: [] };
+  const needsFormOptions = def.fields.some(
+    (field) => field.kind === "mediaRef" || field.kind === "categoryRef",
+  );
+  const options = needsFormOptions
+    ? await getFormOptions(supabase)
+    : { categories: [], media: [] };
 
   return (
     <div className="space-y-6">

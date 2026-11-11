@@ -115,20 +115,18 @@ async function guard(
     return { status: "success", message: "Thanks! We'll be in touch within 24 hours." };
   }
 
-  // 2. Turnstile — verified BEFORE any write.
+  // 2. Turnstile — verified BEFORE any write. Production fails closed when
+  // the secret is missing (see verifyTurnstile); development may skip.
   const turnstile = await verifyTurnstile(fields.turnstileToken);
   if (!turnstile.ok) {
-    if (turnstile.reason !== "not_configured") {
-      console.error("[forms] Turnstile verification failed:", turnstile.reason);
-      return {
-        status: "error",
-        message: "Spam check failed. Please try again.",
-      };
-    }
-    // Not configured (development). Log loudly — production must configure it.
-    if (process.env.NODE_ENV === "production") {
-      console.warn("[forms] TURNSTILE_SECRET_KEY is not set — forms are unprotected.");
-    }
+    console.error("[forms] Turnstile verification failed:", turnstile.reason);
+    return {
+      status: "error",
+      message:
+        turnstile.reason === "not_configured"
+          ? "Forms are temporarily unavailable. Please email info@aorysoft.com."
+          : "Spam check failed. Please try again.",
+    };
   }
 
   // 3. Rate limit — per IP and per email (persistent via Supabase RPC).
