@@ -9,6 +9,7 @@
 // The token is verified timing-safe BEFORE any database access, so neither
 // route can be used as an oracle to enumerate which subscriber ids exist.
 
+import { markSvg } from "@/lib/brand/mark-svg";
 import { getServiceClient } from "@/lib/supabase/admin";
 import { verifyToken } from "./tokens";
 
@@ -66,18 +67,20 @@ export function page({ ok, heading, body }: Outcome): Response {
         border-radius: 10px;
         padding: 2rem 1.5rem;
       }
-      .mark {
-        width: 2.5rem;
-        height: 2.5rem;
-        margin: 0 auto;
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        color: var(--ink);
+        text-decoration: none;
         border-radius: 6px;
-        border: 1px solid var(--line);
-        display: grid;
-        place-items: center;
-        color: var(--signal);
-        font-size: 1rem;
-        font-weight: 600;
       }
+      .brand span {
+        font-family: "Instrument Serif", Georgia, serif;
+        font-size: 1.5rem;
+        letter-spacing: -0.01em;
+      }
+      .brand:focus-visible { outline: 2px solid var(--signal); outline-offset: 3px; }
       h1 {
         font-family: "Instrument Serif", Georgia, serif;
         font-weight: 400;
@@ -91,8 +94,8 @@ export function page({ ok, heading, body }: Outcome): Response {
   </head>
   <body>
     <main>
-      <div class="mark" aria-hidden="true">${ok ? "OK" : "!"}</div>
-      <h1>${heading}</h1>
+      <a class="brand" href="/" aria-label="AorySoft home">${markSvg({ width: 32 })}<span>AorySoft</span></a>
+      <h1 data-outcome="${ok ? "ok" : "error"}">${heading}</h1>
       <p>${body}</p>
       <p><a href="/">Back to aorysoft.com</a></p>
     </main>

@@ -1,11 +1,21 @@
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 import { ImageResponse } from "next/og";
+import { MARK_VIEWBOX } from "@/components/brand/markGeometry";
+import { markDataUri } from "@/lib/brand/mark-svg";
 import { SITE_NAME, SITE_TAGLINE } from "@/lib/site";
 
-export const alt = "AorySoft";
+export const alt = `${SITE_NAME}: ${SITE_TAGLINE.replace(/\.$/, "")}`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-export default function OpenGraphImage() {
+const MARK_WIDTH = 132;
+
+/** Social card: the official A mark, the wordmark, and the tagline on the true-black stage. */
+export default async function OpenGraphImage() {
+  // next/font cannot feed ImageResponse; the OFL TTF ships in src/app/fonts.
+  const serif = await readFile(join(process.cwd(), "src/app/fonts/InstrumentSerif-Regular.ttf"));
+
   return new ImageResponse(
     (
       <div
@@ -17,43 +27,27 @@ export default function OpenGraphImage() {
           justifyContent: "space-between",
           background: "#000000",
           color: "#f4f7fa",
-          padding: "72px",
-          fontFamily: "Georgia, serif",
+          padding: "72px 80px",
         }}
       >
-        <div
-          style={{
-            display: "flex",
-            width: 72,
-            height: 72,
-            borderRadius: 6,
-            border: "1px solid #1e2836",
-            alignItems: "center",
-            justifyContent: "center",
-            color: "#06b6d4",
-            fontSize: 36,
-            fontWeight: 600,
-          }}
-        >
-          A
-        </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-          <div style={{ fontSize: 72, letterSpacing: "-0.03em", lineHeight: 1.05 }}>
+        {/* eslint-disable-next-line @next/next/no-img-element -- ImageResponse renders plain img */}
+        <img
+          src={markDataUri(MARK_WIDTH)}
+          width={MARK_WIDTH}
+          height={Math.round((MARK_WIDTH * MARK_VIEWBOX.height) / MARK_VIEWBOX.width)}
+          alt=""
+        />
+        <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+          <div style={{ fontFamily: "Instrument Serif", fontSize: 104, letterSpacing: "-0.02em", lineHeight: 1 }}>
             {SITE_NAME}
           </div>
-          <div
-            style={{
-              fontSize: 32,
-              color: "#a8b3c2",
-              fontFamily: "system-ui, sans-serif",
-              maxWidth: 900,
-            }}
-          >
+          <div style={{ fontFamily: "Instrument Serif", fontSize: 44, color: "#a8b3c2", lineHeight: 1.2 }}>
             {SITE_TAGLINE}
           </div>
+          <div style={{ display: "flex", width: 160, height: 2, marginTop: 12, background: "#06b6d4" }} />
         </div>
       </div>
     ),
-    { ...size },
+    { ...size, fonts: [{ name: "Instrument Serif", data: serif, style: "normal", weight: 400 }] },
   );
 }
