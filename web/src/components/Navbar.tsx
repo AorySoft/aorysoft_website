@@ -52,6 +52,7 @@ const Navbar = ({
     if (!isMobileMenuOpen) return;
 
     const panel = menuPanelRef.current;
+    const menuButton = menuButtonRef.current;
     const firstLink = panel?.querySelector<HTMLElement>("a, button");
     firstLink?.focus({ preventScroll: true });
 
@@ -67,22 +68,29 @@ const Navbar = ({
         return;
       }
       if (event.key !== "Tab" || !panel) return;
-      const focusable = panel.querySelectorAll<HTMLElement>(
-        'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
-      );
+      // The close (X) toggle is part of the cycle so keyboard users can reach
+      // it, not only Escape. It precedes the panel in DOM order.
+      const focusable = [
+        ...(menuButton ? [menuButton] : []),
+        ...panel.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      ];
       if (focusable.length === 0) return;
       const first = focusable[0];
       const last = focusable[focusable.length - 1];
-      if (event.shiftKey && document.activeElement === first) {
+      const active = document.activeElement as HTMLElement | null;
+      if (!active || !focusable.includes(active)) {
+        event.preventDefault();
+        (event.shiftKey ? last : first).focus();
+      } else if (event.shiftKey && active === first) {
         event.preventDefault();
         last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
+      } else if (!event.shiftKey && active === last) {
         event.preventDefault();
         first.focus();
       }
     };
-
-    const menuButton = menuButtonRef.current;
     window.addEventListener("keydown", onKeyDown);
     return () => {
       window.removeEventListener("keydown", onKeyDown);

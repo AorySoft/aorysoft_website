@@ -1,5 +1,6 @@
-"use client";
-
+// Server component on marketing pages (no client JS, no hydration of the
+// year). The client error boundary (MarketingChromeClient) also renders it;
+// there it runs on the client only, so the year cannot mismatch (R4).
 import Link from "next/link";
 import { Mail } from "lucide-react";
 import BrandMark from "@/components/BrandMark";
@@ -8,9 +9,12 @@ import { SOCIAL_LINKS } from "@/lib/social";
 export default function Footer({
   showBlog = false,
   showWork = false,
+  year = new Date().getFullYear(),
 }: {
   showBlog?: boolean;
   showWork?: boolean;
+  /** Copyright year; defaults to the current year at render time. */
+  year?: number;
 }) {
   const explore = [
     { name: "Home", path: "/" },
@@ -91,7 +95,7 @@ export default function Footer({
         </div>
 
         <div className="mt-12 flex flex-col gap-3 border-t border-line pt-6 text-xs text-ink-subtle sm:flex-row sm:items-center sm:justify-between">
-          <p>© {new Date().getFullYear()} AorySoft. All rights reserved.</p>
+          <p>© {year} AorySoft. All rights reserved.</p>
           <div className="flex gap-4">
             <Link href="/privacy" className="hover:text-signal">
               Privacy
