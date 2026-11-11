@@ -1,0 +1,52 @@
+{
+  "createdAt": "2026-11-11T09:34:10.299Z",
+  "storage": [
+    "test-seed/cover-1.png",
+    "test-seed/cover-2.png",
+    "test-seed/cover-3.png",
+    "test-seed/avatar-1.png",
+    "test-seed/avatar-2.png",
+    "test-seed/avatar-3.png"
+  ],
+  "posts": [
+    "7157f5c8-d5b9-4a3a-9d2a-43ecf0f806de",
+    "de357ea4-1726-4d02-b8a6-c6c5ab6e0eb3",
+    "18afb84a-8d11-4a7b-b1ed-cb5ef2c962d5"
+  ],
+  "reviews": [
+    "b7aba5d8-c069-4f81-993d-6751ab1167a1",
+    "e0b7fe9a-166e-429e-86ed-cd12e569e46f",
+    "815b58df-3d65-479d-931a-180da2cb3431"
+  ],
+  "case_studies": [
+    "53af1682-fb41-4442-bfd5-21891b9b289d",
+    "69ceaee7-f842-46e5-a1c9-93d580204f02"
+  ],
+  "jobs": [
+    "09a1aea7-583e-4680-9319-6eca7028f6bc",
+    "d890e44b-6ff8-4cd8-b2af-01f3aeed4e2d"
+  ],
+  "services": [
+    "ff3b1230-5515-4b9b-a89a-713b453314eb",
+    "6a04bcef-cbfb-4de4-9727-0b4ed99cf1ab",
+    "e38cfe5c-69a2-477e-9417-ce281d6391a2",
+    "2acf530a-8760-472f-8fb0-4837fbff29ce"
+  ],
+  "newsletter_subscribers": [
+    "e5e22989-3c0b-408e-92e0-5606fe1854f7",
+    "bf7cec55-2da0-45fb-a7a2-89ad883cd311",
+    "dc3faea6-0295-4fea-a1fe-ce921b5cb11d"
+  ],
+  "categories": [
+    "898891d2-2ca2-40f3-8fdf-7c9bd9a259d3",
+    "c43097de-a798-4866-99f5-7c97c62dc168"
+  ],
+  "media": [
+    "bb7ac68d-d99a-47ed-9cbc-b68d75699fee",
+    "5aa12ad9-57fe-46ff-9d4e-f5cf3a9a5262",
+    "9cab23df-b9dc-47a5-9dff-2ea3f5b12f0d",
+    "aafc9f4b-5bbb-4473-bad5-e41d2a4853fb",
+    "93ea9082-8958-4f71-ba3b-94916c5e4453",
+    "174a504c-3688-44d2-b8ff-e405fffca108"
+  ]
+}
