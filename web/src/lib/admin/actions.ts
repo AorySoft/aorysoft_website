@@ -8,6 +8,7 @@ import {
   validateResourceInput,
   type ResourceKey,
 } from "./resources";
+import { revalidationTargets } from "./revalidation";
 
 export type ActionState = {
   ok: boolean;
@@ -53,15 +54,13 @@ function formDataToRecord(formData: FormData): Record<string, unknown> {
   return record;
 }
 
+// Publish/unpublish must not wait for the 60 s ISR window or a redeploy:
+// targets include the public layout (nav gates) and the sitemap (N1).
 function revalidateFor(key: ResourceKey) {
-  for (const path of resources[key].revalidate) revalidatePath(path);
-  // Blog article pages are dynamic routes; the "page" form revalidates every
-  // instance of the pattern so edits/renames/unpublishes are reflected without
-  // waiting for the 60 s ISR window (plan §8).
-  if (key === "posts") revalidatePath("/blog/[slug]", "page");
-  if (key === "services") revalidatePath("/services/[slug]", "page");
-  if (key === "cases") revalidatePath("/work");
-  revalidatePath(`/admin/${key}`);
+  for (const target of revalidationTargets(key)) {
+    if (target.type) revalidatePath(target.path, target.type);
+    else revalidatePath(target.path);
+  }
 }
 
 export async function createResource(
