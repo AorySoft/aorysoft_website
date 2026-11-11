@@ -194,7 +194,8 @@ function CapabilitySwitchboard({
         })}
       </div>
 
-      {/* Every capability stays in the DOM for crawlers/LLMs; only the active panel is shown. */}
+      {/* Every capability stays in the DOM for crawlers/LLMs; only the active panel is shown.
+          The display utility goes on the selected panel only: `grid` would override `[hidden]`. */}
       <div className="mt-10 rounded-atelier-lg md:mt-12">
         {capabilities.map((capability, index) => {
           const selected = index === activeIndex;
@@ -207,7 +208,11 @@ function CapabilitySwitchboard({
               aria-labelledby={`capability-tab-${capability.id}`}
               tabIndex={selected ? 0 : -1}
               hidden={!selected}
-              className="grid grid-cols-[minmax(0,1fr)] gap-8 lg:grid-cols-12 lg:gap-12"
+              className={
+                selected
+                  ? "grid grid-cols-[minmax(0,1fr)] gap-8 lg:grid-cols-12 lg:gap-12"
+                  : "hidden"
+              }
             >
               <div className="flex flex-col lg:col-span-5">
                 <h3 className="flex items-center gap-3 font-display text-3xl text-ink md:text-[2.25rem] md:leading-tight">

@@ -52,6 +52,23 @@ describe("Capabilities switchboard", () => {
     expect(screen.getByRole("tabpanel")).toHaveAccessibleName("AI Automation");
   });
 
+  it("keeps every panel in the DOM but displays only the selected one", () => {
+    const { container } = render(<ServicesSection services={fixtureServices} />);
+    const panels = Array.from(container.querySelectorAll<HTMLElement>('[role="tabpanel"]'));
+    expect(panels).toHaveLength(4);
+    // jsdom has no Tailwind: assert the cause of the bug directly. A display
+    // utility such as `grid` on a hidden panel overrides the [hidden] attribute.
+    for (const [index, panel] of panels.entries()) {
+      const selected = index === 0;
+      expect(panel.hidden).toBe(!selected);
+      expect(panel.classList.contains("grid")).toBe(selected);
+    }
+    fireEvent.click(tabs()[2]);
+    expect(panels[2].classList.contains("grid")).toBe(true);
+    expect(panels[0].classList.contains("grid")).toBe(false);
+    expect(panels[0]).toHaveTextContent("AI Automation");
+  });
+
   it("moves selection and focus with arrow, Home, and End keys", () => {
     render(<ServicesSection services={fixtureServices} />);
     const list = screen.getByRole("tablist");
