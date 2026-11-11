@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import PageHero from "@/components/patterns/PageHero";
 import QuoteForm from "./QuoteForm";
 
 export const metadata: Metadata = {
@@ -10,7 +11,13 @@ export const metadata: Metadata = {
 
 export default function QuotePage() {
   return (
-    <main className="min-h-screen">
+    <main>
+      <PageHero
+        eyebrow="Get a Quote"
+        title="Get a quote"
+        lead="Walk through a few short steps about scope, timeline, and constraints. We use that to put together a clear proposal."
+        compact
+      />
       <QuoteForm />
     </main>
   );

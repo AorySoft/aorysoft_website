@@ -4,7 +4,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Calendar, Clock, User } from "lucide-react";
 import SafeHtml from "@/components/SafeHtml";
+import PageEndCta from "@/components/patterns/PageEndCta";
 import { getPublishedPostBySlug, getPublishedPosts } from "@/lib/data";
+import NewsletterSignup from "../NewsletterSignup";
+
+// Server-rendered dates in one fixed format (no server-locale drift).
+const dateFormat = new Intl.DateTimeFormat("en", { dateStyle: "medium", timeZone: "UTC" });
 
 // Plan §8: articles are ISR-prerendered and revalidated when the admin
 // publishes/edits a post (see revalidateFor() in lib/admin/actions.ts).
@@ -113,7 +118,7 @@ export default async function BlogArticlePage({
   };
 
   return (
-    <main className="min-h-screen bg-canvas">
+    <main className="bg-canvas">
       <script
         type="application/ld+json"
         // Static, sanitized JSON — no user HTML is injected here.
@@ -122,7 +127,7 @@ export default async function BlogArticlePage({
         }}
       />
 
-      <article className="shell max-w-4xl py-16 md:py-20">
+      <article className="shell max-w-4xl py-[clamp(2.5rem,8svh,5rem)]">
         <Link
           href="/blog"
           className="inline-flex items-center gap-2 text-sm text-ink-muted transition-colors hover:text-signal"
@@ -147,13 +152,13 @@ export default async function BlogArticlePage({
             <span className="flex items-center gap-1.5">
               <Calendar size={14} aria-hidden="true" />
               <time dateTime={publishedDate}>
-                Published {new Date(publishedDate).toLocaleDateString()}
+                Published {dateFormat.format(new Date(publishedDate))}
               </time>
             </span>
             <span className="flex items-center gap-1.5">
               Updated{" "}
               <time dateTime={post.updated_at}>
-                {new Date(post.updated_at).toLocaleDateString()}
+                {dateFormat.format(new Date(post.updated_at))}
               </time>
             </span>
             <span className="flex items-center gap-1.5">
@@ -164,7 +169,7 @@ export default async function BlogArticlePage({
         </header>
 
         {post.cover_image?.url && (
-          <div className="relative mt-10 aspect-[16/9] overflow-hidden rounded-atelier-lg border border-line">
+          <div className="relative mt-[clamp(1.5rem,5svh,2.5rem)] aspect-[16/9] max-h-[62svh] w-full overflow-hidden rounded-atelier-lg border border-line">
             <Image
               src={post.cover_image.url}
               alt={post.cover_image.alt?.trim() || post.title}
@@ -192,6 +197,12 @@ export default async function BlogArticlePage({
           </Link>
         </footer>
       </article>
+      <NewsletterSignup />
+      <PageEndCta
+        title="Building something similar?"
+        text="Tell us what you want to build and what constraints you already know."
+        secondary={{ href: "/services", label: "Explore services" }}
+      />
     </main>
   );
 }

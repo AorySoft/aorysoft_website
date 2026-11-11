@@ -16,7 +16,7 @@ export default async function CareersPage() {
   const jobs = await getActiveJobs();
 
   return (
-    <main className="min-h-screen">
+    <main>
       <CareersContent jobs={jobs} />
     </main>
   );

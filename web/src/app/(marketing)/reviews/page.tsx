@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
+import PageEndCta from "@/components/patterns/PageEndCta";
+import PageHero from "@/components/patterns/PageHero";
 import Image from "next/image";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getPublishedReviews } from "@/lib/data";
 
@@ -34,22 +35,18 @@ export default async function ReviewsPage() {
   if (reviews.length < REVIEW_GATE) notFound();
 
   return (
-    <main className="min-h-screen">
-      <section className="section-y border-b border-line bg-surface">
-        <div className="shell max-w-3xl">
-          <h1 className="display-title">Client reviews</h1>
-          <p className="body-lead mt-5">
-            Only real client feedback we have permission to show. No made-up
-            quotes.
-          </p>
-        </div>
-      </section>
+    <main>
+      <PageHero
+        eyebrow="Client feedback"
+        title="Client reviews"
+        lead="Only real client feedback we have permission to show. No made-up quotes."
+      />
 
-      <section className="section-y">
+      <section aria-label="Reviews" className="section-y">
         <div className="shell">
-          <ul className="grid grid-cols-1 gap-10 md:grid-cols-2">
+          <ul className="grid grid-cols-1 gap-[clamp(1.5rem,4svh,2.5rem)] md:grid-cols-2">
             {reviews.map((review) => (
-              <li key={review.id} className="border-t border-line pt-8">
+              <li key={review.id} className="border-t border-line pt-[clamp(1.25rem,3svh,2rem)]">
                 <Stars rating={review.rating} />
                 <blockquote className="mt-4 text-lg leading-relaxed text-ink">
                   “{review.review_text}”
@@ -76,16 +73,9 @@ export default async function ReviewsPage() {
               </li>
             ))}
           </ul>
-
-          <p className="mt-14 text-sm text-ink-subtle">
-            Want to talk about a project?{" "}
-            <Link href="/contact" className="text-signal hover:text-ink">
-              Contact us
-            </Link>
-            .
-          </p>
         </div>
       </section>
+      <PageEndCta title="Want to talk about a project?" secondary={{ href: "/services", label: "Explore services" }} />
     </main>
   );
 }

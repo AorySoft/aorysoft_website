@@ -11,9 +11,12 @@ export default function Footer({
   showBlog = false,
   showWork = false,
   year = new Date().getFullYear(),
+  services = [],
 }: {
   showBlog?: boolean;
   showWork?: boolean;
+  /** Published service detail pages (title + href); the column is hidden when empty. */
+  services?: { title: string; href: string }[];
   /** Copyright year; defaults to the current year at render time. */
   year?: number;
 }) {
@@ -33,8 +36,8 @@ export default function Footer({
 
   return (
     <footer className="border-t border-line bg-surface pb-[env(safe-area-inset-bottom,0px)]">
-      <div className="shell py-14">
-        <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-3">
+      <div className="shell py-[clamp(2.5rem,7svh,3.5rem)]">
+        <div className={`grid grid-cols-1 gap-10 md:grid-cols-2 ${services.length > 0 ? "lg:grid-cols-4" : "lg:grid-cols-3"}`}>
           <div className="space-y-4">
             <BrandMark size="sm" />
             {/* Same brand line as metadata, JSON-LD, and llms.txt. */}
@@ -71,6 +74,23 @@ export default function Footer({
               ))}
             </div>
           </div>
+
+          {services.length > 0 ? (
+            <div className="space-y-4">
+              <h2 className="text-sm font-semibold text-ink">Services</h2>
+              <div className="space-y-2">
+                {services.map((service) => (
+                  <Link
+                    key={service.href}
+                    href={service.href}
+                    className="block text-sm text-ink-muted transition hover:text-signal"
+                  >
+                    {service.title}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          ) : null}
 
           <div className="space-y-4">
             <h2 className="text-sm font-semibold text-ink">Company</h2>

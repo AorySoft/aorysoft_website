@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Calendar, Clock, User, SearchX } from "lucide-react";
+import { Calendar, Clock, User } from "lucide-react";
+import EmptyState from "@/components/patterns/EmptyState";
 import type { PostWithRelations } from "@/lib/data";
 import { useRevealOnView } from "@/components/useRevealOnView";
 
@@ -79,8 +80,8 @@ export default function BlogIndex({
   return (
     <>
       {featuredPost && (
-        <section className="bg-canvas py-20">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <section className="section-y bg-canvas">
+          <div className="shell">
             <h2 className="mb-8 font-display text-3xl font-normal text-ink">
               Featured Article
             </h2>
@@ -164,8 +165,8 @@ export default function BlogIndex({
       )}
 
       {blogPosts.length > 0 && (
-        <section className="bg-surface-raised/30 py-8">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <section className="border-b border-line bg-surface-raised/30 py-[clamp(1rem,3svh,2rem)]">
+          <div className="shell">
             <div
               role="group"
               aria-label="Filter by category"
@@ -191,8 +192,8 @@ export default function BlogIndex({
         </section>
       )}
 
-      <section className="bg-canvas py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <section className="section-y bg-canvas">
+        <div className="shell">
           {filteredPosts.length > 0 ? (
             <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
               {filteredPosts.map((post, index) => (
@@ -261,19 +262,10 @@ export default function BlogIndex({
               ))}
             </div>
           ) : (
-            <div className="flex flex-col items-center space-y-4 py-12 text-center">
-              <SearchX
-                className="h-12 w-12 text-ink-subtle"
-                aria-hidden="true"
-              />
-              <h2 className="font-display text-2xl font-normal text-ink">
-                No articles published yet
-              </h2>
-              <p className="max-w-md text-ink-subtle">
-                No posts yet. Subscribe below if you want a note when the first
-                ones go live, or check back later.
-              </p>
-            </div>
+            <EmptyState title="No articles published yet">
+              Subscribe below if you want a note when the first ones go live,
+              or check back later.
+            </EmptyState>
           )}
         </div>
       </section>

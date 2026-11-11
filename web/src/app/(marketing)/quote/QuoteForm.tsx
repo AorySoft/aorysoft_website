@@ -49,16 +49,7 @@ const QuoteForm = () => {
   return (
     <MotionConfig reducedMotion="user">
       <div>
-        <section className="section-y border-b border-line bg-surface">
-          <div className="shell max-w-3xl text-center">
-            <h1 className="display-title">Get a quote</h1>
-            <p className="body-lead mx-auto mt-5">
-              Walk through a few short steps about scope, timeline, and
-              constraints. We use that to put together a clear proposal.
-            </p>
-          </div>
-        </section>
-
+        {/* The page hero (h1) is server-rendered in quote/page.tsx. */}
         {currentStep <= totalSteps && (
           <QuoteProgress
             currentStep={currentStep}
@@ -68,8 +59,8 @@ const QuoteForm = () => {
         )}
 
         <section className="section-y">
-          <div className="shell max-w-3xl">
-            <div className="surface-panel relative p-6 md:p-10">
+          <div className="shell">
+            <div className="surface-panel relative max-w-3xl p-6 md:p-10">
               <form onSubmit={handleFormSubmit}>
                 {stepContent}
 
@@ -77,7 +68,7 @@ const QuoteForm = () => {
                 <TurnstileField onTokenChange={setTurnstileToken} />
 
                 {currentStep <= totalSteps && (
-                  <div className="mt-12 flex justify-between gap-4">
+                  <div className="mt-[clamp(1.75rem,5svh,3rem)] flex justify-between gap-4">
                     <button
                       type="button"
                       onClick={prevStep}

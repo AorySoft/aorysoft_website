@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import PageHero from "@/components/patterns/PageHero";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
@@ -11,16 +12,12 @@ const LAST_UPDATED = "November 2026";
 
 export default function PrivacyPage() {
   return (
-    <main className="min-h-screen bg-canvas">
-      <div className="shell max-w-3xl py-20">
-        <h1 className="display-title mb-3">
-          Privacy Policy
-        </h1>
-        <p className="text-sm text-ink-subtle mb-12">Last updated: {LAST_UPDATED}</p>
-
-        <div className="space-y-10 text-ink-muted leading-relaxed">
+    <main className="bg-canvas">
+      <PageHero eyebrow="Legal" title="Privacy Policy" lead={`Last updated: ${LAST_UPDATED}`} compact />
+      <div className="shell section-y">
+        <div className="max-w-3xl space-y-10 leading-relaxed text-ink-muted">
           <section className="space-y-3">
-            <h2 className="text-2xl font-bold text-ink">Who we are</h2>
+            <h2 className="font-display text-2xl font-normal text-ink md:text-3xl">Who we are</h2>
             <p>
               AorySoft builds software, AI systems, and automation for businesses.
               This policy explains what this website collects, why, and what choices
@@ -36,7 +33,7 @@ export default function PrivacyPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-2xl font-bold text-ink">
+            <h2 className="font-display text-2xl font-normal text-ink md:text-3xl">
               Information you give us
             </h2>
             <ul className="list-disc pl-6 space-y-2">
@@ -57,7 +54,7 @@ export default function PrivacyPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-2xl font-bold text-ink">
+            <h2 className="font-display text-2xl font-normal text-ink md:text-3xl">
               Information collected automatically
             </h2>
             <p>
@@ -76,7 +73,7 @@ export default function PrivacyPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-2xl font-bold text-ink">Cookies</h2>
+            <h2 className="font-display text-2xl font-normal text-ink md:text-3xl">Cookies</h2>
             <p>
               The public website sets no tracking cookies. Cookies are used only for
               staff signing in to the administration area, to keep that session secure.
@@ -84,7 +81,7 @@ export default function PrivacyPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-2xl font-bold text-ink">
+            <h2 className="font-display text-2xl font-normal text-ink md:text-3xl">
               How we use your information
             </h2>
             <ul className="list-disc pl-6 space-y-2">
@@ -100,7 +97,7 @@ export default function PrivacyPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-2xl font-bold text-ink">
+            <h2 className="font-display text-2xl font-normal text-ink md:text-3xl">
               Service providers
             </h2>
             <p>
@@ -112,7 +109,7 @@ export default function PrivacyPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-2xl font-bold text-ink">Retention</h2>
+            <h2 className="font-display text-2xl font-normal text-ink md:text-3xl">Retention</h2>
             <p>
               Enquiries are kept while we handle your request and for a reasonable
               period afterwards for our records, then deleted or archived. Newsletter
@@ -122,7 +119,7 @@ export default function PrivacyPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-2xl font-bold text-ink">Your choices</h2>
+            <h2 className="font-display text-2xl font-normal text-ink md:text-3xl">Your choices</h2>
             <p>
               You can ask us to access, correct or delete the personal information you
               have sent us, or to stop contacting you, by emailing{" "}
@@ -138,7 +135,7 @@ export default function PrivacyPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-2xl font-bold text-ink">Children</h2>
+            <h2 className="font-display text-2xl font-normal text-ink md:text-3xl">Children</h2>
             <p>
               This site is intended for businesses and is not directed at children. We
               do not knowingly collect information from children.
@@ -146,7 +143,7 @@ export default function PrivacyPage() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-2xl font-bold text-ink">Changes</h2>
+            <h2 className="font-display text-2xl font-normal text-ink md:text-3xl">Changes</h2>
             <p>
               We may update this policy as the site or our tools change. The date at the
               top of this page shows the latest revision.

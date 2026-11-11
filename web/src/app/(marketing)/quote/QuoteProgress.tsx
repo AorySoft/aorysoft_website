@@ -12,9 +12,9 @@ export default function QuoteProgress({
   progress: number;
 }) {
   return (
-    <section className="border-b border-line py-8">
-      <div className="shell max-w-3xl">
-        <div className="space-y-4">
+    <section className="border-b border-line py-[clamp(1rem,3svh,2rem)]">
+      <div className="shell">
+        <div className="max-w-3xl space-y-4">
           <div className="flex justify-between text-sm text-ink-subtle">
             <span>
               Step {currentStep} of {totalSteps}

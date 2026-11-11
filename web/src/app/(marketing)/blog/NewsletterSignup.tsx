@@ -4,6 +4,7 @@ import { useActionState, useState } from "react";
 import { Loader2 } from "lucide-react";
 import TurnstileField from "@/components/TurnstileField";
 import HoneypotField from "@/components/HoneypotField";
+import Eyebrow from "@/components/patterns/Eyebrow";
 import { useRevealOnView } from "@/components/useRevealOnView";
 import { subscribeNewsletter } from "@/lib/public-forms/actions";
 import { idleFormState } from "@/lib/public-forms/state";
@@ -23,22 +24,22 @@ export default function NewsletterSignup() {
   const revealRef = useRevealOnView<HTMLDivElement>();
 
   return (
-    <section className="bg-surface-raised/30 py-20">
-      <div className="mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
-        <div
-          ref={revealRef}
-          className="atelier-fade-up space-y-8 rounded-atelier-lg border border-line bg-surface p-12"
-        >
-          <h2 className="font-display text-4xl font-normal text-ink">
-            Newsletter
+    <section aria-labelledby="newsletter-title" className="section-y border-t border-line bg-surface">
+      <div
+        ref={revealRef}
+        className="atelier-fade-up shell grid gap-[clamp(1.25rem,4svh,2rem)] lg:grid-cols-12 lg:items-end lg:gap-12"
+      >
+        <div className="lg:col-span-5">
+          <Eyebrow className="mb-[clamp(0.75rem,2svh,1.25rem)]">Newsletter</Eyebrow>
+          <h2 id="newsletter-title" className="display-title">
+            Notes from the build
           </h2>
-          <p className="text-xl text-ink-muted">
+          <p className="body-lead mt-[clamp(0.75rem,2.5svh,1.25rem)]">
             Occasional notes on AI, automation, and shipping software. No spam.
           </p>
-          <form
-            className="mx-auto flex max-w-md flex-col gap-4 sm:flex-row"
-            action={formAction}
-          >
+        </div>
+        <div className="space-y-4 lg:col-span-7">
+          <form className="flex max-w-xl flex-col gap-4 sm:flex-row" action={formAction}>
             <label htmlFor="newsletter-email" className="sr-only">
               Email address
             </label>

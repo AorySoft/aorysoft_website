@@ -18,7 +18,7 @@ export default function MarketingChromeClient({
         Skip to content
       </a>
       <Navbar />
-      <div id="main-content" tabIndex={-1} className="pt-16 focus:outline-none">
+      <div id="main-content" tabIndex={-1} className="pt-[calc(var(--nav-h)+env(safe-area-inset-top,0px))] focus:outline-none">
         {children}
       </div>
       <Footer />
