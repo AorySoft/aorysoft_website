@@ -1,232 +1,169 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ArrowRight } from "lucide-react";
-import {
-  getPublishedServiceBySlug,
-  getPublishedServiceDetails,
-} from "@/lib/data";
+import { ArrowRight } from "lucide-react";
+import CapabilityVignette from "@/components/capabilities/CapabilityVignettes";
+import stageStyles from "@/components/capabilities/capabilities.module.css";
+import { vignetteFor } from "@/components/capabilities/serviceModel";
+import ExampleFrame from "@/components/patterns/ExampleFrame";
+import PageEndCta from "@/components/patterns/PageEndCta";
+import PageHero from "@/components/patterns/PageHero";
+import SectionHeader from "@/components/patterns/SectionHeader";
+import ServiceRow from "@/components/patterns/ServiceRow";
+import StackRows from "@/components/patterns/StackRows";
+import StepRoute from "@/components/patterns/StepRoute";
+import { getPublishedServiceBySlug, getPublishedServiceDetails } from "@/lib/data";
+import { jsonLdScript, serviceJsonLd } from "@/lib/seo/service-jsonld";
 
 export const revalidate = 60;
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+const updatedFormat = new Intl.DateTimeFormat("en", { dateStyle: "medium", timeZone: "UTC" });
 
 export async function generateStaticParams() {
   const services = await getPublishedServiceDetails();
-  return (services ?? [])
-    .filter((service) => service.slug)
-    .map((service) => ({ slug: service.slug as string }));
+  return (services ?? []).filter((service) => service.slug).map((service) => ({ slug: service.slug as string }));
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const service = await getPublishedServiceBySlug(slug);
-  if (!service) {
-    return { title: "Service not found", robots: { index: false, follow: false } };
-  }
+  if (!service) return { title: "Service not found", robots: { index: false, follow: false } };
 
   const title = service.seo_title || service.title;
-  const description =
-    service.seo_description || service.subtitle || service.description || undefined;
-
+  const description = service.seo_description || service.subtitle || service.description || undefined;
   return {
     title,
     description,
     alternates: { canonical: `/services/${service.slug}` },
-    openGraph: {
-      title,
-      description,
-      url: `/services/${service.slug}`,
-    },
+    openGraph: { title, description, url: `/services/${service.slug}` },
   };
 }
 
-export default async function ServiceDetailPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+/**
+ * One template for every service, driven only by CMS fields: the icon picks
+ * the labeled illustrative example; deliverables, process steps, technologies,
+ * and FAQs render as shared patterns and are skipped when empty.
+ */
+export default async function ServiceDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const service = await getPublishedServiceBySlug(slug);
+  const [service, all] = await Promise.all([getPublishedServiceBySlug(slug), getPublishedServiceDetails()]);
   if (!service || !service.slug) notFound();
 
-  const canonical = `${siteUrl}/services/${service.slug}`;
-  const description =
-    service.seo_description || service.subtitle || service.description || undefined;
-
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "Service",
-        name: service.title,
-        description,
-        url: canonical,
-        dateModified: service.updated_at,
-        provider: {
-          "@type": "Organization",
-          name: "AorySoft",
-          url: siteUrl,
-        },
-      },
-      {
-        "@type": "BreadcrumbList",
-        itemListElement: [
-          { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
-          {
-            "@type": "ListItem",
-            position: 2,
-            name: "Services",
-            item: `${siteUrl}/services`,
-          },
-          {
-            "@type": "ListItem",
-            position: 3,
-            name: service.title,
-            item: canonical,
-          },
-        ],
-      },
-      ...(service.faqs.length > 0
-        ? [
-            {
-              "@type": "FAQPage",
-              mainEntity: service.faqs.map((faq) => ({
-                "@type": "Question",
-                name: faq.question,
-                acceptedAnswer: {
-                  "@type": "Answer",
-                  text: faq.answer,
-                },
-              })),
-            },
-          ]
-        : []),
-    ],
-  };
+  const others = (all ?? []).filter((item) => item.slug && item.id !== service.id).slice(0, 3);
 
   return (
-    <main className="min-h-screen bg-canvas">
+    <main className="bg-canvas">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
-        }}
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(serviceJsonLd({ ...service, slug: service.slug }, siteUrl)) }}
       />
 
-      <article className="shell max-w-3xl py-16 md:py-20">
-        <Link
-          href="/services"
-          className="inline-flex items-center gap-2 text-sm text-ink-muted transition-colors hover:text-signal"
-        >
-          <ArrowLeft size={16} aria-hidden="true" />
-          All services
-        </Link>
+      <PageHero eyebrow="Service" title={service.title} lead={service.subtitle} back={{ href: "/services", label: "All services" }}>
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <Link href="/quote" className="btn-primary">
+            Get a Quote
+            <ArrowRight size={16} aria-hidden="true" />
+          </Link>
+          <Link href="/contact" className="btn-secondary">
+            Contact us
+          </Link>
+        </div>
+      </PageHero>
 
-        <header className="mt-8 space-y-4">
-          <h1 className="display-title text-ink">{service.title}</h1>
-          {service.subtitle ? (
-            <p className="text-lg text-ink-subtle">{service.subtitle}</p>
-          ) : null}
-          {service.description ? (
-            <p className="body-lead text-ink-muted">{service.description}</p>
-          ) : null}
-          <p className="text-sm text-ink-subtle">
-            Last updated{" "}
-            <time dateTime={service.updated_at}>
-              {new Date(service.updated_at).toLocaleDateString()}
-            </time>
-          </p>
-        </header>
+      <section aria-labelledby="overview-title" className="section-y">
+        <div className="shell grid gap-[clamp(2rem,5svh,3rem)] lg:grid-cols-12 lg:items-start lg:gap-12">
+          <div className="lg:col-span-5">
+            <SectionHeader id="overview-title" eyebrow="Overview" title="What it is" />
+            {service.description ? (
+              <p className="mt-[clamp(0.75rem,2.5svh,1.25rem)] whitespace-pre-line text-base leading-relaxed text-ink-muted md:text-lg">
+                {service.description}
+              </p>
+            ) : null}
+            <p className="mt-6 text-sm text-ink-muted">
+              Last updated <time dateTime={service.updated_at}>{updatedFormat.format(new Date(service.updated_at))}</time>
+            </p>
+          </div>
+          <div className="min-w-0 lg:col-span-7">
+            <ExampleFrame frameClassName={stageStyles.stage}>
+              <CapabilityVignette kind={vignetteFor(service.icon ?? "")} />
+            </ExampleFrame>
+          </div>
+        </div>
+      </section>
 
-        {service.deliverables.length > 0 ? (
-          <section className="mt-12 border-t border-line pt-10">
-            <h2 className="font-display text-2xl text-ink md:text-3xl">
-              Deliverables
-            </h2>
-            <ul className="mt-6 space-y-3">
+      {service.deliverables.length > 0 ? (
+        <section aria-labelledby="deliverables-title" className="section-y border-t border-line bg-surface">
+          <div className="shell">
+            <SectionHeader split id="deliverables-title" eyebrow="Scope" title="What you get" />
+            <ul className="mt-[clamp(1.5rem,5svh,3rem)] grid border-t border-line sm:grid-cols-2 sm:gap-x-10">
               {service.deliverables.map((item) => (
-                <li
-                  key={item}
-                  className="border-l border-line pl-4 text-base leading-relaxed text-ink-muted"
-                >
+                <li key={item} className="flex items-start gap-3 border-b border-line py-[clamp(0.75rem,2svh,1rem)] text-base text-ink">
+                  <span className="mt-2.5 h-1 w-1 shrink-0 bg-signal" aria-hidden="true" />
                   {item}
                 </li>
               ))}
             </ul>
-          </section>
-        ) : null}
+          </div>
+        </section>
+      ) : null}
 
-        {service.process_steps.length > 0 ? (
-          <section className="mt-12 border-t border-line pt-10">
-            <h2 className="font-display text-2xl text-ink md:text-3xl">
-              How we deliver
-            </h2>
-            <ol className="mt-6 space-y-6">
-              {service.process_steps.map((step, index) => (
-                <li key={`${step.title}-${index}`}>
-                  <h3 className="font-display text-xl text-ink">
-                    {index + 1}. {step.title}
-                  </h3>
-                  <p className="mt-2 text-base leading-relaxed text-ink-muted">
-                    {step.text}
-                  </p>
-                </li>
-              ))}
-            </ol>
-          </section>
-        ) : null}
+      {service.process_steps.length > 0 ? (
+        <section aria-labelledby="process-title" className="section-y border-t border-line">
+          <div className="shell">
+            <SectionHeader split id="process-title" eyebrow="Process" title="How we deliver" />
+            <StepRoute steps={service.process_steps} className="mt-[clamp(1.75rem,6svh,4rem)]" />
+          </div>
+        </section>
+      ) : null}
 
-        {service.technologies.length > 0 ? (
-          <section className="mt-12 border-t border-line pt-10">
-            <h2 className="font-display text-2xl text-ink md:text-3xl">
-              Technologies
-            </h2>
-            <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-2">
-              {service.technologies.map((tech) => (
-                <li key={tech} className="font-display text-xl text-ink">
-                  {tech}
-                </li>
-              ))}
-            </ul>
-          </section>
-        ) : null}
+      {service.technologies.length > 0 ? (
+        <section aria-labelledby="tech-title" className="section-y border-t border-line bg-surface">
+          <div className="shell">
+            <SectionHeader split id="tech-title" eyebrow="Stack" title="Technology" lead="Tools we typically use for this service. The stack can shift per project." />
+            <StackRows layers={[{ name: "Core tools", tools: service.technologies }]} className="mt-[clamp(1.5rem,5svh,3rem)]" />
+          </div>
+        </section>
+      ) : null}
 
-        {service.faqs.length > 0 ? (
-          <section className="mt-12 border-t border-line pt-10">
-            <h2 className="font-display text-2xl text-ink md:text-3xl">FAQs</h2>
-            <dl className="mt-6 space-y-6">
+      {service.faqs.length > 0 ? (
+        <section aria-labelledby="faq-title" className="section-y border-t border-line">
+          <div className="shell">
+            <SectionHeader split id="faq-title" eyebrow="FAQ" title="Questions" />
+            <dl className="mt-[clamp(1.5rem,5svh,3rem)] grid border-t border-line md:grid-cols-2 md:gap-x-10">
               {service.faqs.map((faq) => (
-                <div key={faq.question}>
-                  <dt className="font-medium text-ink">{faq.question}</dt>
-                  <dd className="mt-2 text-base leading-relaxed text-ink-muted">
-                    {faq.answer}
-                  </dd>
+                <div key={faq.question} className="border-b border-line py-[clamp(1rem,3svh,1.5rem)]">
+                  <dt className="font-display text-xl text-ink">{faq.question}</dt>
+                  <dd className="mt-2 text-base leading-relaxed text-ink-muted">{faq.answer}</dd>
                 </div>
               ))}
             </dl>
-          </section>
-        ) : null}
-
-        <footer className="mt-14 border-t border-line pt-8">
-          <p className="text-base text-ink-muted">
-            Ready to talk about this service?
-          </p>
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-            <Link href="/quote" className="btn-primary">
-              Get a Quote
-              <ArrowRight size={16} aria-hidden="true" />
-            </Link>
-            <Link href="/about" className="btn-secondary">
-              About AorySoft
-            </Link>
           </div>
-        </footer>
-      </article>
+        </section>
+      ) : null}
+
+      {others.length > 0 ? (
+        <section aria-labelledby="other-services-title" className="section-y border-t border-line bg-surface">
+          <div className="shell">
+            <SectionHeader split id="other-services-title" eyebrow="More" title="Other services" />
+            <div className="mt-[clamp(1rem,3svh,2rem)] border-t border-line">
+              {others.map((item) => (
+                <ServiceRow
+                  key={item.id}
+                  headingLevel={3}
+                  title={item.title}
+                  subtitle={item.subtitle}
+                  iconKey={item.icon}
+                  href={`/services/${item.slug}`}
+                  linkLabel={`View ${item.title}`}
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      <PageEndCta title={`Talk to us about ${service.title}`} />
     </main>
   );
 }

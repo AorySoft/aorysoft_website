@@ -1,4 +1,6 @@
 import type { ReactNode } from "react";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import GhostMark from "@/components/brand/GhostMark";
 import Eyebrow from "./Eyebrow";
 import styles from "./patterns.module.css";
@@ -14,7 +16,10 @@ export default function PageHero({
   lead,
   children,
   compact = false,
+  back,
 }: {
+  /** Optional "back to parent" link above the eyebrow (detail pages). */
+  back?: { href: string; label: string };
   eyebrow: string;
   title: ReactNode;
   lead?: ReactNode;
@@ -29,6 +34,15 @@ export default function PageHero({
       <div className={`${styles.heroField} pointer-events-none absolute inset-0 -z-10`} aria-hidden="true" />
       <div className={`shell relative ${compact ? "py-[clamp(2.25rem,7svh,5rem)]" : "py-[clamp(2.5rem,9svh,6rem)]"}`}>
         <div className="max-w-3xl">
+          {back ? (
+            <Link
+              href={back.href}
+              className="mb-[clamp(1rem,3svh,1.75rem)] inline-flex items-center gap-2 text-sm text-ink-muted transition-colors hover:text-signal"
+            >
+              <ArrowLeft size={16} aria-hidden="true" />
+              {back.label}
+            </Link>
+          ) : null}
           <Eyebrow>{eyebrow}</Eyebrow>
           <h1 className="display-title mt-5">{title}</h1>
           {lead ? <div className="body-lead mt-5">{lead}</div> : null}

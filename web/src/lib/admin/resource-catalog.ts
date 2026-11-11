@@ -105,7 +105,7 @@ export const resources: Record<ResourceKey, ResourceDef> = {
         kind: "slug",
         maxLength: 80,
         fieldset: "Basics",
-        help: "Cannot be changed after the first save. Use lowercase letters, numbers, and hyphens. Detail page publishes only with overview + at least 4 deliverables.",
+        help: "Use lowercase letters, numbers, and hyphens. The detail page publishes once the service is active with an overview and at least 4 deliverables; from then on the slug is locked so public links never break.",
       },
       {
         name: "description",
@@ -156,6 +156,7 @@ export const resources: Record<ResourceKey, ResourceDef> = {
         kind: "select",
         options: ICON_CHOICES,
         fieldset: "Listing",
+        help: "Also picks the illustrative example shown with this service (always labeled as an example): bot = chat assistant, brain = AI agent, zap = workflow automation, bar-chart = insights, cloud/shield = deployment, code = build, database = data model.",
       },
       {
         name: "color",
