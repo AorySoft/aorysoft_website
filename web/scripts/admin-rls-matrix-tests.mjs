@@ -121,6 +121,24 @@ console.log("\n── 1. Anonymous access (no session) ──");
     check(`anon CANNOT read ${table}`, Boolean(e), e ? e.message : "");
   }
 
+  // Reviews (0013): public columns readable, submitter_email is not.
+  {
+    const { error: okErr } = await anon
+      .from("reviews")
+      .select("id, display_name, review_text, rating, status")
+      .limit(1);
+    check("anon reads public review columns", !okErr, okErr ? okErr.message : "");
+    const { error: emailErr } = await anon
+      .from("reviews")
+      .select("submitter_email")
+      .limit(1);
+    check(
+      "anon CANNOT read reviews.submitter_email",
+      Boolean(emailErr),
+      emailErr ? emailErr.message : "",
+    );
+  }
+
   const writeAttempts = [
     ["posts", { title: "x", slug: `anon-x-${stamp}` }],
     ["categories", { name: "x", slug: `anon-x-${stamp}` }],

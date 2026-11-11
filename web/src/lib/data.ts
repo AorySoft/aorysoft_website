@@ -181,18 +181,25 @@ export async function getActiveJobs(): Promise<JobRow[] | null> {
   );
 }
 
-export type ReviewWithImage = ReviewRow & {
+/**
+ * Public review shape — never includes submitter_email (PII). Anon has no
+ * SELECT on that column after migration 0013, so it must not be requested.
+ */
+export type PublicReviewRow = Omit<ReviewRow, "submitter_email">;
+
+export type ReviewWithImage = PublicReviewRow & {
   profile_image: { url: string; alt: string } | null;
 };
+
+export const PUBLIC_REVIEW_COLUMNS =
+  "id, display_name, review_text, rating, source, source_url, project_or_service, attribution, profile_image_id, permission_confirmed, featured, status, sort_order, created_at, updated_at, profile_image:media!profile_image_id(url, alt)";
 
 /** Published reviews with confirmed display permission (RLS + filters). */
 export async function getPublishedReviews(): Promise<ReviewWithImage[] | null> {
   return safeQuery((client) =>
     client
       .from("reviews")
-      .select(
-        "id, display_name, review_text, rating, source, source_url, project_or_service, attribution, profile_image_id, permission_confirmed, featured, status, submitter_email, sort_order, created_at, updated_at, profile_image:media!profile_image_id(url, alt)",
-      )
+      .select(PUBLIC_REVIEW_COLUMNS)
       .eq("status", "published")
       .eq("permission_confirmed", true)
       .order("featured", { ascending: false })
