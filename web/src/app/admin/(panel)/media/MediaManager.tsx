@@ -170,7 +170,7 @@ export default function MediaManager({
           {message}
         </p>
       )}
-      {error && (
+      {error && !pendingDelete && (
         <p role="alert" className="rounded-atelier-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">
           {error}
         </p>
@@ -247,7 +247,10 @@ export default function MediaManager({
                   {deletable && (
                     <button
                       type="button"
-                      onClick={() => setPendingDelete(item)}
+                      onClick={() => {
+                        setError(null);
+                        setPendingDelete(item);
+                      }}
                       disabled={busy}
                       aria-label={`Delete ${item.storage_path}`}
                       className="rounded-atelier border border-line px-3 py-1.5 text-xs text-ink-muted transition-colors duration-200 hover:border-red-500/50 hover:text-red-400 disabled:opacity-50"
@@ -272,6 +275,7 @@ export default function MediaManager({
         }
         confirmLabel="Delete"
         pending={busy}
+        error={pendingDelete ? error : null}
         onCancel={() => {
           if (!busy) setPendingDelete(null);
         }}

@@ -124,7 +124,7 @@ export default function ResourceTable({
         </p>
       </div>
 
-      {deleteError && (
+      {deleteError && !pendingDelete && (
         <p
           role="alert"
           className="rounded-atelier-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300"
@@ -191,7 +191,10 @@ export default function ResourceTable({
                       {canDelete && (
                         <button
                           type="button"
-                          onClick={() => setPendingDelete(row)}
+                          onClick={() => {
+                            setDeleteError(null);
+                            setPendingDelete(row);
+                          }}
                           disabled={deletingId === String(row.id)}
                           aria-label={`Delete ${String(row.title ?? row.name ?? "item")}`}
                           className="text-ink-subtle transition-colors duration-200 hover:text-red-400 disabled:opacity-50"
@@ -237,6 +240,7 @@ export default function ResourceTable({
         message={`Delete "${pendingLabel}"? This cannot be undone.`}
         confirmLabel="Delete"
         pending={deletingId !== null}
+        error={deleteError}
         onCancel={() => {
           if (deletingId === null) setPendingDelete(null);
         }}

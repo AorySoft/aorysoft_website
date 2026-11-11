@@ -43,7 +43,10 @@ export default function ConfirmDeleteButton({
     <>
       <button
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={() => {
+          setError(null);
+          setOpen(true);
+        }}
         disabled={pending}
         aria-label={label}
         className="inline-flex items-center gap-1.5 rounded-atelier border border-line px-3 py-1.5 text-xs text-ink-muted transition-colors duration-200 hover:border-red-500/50 hover:text-red-400 disabled:opacity-50"
@@ -51,7 +54,7 @@ export default function ConfirmDeleteButton({
         <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
         {pending ? "Deleting…" : "Delete"}
       </button>
-      {error && (
+      {error && !open && (
         <p role="alert" className="mt-2 text-xs text-red-400">
           {error}
         </p>
@@ -62,6 +65,7 @@ export default function ConfirmDeleteButton({
         message={confirmMessage}
         confirmLabel="Delete"
         pending={pending}
+        error={error}
         onCancel={() => {
           if (!pending) setOpen(false);
         }}
