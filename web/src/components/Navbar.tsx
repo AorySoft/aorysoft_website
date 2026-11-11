@@ -122,9 +122,14 @@ const Navbar = ({
     >
       <div className="shell">
         <div className="flex h-16 items-center justify-between gap-4">
-          <BrandMark size="sm" />
+          {/* Logo and CTA are equal flex-1 slots so the centred links keep
+              their natural width; web-font swaps in either slot no longer
+              resize/shift the link row (Vercel CLS report). */}
+          <div className="flex flex-1 items-center">
+            <BrandMark size="sm" />
+          </div>
 
-          <div className="hidden flex-1 items-center justify-center gap-8 md:flex">
+          <div className="hidden flex-none items-center justify-center gap-8 md:flex">
             {navItems.map((item) => (
               <Link
                 key={item.name}
@@ -137,7 +142,7 @@ const Navbar = ({
             ))}
           </div>
 
-          <div className="hidden md:block">
+          <div className="hidden flex-1 justify-end md:flex">
             <Link href="/quote" className="btn-primary !px-5 !py-2.5">
               Get a Quote
             </Link>
