@@ -2,6 +2,7 @@
 // never updates or deletes existing rows — and records every id in a manifest.
 //
 //   node --env-file=.env.local scripts/seed-test-content.mjs           # seed
+//   node --env-file=.env.local scripts/seed-test-content.mjs --remove --dry-run  # read-only preview
 //   node --env-file=.env.local scripts/seed-test-content.mjs --remove  # delete only what the manifest lists
 //
 // Honesty: every title says "(test)", every body starts with "Test content",
@@ -329,6 +330,19 @@ async function remove() {
   if (!m) {
     console.error("No manifest; nothing to remove.");
     process.exit(1);
+  }
+  if (process.argv.includes("--dry-run")) {
+    // Read-only: report what --remove would delete, and how many rows still exist.
+    console.log(`DRY RUN — nothing will be deleted. Manifest: ${MANIFEST}${m.removedAt ? ` (already removed ${m.removedAt})` : ""}`);
+    for (const table of TABLES) {
+      const ids = m[table] ?? [];
+      if (ids.length === 0) continue;
+      const { count, error } = await db.from(table).select("id", { count: "exact", head: true }).in("id", ids);
+      if (error) throw new Error(`dry-run ${table}: ${error.message}`);
+      console.log(`  ${table}: would delete ${count ?? 0} of ${ids.length} listed`);
+    }
+    console.log(`  storage: would remove ${m.storage.length} file(s): ${m.storage.join(", ") || "none"}`);
+    return;
   }
   // Dependents first, media last (posts/reviews reference media).
   for (const table of TABLES) {
