@@ -131,6 +131,7 @@
 
 @media (min-width: 1024px) {
   .stage > div {
-    max-width: min(100%, calc((var(--avail-h) - 6rem) * 1.6));
+    /* Leave room for the section header and tabs on 720–768px-tall laptops. */
+    max-width: min(100%, calc((var(--avail-h) - 20rem) * 1.6));
   }
 }

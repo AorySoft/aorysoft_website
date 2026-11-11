@@ -76,3 +76,57 @@ Median of 3 runs per round, 2 rounds. Mobile uses 4× CPU and throttled networki
   - black on the primary button: 8.65:1
 - **Honesty:** a grep found the "insight" example implying real channel data ("Orders by channel · last 8 weeks"). It now uses generic groups and the note "sample shapes · no real data", and a test (`CapabilityVignettes.test.tsx`) fails if any scene shows percentages, money, periods or result words.
 - **Reduced motion:** every new loop (StepRoute pulse, tab indicator) has a reduced-motion rule. The audits ran with reduced motion emulated.
+
+## Home LCP regression: investigation (follow-up)
+
+### Method
+
+- **Same minimal data in both builds:** the Supabase URL is pointed at an unreachable `.invalid` host, so every query is empty. No test content and no database access.
+- **Builds compared:** pre-Batch-8 `a55f551`, intermediate commits (bisect), and current.
+- **Runs:** alternating A/B, 5–7 runs, medians. Mobile 375 px.
+
+### Findings
+
+| Check | Baseline | Batch 8 |
+|---|---|---|
+| Render-blocking CSS | 2 files, 11.3 KB gz | 2 files, 12.5 KB gz (same order) |
+| Font preloads | 3 | 3 (same) |
+| HTML | 12.3 KB gz | 13.6 KB gz |
+| TTFB, CSS end, font end | — | identical within ±60 ms |
+| LCP element (mobile) | hero lead `<p>` | hero lead `<p>` |
+| LCP element (desktop) | h1 `<em>` | lead `<p>` (h1 is smaller under the viewport rule) |
+
+- **Network-only throttling:** LCP 1024 → 1028 ms (no regression).
+- **Desktop:** 332 → 388 ms (+56 ms, within budget).
+- **4× CPU:** about +0.6–1.0 s. All of it is main-thread **Layout before first paint** (traces: about 1.2 s vs about 2.1 s). Scripts, parse and style are equal or lower.
+
+**Ruled out by injection or bisect:** `text-wrap`, container queries, the viewport meta, the new global tokens, animations, and every individual home section.
+
+**Bisect:**
+- `8ca502b` (home restructure) ≈ baseline.
+- `29d9849` (sizing) ≈ baseline LCP.
+- The regression appears with step 6 (`e9132fc`).
+
+**Cause:** moving the root `app/loading.tsx` into admin (Q7).
+- With a root Suspense boundary, Next's static HTML paints a small shell first and reveals the content in a second pass.
+- Without it, slow CPUs lay out the whole page before the first paint.
+- Proof: current code with `loading.tsx` restored gives LCP **2180 ms** vs 3720 ms in the same run.
+
+### Options (not applied; needs a decision because of the no-JS trade-off)
+
+| Option | Mobile 4× CPU LCP (same run) | Trade-off |
+|---|---|---|
+| A. Invisible `app/(marketing)/loading.tsx` (`return null`) | 2476 ms vs current 3100 (baseline ≈ 2508) | No spinner; h1 stays in the raw HTML. Page content ships in `<div hidden>` revealed by an inline script, so visitors with JS disabled see a blank page (true before Batch 8 too, with a spinner). Dynamic-route 404 body unchanged. |
+| B. Restore root `loading.tsx` | 2180 ms | Brings back the spinner in raw HTML (reverts N7/Q7). |
+| C. `content-visibility: auto` on below-the-fold sections | about −350 ms | Pure CSS, but not enough alone. Offscreen sizes become estimates (anchor jumps, the layout audit reads estimates). |
+| D. Accept | +0.6–1.0 s on slow CPUs only | Network-bound and desktop are within budget. |
+
+**Recommendation:** A, which gives baseline parity with no spinner. Confirm the no-JS trade-off first.
+
+## Capabilities tightening (follow-up)
+
+- **Change:** the example frame is capped at `(--avail-h − 20rem) × 1.6`, and gaps and feature rows are tighter.
+- **Result:**
+  - 1366×768: 1.12× → fits
+  - 1024×768: 1.11× → 1.08×
+  - 1280×720 (1920×1080 at 150%): 1.17× → 1.07×

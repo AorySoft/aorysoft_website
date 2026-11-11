@@ -121,7 +121,7 @@ function CapabilitySwitchboard({
   select: (index: number, tab?: HTMLElement | null, focus?: boolean) => void;
 }) {
   return (
-    <div className="mt-[clamp(1.5rem,5svh,4rem)]">
+    <div className="mt-[clamp(1.25rem,4svh,3rem)]">
       <div
         role="tablist"
         aria-label="Capabilities"
@@ -197,7 +197,7 @@ function CapabilitySwitchboard({
                     <h4 className="mt-[clamp(1.25rem,3.5svh,2rem)] text-sm font-semibold text-ink">What this can include</h4>
                     <ul className="mt-3 grid border-t border-line lg:grid-cols-2 lg:gap-x-6">
                       {capability.features.map((feature) => (
-                        <li key={feature} className="flex items-center gap-3 border-b border-line py-2 text-sm text-ink-muted">
+                        <li key={feature} className="flex items-center gap-3 border-b border-line py-[clamp(0.375rem,1.1svh,0.5rem)] text-sm text-ink-muted">
                           <span className="h-1 w-1 shrink-0 bg-signal" aria-hidden="true" />
                           {feature}
                         </li>
