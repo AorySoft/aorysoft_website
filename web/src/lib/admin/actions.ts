@@ -9,6 +9,12 @@ import {
   type ResourceKey,
 } from "./resources";
 import { revalidationTargets } from "./revalidation";
+import {
+  SLUG_LOCKED_MESSAGE,
+  SLUG_LOCK_RESOURCES,
+  friendlySlugError,
+  isSlugLocked,
+} from "./slug-lock";
 
 export type ActionState = {
   ok: boolean;
@@ -77,7 +83,11 @@ export async function createResource(
   if (!validated.ok) return { ok: false, errors: validated.errors };
 
   const { error } = await supabase.from(resources[key].table).insert(validated.value);
-  if (error) return { ok: false, error: `Save failed: ${error.message}` };
+  if (error) {
+    const slugErrors = friendlySlugError(error, resources[key].singular);
+    if (slugErrors) return { ok: false, errors: slugErrors };
+    return { ok: false, error: `Save failed: ${error.message}` };
+  }
 
   revalidateFor(key);
   return { ok: true };
@@ -98,15 +108,21 @@ export async function updateResource(
 
   const payload = { ...validated.value };
 
-  // Lock slugs once set so public URLs never break (simpler than redirects).
-  if (key === "services" || key === "cases") {
+  // Services/cases: the slug locks once the page has been published, so a
+  // public URL never changes (simpler than redirects). select("*") works
+  // whether or not migration 0016 (slug_locked_at) is applied yet; the 0016
+  // trigger enforces the same rule in the database.
+  if (SLUG_LOCK_RESOURCES.has(key)) {
     const { data: existing } = await supabase
       .from(resources[key].table)
-      .select("slug")
+      .select("*")
       .eq("id", id)
       .maybeSingle();
-    if (existing && typeof existing.slug === "string" && existing.slug.trim()) {
-      payload.slug = existing.slug;
+    if (existing && isSlugLocked(key, existing as Record<string, unknown>)) {
+      const currentSlug = (existing as { slug?: string | null }).slug ?? null;
+      if ((payload.slug ?? null) !== currentSlug) {
+        return { ok: false, errors: { slug: SLUG_LOCKED_MESSAGE } };
+      }
     }
   }
 
@@ -118,7 +134,11 @@ export async function updateResource(
     .from(resources[key].table)
     .update({ ...payload, updated_at: new Date().toISOString() })
     .eq("id", id);
-  if (error) return { ok: false, error: `Save failed: ${error.message}` };
+  if (error) {
+    const slugErrors = friendlySlugError(error, resources[key].singular);
+    if (slugErrors) return { ok: false, errors: slugErrors };
+    return { ok: false, error: `Save failed: ${error.message}` };
+  }
 
   revalidateFor(key);
   return { ok: true };

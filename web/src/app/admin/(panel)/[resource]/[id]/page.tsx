@@ -6,6 +6,7 @@ import {
   resolveResourceKey,
 } from "@/lib/admin/resources";
 import { canEdit, type Role } from "@/lib/admin/permissions";
+import { isSlugLocked } from "@/lib/admin/slug-lock";
 import ResourceForm from "../../components/ResourceForm";
 import { getFormOptions } from "../../options";
 
@@ -73,6 +74,7 @@ export default async function EditResourcePage({
         )}
         categories={options.categories}
         media={options.media}
+        slugLocked={isSlugLocked(key, row as Record<string, unknown>)}
       />
     </div>
   );

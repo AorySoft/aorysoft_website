@@ -22,14 +22,20 @@ function Field({
   error,
   categories,
   media,
+  locked = false,
 }: {
   def: FieldDef;
   value: unknown;
   error?: string;
   categories: { id: string; name: string }[];
   media: { id: string; url: string; alt: string }[];
+  /** Slug fields only: locked because the page has been published. */
+  locked?: boolean;
 }) {
-  const describedBy = error ? `${def.name}-error` : undefined;
+  const lockNoteId = locked ? `${def.name}-locked` : undefined;
+  const describedBy =
+    [error ? `${def.name}-error` : null, lockNoteId].filter(Boolean).join(" ") ||
+    undefined;
 
   let control: React.ReactNode;
 
@@ -159,7 +165,7 @@ function Field({
       break;
     }
     case "slug": {
-      const locked = Boolean(value && String(value).trim());
+      // Services/cases only, decided server-side from the stored row (R5/N9).
       control = (
         <input
           type="text"
@@ -200,9 +206,15 @@ function Field({
       {def.help && (
         <p className="mt-1 text-xs text-ink-subtle">{def.help}</p>
       )}
+      {locked && (
+        <p id={lockNoteId} className="mt-1 text-xs text-ink-subtle">
+          Locked because this page has been published. Public URLs do not
+          change.
+        </p>
+      )}
       {error && (
         <p
-          id={describedBy}
+          id={`${def.name}-error`}
           className="mt-1 text-xs font-medium text-red-400"
           role="alert"
         >
@@ -218,11 +230,14 @@ export default function ResourceForm({
   initial,
   categories = [],
   media = [],
+  slugLocked = false,
 }: {
   def: ResourceDef;
   initial?: Record<string, unknown>;
   categories?: { id: string; name: string }[];
   media?: { id: string; url: string; alt: string }[];
+  /** From isSlugLocked() on the stored row (services/cases once published). */
+  slugLocked?: boolean;
 }) {
   const isEdit = Boolean(initial?.id);
   const id = typeof initial?.id === "string" ? initial.id : "";
@@ -287,6 +302,7 @@ export default function ResourceForm({
                     error={state.errors?.[field.name]}
                     categories={categories}
                     media={media}
+                    locked={field.kind === "slug" && slugLocked}
                   />
                 </div>
               ))}
