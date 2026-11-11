@@ -1,19 +1,26 @@
-import { describe, expect, it } from "vitest";
-import { reachedFor } from "./ProcessLine";
+import { createElement } from "react";
+import { cleanup, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it } from "vitest";
+import { PROCESS_STEPS } from "@/lib/about-content";
+import ProcessLine from "./ProcessLine";
 
-describe("reachedFor", () => {
-  it("lights nothing before the section and every step at the end", () => {
-    expect(reachedFor(0)).toBe(0);
-    expect(reachedFor(1)).toBe(5);
+afterEach(cleanup);
+
+describe("ProcessLine", () => {
+  it("renders every delivery step, in order, as an ordered list", () => {
+    render(createElement(ProcessLine));
+    const items = screen.getAllByRole("listitem");
+    expect(items).toHaveLength(PROCESS_STEPS.length);
+    PROCESS_STEPS.forEach((step, index) => {
+      expect(items[index]).toHaveTextContent(step.title);
+      expect(items[index]).toHaveTextContent(step.text);
+    });
+    expect(screen.getByRole("list").tagName).toBe("OL");
   });
 
-  it("lights a step slightly before the fill reaches its node", () => {
-    expect(reachedFor(0.15)).toBe(1);
-    expect(reachedFor(0.5)).toBe(2);
-  });
-
-  it("clamps out-of-range progress", () => {
-    expect(reachedFor(-0.2)).toBe(0);
-    expect(reachedFor(1.4)).toBe(5);
+  it("keeps the section title above the steps", () => {
+    render(createElement(ProcessLine));
+    expect(screen.getByRole("heading", { level: 3, name: "How a project runs" })).toBeInTheDocument();
+    expect(screen.getAllByRole("heading", { level: 4 })).toHaveLength(PROCESS_STEPS.length);
   });
 });

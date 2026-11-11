@@ -1,30 +1,14 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { MARK_PATHS } from "@/components/brand/markGeometry";
+import GhostMark from "@/components/brand/GhostMark";
 import HeroSculpture from "@/components/hero/HeroSculpture";
 import styles from "@/components/hero/HeroSection.module.css";
-
-/** Ghosted A outline cropped at the hero's lower-left, echoing the logo field. */
-function GhostMark() {
-  return (
-    <svg
-      className="pointer-events-none absolute -bottom-40 -left-48 h-[46rem] w-auto text-ink opacity-[0.045] md:-left-24"
-      viewBox="0 0 42.4 39.2"
-      fill="none"
-      aria-hidden="true"
-      focusable="false"
-    >
-      {MARK_PATHS.map((d) => (
-        <path key={d} d={d} stroke="currentColor" strokeWidth="1" vectorEffect="non-scaling-stroke" />
-      ))}
-    </svg>
-  );
-}
 
 const HeroSection = () => {
   return (
     <section aria-labelledby="hero-title" className="relative isolate overflow-hidden">
-      <GhostMark />
+      {/* Ghosted A cropped at the lower-left, echoing the logo field. */}
+      <GhostMark className="-bottom-40 -left-48 h-[46rem] opacity-[0.045] md:-left-24" />
       <div className={`${styles.field} pointer-events-none absolute inset-0 -z-10`} aria-hidden="true" />
 
       <div className="shell relative grid grid-cols-[minmax(0,1fr)] items-center gap-y-10 pb-16 pt-10 md:pb-24 md:pt-16 lg:min-h-[calc(100svh-4rem)] lg:grid-cols-12 lg:gap-x-8 lg:py-16">

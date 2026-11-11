@@ -3,20 +3,10 @@
 import { useCallback, useEffect, useMemo, useState, type KeyboardEvent } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
-import {
-  ArrowRight,
-  BarChart3,
-  Bot,
-  Brain,
-  Cloud,
-  Code,
-  Database,
-  Shield,
-  Zap,
-  type LucideIcon,
-} from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import type { ServiceRow } from "@/lib/types";
 import CapabilityVignette from "@/components/capabilities/CapabilityVignettes";
+import { CapabilityIcon } from "@/components/capabilities/icons";
 import styles from "@/components/capabilities/capabilities.module.css";
 import {
   CAPABILITY_EVENT,
@@ -24,17 +14,6 @@ import {
   toCapabilities,
   vignetteFor,
 } from "@/components/capabilities/serviceModel";
-
-const ICONS: Record<string, LucideIcon> = {
-  bot: Bot,
-  zap: Zap,
-  "bar-chart": BarChart3,
-  cloud: Cloud,
-  brain: Brain,
-  code: Code,
-  database: Database,
-  shield: Shield,
-};
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -159,7 +138,6 @@ function CapabilitySwitchboard({
       >
         {capabilities.map((capability, index) => {
           const selected = index === activeIndex;
-          const Icon = ICONS[capability.iconKey] ?? Bot;
           return (
             <button
               key={capability.id}
@@ -182,9 +160,9 @@ function CapabilitySwitchboard({
                   aria-hidden="true"
                 />
               ) : null}
-              <Icon
+              <CapabilityIcon
+                iconKey={capability.iconKey}
                 className={`h-4 w-4 shrink-0 transition-colors ${selected ? "text-signal" : "text-ink-subtle group-hover:text-ink-muted"}`}
-                aria-hidden="true"
               />
               <span className="whitespace-nowrap font-display text-xl">
                 {capability.title}
@@ -199,7 +177,6 @@ function CapabilitySwitchboard({
       <div className="mt-10 rounded-atelier-lg md:mt-12">
         {capabilities.map((capability, index) => {
           const selected = index === activeIndex;
-          const Icon = ICONS[capability.iconKey] ?? Bot;
           return (
             <div
               key={capability.id}
@@ -216,7 +193,7 @@ function CapabilitySwitchboard({
             >
               <div className="flex flex-col lg:col-span-5">
                 <h3 className="flex items-center gap-3 font-display text-3xl text-ink md:text-[2.25rem] md:leading-tight">
-                  <Icon className="h-5 w-5 shrink-0 text-signal" aria-hidden="true" />
+                  <CapabilityIcon iconKey={capability.iconKey} className="h-5 w-5 shrink-0 text-signal" />
                   {capability.title}
                 </h3>
                 {capability.subtitle ? (
