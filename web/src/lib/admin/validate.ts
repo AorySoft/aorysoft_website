@@ -54,6 +54,13 @@ export function validateSlug(raw: unknown): ValidationResult {
   return { ok: true, value };
 }
 
+/** Optional slug — empty becomes null (service cards without a detail page). */
+export function validateOptionalSlug(raw: unknown): ValidationResult {
+  if (raw === null || raw === undefined || raw === "")
+    return { ok: true, value: null };
+  return validateSlug(raw);
+}
+
 export function validateEmail(raw: unknown): ValidationResult {
   const value = typeof raw === "string" ? raw.trim() : "";
   if (!value) return { ok: false, error: "Email is required." };

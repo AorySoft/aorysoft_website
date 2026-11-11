@@ -1,23 +1,16 @@
-// Robots policy (SEO). Allows the marketing site, but blocks the admin panel
-// and the newsletter token routes (which are noindexed in their HTML too).
 import type { MetadataRoute } from "next";
-
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+import { absoluteUrl } from "@/lib/site";
+import { buildRobotsRules } from "@/lib/seo/robots-policy";
 
 export default function robots(): MetadataRoute.Robots {
+  const rules = buildRobotsRules();
   return {
-    rules: [
-      {
-        userAgent: "*",
-        allow: "/",
-        disallow: [
-          "/admin",
-          "/feedback",
-          "/newsletter/confirm",
-          "/newsletter/unsubscribe",
-        ],
-      },
-    ],
-    sitemap: `${siteUrl}/sitemap.xml`,
+    rules: rules.map((rule) => ({
+      userAgent: rule.userAgent,
+      allow: rule.allow,
+      // Fresh array per group so every UA repeats the full Disallow list.
+      disallow: [...rule.disallow],
+    })),
+    sitemap: absoluteUrl("/sitemap.xml"),
   };
 }

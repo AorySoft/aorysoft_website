@@ -1,23 +1,31 @@
+"use client";
+
 import Link from "next/link";
 import { Mail } from "lucide-react";
 import BrandMark from "@/components/BrandMark";
 import { SOCIAL_LINKS } from "@/lib/social";
 
-const quickLinks = [
-  { name: "Home", path: "/" },
-  { name: "About", path: "/#about" },
-  { name: "Services", path: "/#services" },
-  { name: "Work", path: "/#work" },
-];
+export default function Footer({
+  showBlog = false,
+  showWork = false,
+}: {
+  showBlog?: boolean;
+  showWork?: boolean;
+}) {
+  const explore = [
+    { name: "Home", path: "/" },
+    { name: "About", path: "/about" },
+    { name: "Services", path: "/services" },
+    ...(showWork ? [{ name: "Case studies", path: "/work" }] : []),
+    ...(showBlog ? [{ name: "Blog", path: "/blog" }] : []),
+  ];
 
-const companyLinks = [
-  { name: "Careers", path: "/careers" },
-  { name: "Blog", path: "/blog" },
-  { name: "Contact", path: "/contact" },
-  { name: "Get a Quote", path: "/quote" },
-];
+  const company = [
+    { name: "Careers", path: "/careers" },
+    { name: "Contact", path: "/contact" },
+    { name: "Get a Quote", path: "/quote" },
+  ];
 
-const Footer = () => {
   return (
     <footer className="border-t border-line bg-surface">
       <div className="shell py-14">
@@ -47,7 +55,7 @@ const Footer = () => {
           <div className="space-y-4">
             <h2 className="text-sm font-semibold text-ink">Explore</h2>
             <div className="space-y-2">
-              {quickLinks.map((link) => (
+              {explore.map((link) => (
                 <Link
                   key={link.name}
                   href={link.path}
@@ -62,7 +70,7 @@ const Footer = () => {
           <div className="space-y-4">
             <h2 className="text-sm font-semibold text-ink">Company</h2>
             <div className="space-y-2">
-              {companyLinks.map((link) => (
+              {company.map((link) => (
                 <Link
                   key={link.name}
                   href={link.path}
@@ -82,21 +90,13 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col items-start justify-between gap-4 border-t border-line pt-8 sm:flex-row sm:items-center">
-          <p className="text-sm text-ink-subtle">
-            © {new Date().getFullYear()} AorySoft. All rights reserved.
-          </p>
-          <div className="flex items-center gap-6 text-sm">
-            <Link
-              href="/privacy"
-              className="text-ink-muted transition hover:text-signal"
-            >
+        <div className="mt-12 flex flex-col gap-3 border-t border-line pt-6 text-xs text-ink-subtle sm:flex-row sm:items-center sm:justify-between">
+          <p>© {new Date().getFullYear()} AorySoft. All rights reserved.</p>
+          <div className="flex gap-4">
+            <Link href="/privacy" className="hover:text-signal">
               Privacy
             </Link>
-            <Link
-              href="/terms"
-              className="text-ink-muted transition hover:text-signal"
-            >
+            <Link href="/terms" className="hover:text-signal">
               Terms
             </Link>
           </div>
@@ -104,6 +104,4 @@ const Footer = () => {
       </div>
     </footer>
   );
-};
-
-export default Footer;
+}

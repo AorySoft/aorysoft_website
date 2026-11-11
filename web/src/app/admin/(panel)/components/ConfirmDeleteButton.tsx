@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Trash2 } from "lucide-react";
+import ConfirmDialog from "@/components/ConfirmDialog";
 
 /**
  * Reusable confirm-then-delete button. Pass a server action reference plus the
@@ -23,9 +24,9 @@ export default function ConfirmDeleteButton({
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const [open, setOpen] = useState(false);
 
-  const handleClick = async () => {
-    if (!window.confirm(confirmMessage)) return;
+  const handleConfirm = async () => {
     setPending(true);
     setError(null);
     const result = await action(id);
@@ -34,6 +35,7 @@ export default function ConfirmDeleteButton({
       setError(result.error ?? "Delete failed.");
       return;
     }
+    setOpen(false);
     router.refresh();
   };
 
@@ -41,7 +43,7 @@ export default function ConfirmDeleteButton({
     <>
       <button
         type="button"
-        onClick={handleClick}
+        onClick={() => setOpen(true)}
         disabled={pending}
         aria-label={label}
         className="inline-flex items-center gap-1.5 rounded-atelier border border-line px-3 py-1.5 text-xs text-ink-muted transition-colors duration-200 hover:border-red-500/50 hover:text-red-400 disabled:opacity-50"
@@ -54,6 +56,17 @@ export default function ConfirmDeleteButton({
           {error}
         </p>
       )}
+      <ConfirmDialog
+        open={open}
+        title="Confirm delete"
+        message={confirmMessage}
+        confirmLabel="Delete"
+        pending={pending}
+        onCancel={() => {
+          if (!pending) setOpen(false);
+        }}
+        onConfirm={handleConfirm}
+      />
     </>
   );
 }

@@ -36,19 +36,62 @@ export function page({ ok, heading, body }: Outcome): Response {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex" />
     <title>${heading} | AorySoft</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Instrument+Serif&display=swap" rel="stylesheet" />
     <style>
-      body { font-family: system-ui, sans-serif; background: #0f172a; color: #e2e8f0;
-             display: grid; place-items: center; min-height: 100vh; margin: 0; padding: 1.5rem; }
-      main { max-width: 32rem; text-align: center; }
-      .mark { font-size: 3rem; }
-      h1 { font-size: 1.5rem; margin: 1rem 0 0.5rem; }
-      p { color: #94a3b8; line-height: 1.6; }
-      a { color: #22d3ee; }
+      :root {
+        --canvas: #000000;
+        --surface: #0b0f14;
+        --line: #1e2836;
+        --ink: #f4f7fa;
+        --ink-muted: #a8b3c2;
+        --signal: #06b6d4;
+      }
+      body {
+        font-family: "DM Sans", system-ui, sans-serif;
+        background: var(--canvas);
+        color: var(--ink);
+        display: grid;
+        place-items: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 1.5rem;
+      }
+      main {
+        max-width: 32rem;
+        text-align: center;
+        border: 1px solid var(--line);
+        background: var(--surface);
+        border-radius: 10px;
+        padding: 2rem 1.5rem;
+      }
+      .mark {
+        width: 2.5rem;
+        height: 2.5rem;
+        margin: 0 auto;
+        border-radius: 6px;
+        border: 1px solid var(--line);
+        display: grid;
+        place-items: center;
+        color: var(--signal);
+        font-size: 1rem;
+        font-weight: 600;
+      }
+      h1 {
+        font-family: "Instrument Serif", Georgia, serif;
+        font-weight: 400;
+        font-size: 1.75rem;
+        letter-spacing: -0.02em;
+        margin: 1rem 0 0.5rem;
+      }
+      p { color: var(--ink-muted); line-height: 1.65; }
+      a { color: var(--signal); text-underline-offset: 3px; }
     </style>
   </head>
   <body>
     <main>
-      <div class="mark" aria-hidden="true">${ok ? "✅" : "⚠️"}</div>
+      <div class="mark" aria-hidden="true">${ok ? "OK" : "!"}</div>
       <h1>${heading}</h1>
       <p>${body}</p>
       <p><a href="/">Back to aorysoft.com</a></p>

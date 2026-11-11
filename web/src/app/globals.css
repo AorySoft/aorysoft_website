@@ -24,6 +24,12 @@
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .animate-spin {
+    animation: none;
+  }
+}
+
 @layer base {
   ::selection {
     background: rgb(var(--color-signal) / 0.35);
@@ -84,5 +90,27 @@
 
   .surface-panel {
     @apply rounded-atelier-lg border border-line bg-surface/80;
+  }
+
+  /* F30: CSS entrance for simple fades (prefer over Framer for blog cards). */
+  .atelier-fade-up {
+    animation: atelier-fade-up 0.55s ease-out both;
+  }
+}
+
+@keyframes atelier-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .atelier-fade-up {
+    animation: none;
   }
 }

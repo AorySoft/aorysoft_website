@@ -26,6 +26,7 @@ describe("verifyTurnstile", () => {
   it("skips verification when no secret is configured (development)", async () => {
     delete process.env.TURNSTILE_SECRET_KEY;
     expect(isTurnstileConfigured()).toBe(false);
+    expect(process.env.NODE_ENV).not.toBe("production");
 
     // No fetch at all should happen when unconfigured.
     const fetchSpy = vi.fn();
@@ -35,6 +36,22 @@ describe("verifyTurnstile", () => {
     await expect(verifyTurnstile(undefined)).resolves.toEqual({ ok: true });
     await expect(verifyTurnstile("")).resolves.toEqual({ ok: true });
     expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
+  it("fails closed in production when no secret is configured", async () => {
+    delete process.env.TURNSTILE_SECRET_KEY;
+    vi.stubEnv("NODE_ENV", "production");
+
+    const fetchSpy = vi.fn();
+    vi.stubGlobal("fetch", fetchSpy);
+
+    await expect(verifyTurnstile("any-token")).resolves.toEqual({
+      ok: false,
+      reason: "not_configured",
+    });
+    expect(fetchSpy).not.toHaveBeenCalled();
+
+    vi.unstubAllEnvs();
   });
 
   it("rejects a missing token when configured, without calling Cloudflare", async () => {

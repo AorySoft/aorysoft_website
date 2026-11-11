@@ -3,11 +3,10 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { canDelete, canEdit, type Role } from "@/lib/admin/permissions";
 import ConfirmDeleteButton from "../../components/ConfirmDeleteButton";
-import { deleteSubmission, updateSubmissionStatusAction } from "../actions";
+import { deleteSubmission } from "../actions";
+import SubmissionStatusForm from "../SubmissionStatusForm";
 
 export const metadata = { title: "Admin — Submission" };
-
-const STATUSES = ["new", "read", "replied", "archived"] as const;
 
 export default async function SubmissionDetailPage({
   params,
@@ -104,32 +103,10 @@ export default async function SubmissionDetailPage({
       </section>
 
       <section className="flex flex-wrap items-center justify-between gap-4 rounded-atelier-lg border border-line bg-surface/80 p-6">
-        <form
-          action={updateSubmissionStatusAction.bind(null, row.id)}
-          className="flex items-center gap-3"
-        >
-          <label htmlFor="status" className="text-sm text-ink-muted">
-            Status
-          </label>
-          <select
-            id="status"
-            name="status"
-            defaultValue={row.status}
-            className="rounded-atelier border border-line bg-surface-raised px-3 py-2 text-sm text-ink focus:border-signal focus:outline-none"
-          >
-            {STATUSES.map((status) => (
-              <option key={status} value={status}>
-                {status}
-              </option>
-            ))}
-          </select>
-          <button
-            type="submit"
-            className="rounded-atelier-lg bg-signal px-4 py-2 text-sm font-semibold text-canvas transition-all duration-200 hover:shadow-lg hover:shadow-signal"
-          >
-            Update
-          </button>
-        </form>
+        <SubmissionStatusForm
+          submissionId={row.id}
+          currentStatus={row.status}
+        />
 
         {canDelete(role, "submissions") && (
           <ConfirmDeleteButton

@@ -1,11 +1,14 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { DM_Sans, Instrument_Serif } from "next/font/google";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import SiteAnalytics from "@/components/SiteAnalytics";
+import SiteJsonLd from "@/components/SiteJsonLd";
+import {
+  SITE_DESCRIPTION,
+  SITE_LOGO_PATH,
+  SITE_MARK_PATH,
+  SITE_NAME,
+  absoluteUrl,
+} from "@/lib/site";
 import "./globals.css";
-
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
 const sans = DM_Sans({
   subsets: ["latin"],
@@ -18,41 +21,48 @@ const display = Instrument_Serif({
   weight: "400",
   style: ["normal", "italic"],
   variable: "--font-display",
-  // optional: avoid late Instrument Serif swaps shifting the hero/footer (CLS).
   display: "optional",
   adjustFontFallback: true,
 });
 
+export const viewport: Viewport = {
+  themeColor: "#000000",
+  colorScheme: "dark",
+};
+
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
+  metadataBase: new URL(absoluteUrl("/")),
   title: {
-    default: "AorySoft | AI-first solutions, real-world impact",
-    template: "%s | AorySoft",
+    default: `${SITE_NAME} | AI-first solutions, real-world impact`,
+    template: `%s | ${SITE_NAME}`,
   },
-  description:
-    "AorySoft builds software, AI systems, and automation for businesses: websites, apps, integrations, and practical AI.",
-  applicationName: "AorySoft",
-  keywords: ["AI", "automation", "integrations", "data analytics", "cloud", "AorySoft"],
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
+  keywords: [
+    "AI",
+    "automation",
+    "integrations",
+    "web development",
+    "AI chatbots",
+    "AorySoft",
+  ],
   openGraph: {
     type: "website",
-    siteName: "AorySoft",
-    title: "AorySoft | AI-first solutions, real-world impact",
-    description:
-      "AorySoft builds software, AI systems, and automation for businesses: websites, apps, integrations, and practical AI.",
-    url: siteUrl,
-    images: [{ url: "/brand/aorysoft-logo.jpg", alt: "AorySoft" }],
+    siteName: SITE_NAME,
+    title: `${SITE_NAME} | AI-first solutions, real-world impact`,
+    description: SITE_DESCRIPTION,
+    url: absoluteUrl("/"),
   },
   twitter: {
-    card: "summary",
-    title: "AorySoft | AI-first solutions, real-world impact",
-    description:
-      "AorySoft builds software, AI systems, and automation for businesses: websites, apps, integrations, and practical AI.",
-    images: ["/brand/aorysoft-logo.jpg"],
+    card: "summary_large_image",
+    title: `${SITE_NAME} | AI-first solutions, real-world impact`,
+    description: SITE_DESCRIPTION,
   },
   icons: {
-    icon: [{ url: "/brand/aorysoft-mark.svg", type: "image/svg+xml" }],
-    apple: "/brand/aorysoft-logo.jpg",
+    icon: [{ url: SITE_MARK_PATH, type: "image/svg+xml" }],
+    apple: SITE_LOGO_PATH,
   },
+  manifest: "/manifest.webmanifest",
   robots: {
     index: true,
     follow: true,
@@ -68,17 +78,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${sans.variable} ${display.variable}`} data-scroll-behavior="smooth">
-      <body className="min-h-screen bg-canvas font-sans text-ink antialiased overflow-x-hidden">
-        <a href="#main-content" className="skip-link">
-          Skip to content
-        </a>
-        <Navbar />
-        <div id="main-content" tabIndex={-1} className="pt-16 focus:outline-none">
-          {children}
-        </div>
-        <Footer />
-        <SiteAnalytics />
+    <html
+      lang="en"
+      className={`${sans.variable} ${display.variable}`}
+      data-scroll-behavior="smooth"
+    >
+      <body className="min-h-screen overflow-x-hidden bg-canvas font-sans text-ink antialiased">
+        <SiteJsonLd />
+        {children}
       </body>
     </html>
   );

@@ -196,14 +196,16 @@ describe("submitContact", () => {
     expect(sendContactNotification).not.toHaveBeenCalled();
   });
 
-  it("swallows a honeypot submission as success without writing", async () => {
+  it("rejects a honeypot-filled submission without writing", async () => {
     const result = await submitContact(
       idleFormState,
       form({ ...contactFields, website: "http://spam.example" }),
     );
 
+    // Fake success to bots; nothing is persisted.
     expect(result.status).toBe("success");
     expect(h.state.inserted).toHaveLength(0);
+    expect(h.state.attempts).toBe(0);
   });
 
   it("rate-limits a flood from one IP before any write", async () => {
@@ -270,6 +272,17 @@ describe("submitQuote", () => {
     h.state.quoteEmailResult = { ok: false, error: "Resend error: HTTP 429" };
     const result = await submitQuote(idleFormState, form(quoteFields));
     expect(result.status).toBe("success");
+  });
+
+  it("rejects a honeypot-filled submission without writing", async () => {
+    const result = await submitQuote(
+      idleFormState,
+      form({ ...quoteFields, website: "http://spam.example" }),
+    );
+
+    expect(result.status).toBe("success");
+    expect(h.state.inserted).toHaveLength(0);
+    expect(h.state.attempts).toBe(0);
   });
 });
 
@@ -349,7 +362,7 @@ describe("subscribeNewsletter", () => {
     expect(h.state.inserted).toHaveLength(0);
   });
 
-  it("swallows a honeypot submission as success without writing", async () => {
+  it("rejects a honeypot-filled submission without writing", async () => {
     const result = await subscribeNewsletter(
       idleFormState,
       form({ email: "bot@example.com", website: "http://spam.example" }),
@@ -357,5 +370,6 @@ describe("subscribeNewsletter", () => {
 
     expect(result.status).toBe("success");
     expect(h.state.inserted).toHaveLength(0);
+    expect(h.state.attempts).toBe(0);
   });
 });

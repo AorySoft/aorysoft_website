@@ -1,11 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { ServiceRow } from "@/lib/types";
-import {
-  PLACEHOLDER_CAPABILITIES,
-  findCapabilityIndex,
-  toCapabilities,
-  vignetteFor,
-} from "./serviceModel";
+import { findCapabilityIndex, toCapabilities, vignetteFor } from "./serviceModel";
+import { PLACEHOLDER_CAPABILITIES } from "./testPlaceholders";
 
 const row = (overrides: Partial<ServiceRow>): ServiceRow => ({
   id: "id-1",
@@ -17,15 +13,28 @@ const row = (overrides: Partial<ServiceRow>): ServiceRow => ({
   color: null,
   sort_order: 0,
   active: true,
+  slug: null,
+  seo_title: null,
+  seo_description: null,
+  deliverables: [],
+  process_steps: [],
+  technologies: [],
+  faqs: [],
   created_at: "",
   updated_at: "",
   ...overrides,
 });
 
 describe("toCapabilities", () => {
-  it("falls back to placeholders when the CMS returns nothing", () => {
-    expect(toCapabilities(null)).toBe(PLACEHOLDER_CAPABILITIES);
-    expect(toCapabilities([])).toBe(PLACEHOLDER_CAPABILITIES);
+  it("returns an empty list when the CMS returns nothing (no silent placeholders)", () => {
+    expect(toCapabilities(null)).toEqual([]);
+    expect(toCapabilities([])).toEqual([]);
+  });
+
+  it("allows explicit test placeholders behind the options flag", () => {
+    expect(toCapabilities(null, { placeholders: PLACEHOLDER_CAPABILITIES })).toBe(
+      PLACEHOLDER_CAPABILITIES,
+    );
   });
 
   it("keys capabilities by row id so duplicate titles stay distinct", () => {

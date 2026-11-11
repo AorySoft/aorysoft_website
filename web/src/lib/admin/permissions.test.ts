@@ -7,6 +7,7 @@ const CONTENT_AREAS: Area[] = [
   "services",
   "jobs",
   "reviews",
+  "cases",
   "media",
 ];
 
@@ -18,6 +19,7 @@ describe("permission matrix (plan §5.5)", () => {
       "services",
       "jobs",
       "reviews",
+      "cases",
       "media",
       "submissions",
       "newsletter",
@@ -38,6 +40,7 @@ describe("permission matrix (plan §5.5)", () => {
       "services",
       "jobs",
       "reviews",
+      "cases",
       "media",
       "submissions",
       "newsletter",

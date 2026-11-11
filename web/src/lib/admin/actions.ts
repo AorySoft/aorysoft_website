@@ -59,6 +59,8 @@ function revalidateFor(key: ResourceKey) {
   // instance of the pattern so edits/renames/unpublishes are reflected without
   // waiting for the 60 s ISR window (plan §8).
   if (key === "posts") revalidatePath("/blog/[slug]", "page");
+  if (key === "services") revalidatePath("/services/[slug]", "page");
+  if (key === "cases") revalidatePath("/work");
   revalidatePath(`/admin/${key}`);
 }
 
@@ -95,9 +97,27 @@ export async function updateResource(
   const validated = validateResourceInput(key, formDataToRecord(formData));
   if (!validated.ok) return { ok: false, errors: validated.errors };
 
+  const payload = { ...validated.value };
+
+  // Lock slugs once set so public URLs never break (simpler than redirects).
+  if (key === "services" || key === "cases") {
+    const { data: existing } = await supabase
+      .from(resources[key].table)
+      .select("slug")
+      .eq("id", id)
+      .maybeSingle();
+    if (existing && typeof existing.slug === "string" && existing.slug.trim()) {
+      payload.slug = existing.slug;
+    }
+  }
+
+  if (key === "cases" && payload.status === "published" && !payload.published_at) {
+    payload.published_at = new Date().toISOString().slice(0, 10);
+  }
+
   const { error } = await supabase
     .from(resources[key].table)
-    .update({ ...validated.value, updated_at: new Date().toISOString() })
+    .update({ ...payload, updated_at: new Date().toISOString() })
     .eq("id", id);
   if (error) return { ok: false, error: `Save failed: ${error.message}` };
 

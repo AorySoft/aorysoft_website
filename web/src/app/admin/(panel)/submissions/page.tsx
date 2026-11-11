@@ -4,6 +4,12 @@ import { isPublicSupabaseConfigured } from "@/lib/supabase/admin";
 import { canDelete, canEdit, type Role } from "@/lib/admin/permissions";
 import SetupNotice from "../SetupNotice";
 import ConfirmDeleteButton from "../components/ConfirmDeleteButton";
+import {
+  AdminEmptyState,
+  AdminTableBody,
+  AdminTableHead,
+  AdminTableShell,
+} from "../components/AdminTableShell";
 import { deleteSubmission } from "./actions";
 
 export const metadata = { title: "Admin — Submissions" };
@@ -18,14 +24,15 @@ function filterLink(
   active: boolean,
   key: string,
 ) {
-  const query =
-    (type !== "all" ? `type=${type}` : "") +
-    (status !== "all" ? `${type !== "all" ? "&" : ""}status=${status}` : "");
+  const params = new URLSearchParams();
+  if (type !== "all") params.set("type", type);
+  if (status !== "all") params.set("status", status);
+  const query = params.toString();
   return (
     <Link
       key={key}
       href={`/admin/submissions${query ? `?${query}` : ""}`}
-      className={`rounded-full px-4 py-1.5 text-sm transition-colors duration-200 ${
+      className={`rounded-atelier px-4 py-1.5 text-sm transition-colors duration-200 ${
         active
           ? "bg-signal text-canvas"
           : "border border-line bg-surface-raised text-ink-muted hover:bg-surface-raised"
@@ -103,19 +110,19 @@ export default async function SubmissionsPage({
         {TYPES.map((t) =>
           filterLink(
             t,
-            "all",
+            status,
             t === "all" ? "All types" : t,
-            type === t && status === "all",
+            type === t,
             `type-${t}`,
           ),
         )}
-        <span className="mx-2 h-4 w-px bg-gray-700" aria-hidden="true" />
+        <span className="mx-2 h-4 w-px bg-line" aria-hidden="true" />
         {STATUSES.map((s) =>
           filterLink(
-            "all",
+            type,
             s,
             s === "all" ? "All statuses" : s,
-            status === s && type === "all",
+            status === s,
             `status-${s}`,
           ),
         )}
@@ -128,77 +135,72 @@ export default async function SubmissionsPage({
       )}
 
       {!error && submissions.length === 0 && (
-        <div className="rounded-atelier-lg border border-line bg-surface/80 p-10 text-center">
-          <p className="font-medium text-ink">No submissions match</p>
-          <p className="mt-1 text-sm text-ink-subtle">
-            Contact/quote forms deliver here once the Phase 4 pipeline (Turnstile
-            → Supabase → Resend) is connected.
-          </p>
-        </div>
+        <AdminEmptyState
+          title="No submissions match"
+          description="Contact and quote forms deliver here after Turnstile, validation, and Resend succeed."
+        />
       )}
 
       {submissions.length > 0 && (
-        <div className="overflow-x-auto rounded-atelier-lg border border-line">
-          <table className="min-w-full text-left text-sm">
-            <thead className="bg-surface text-xs uppercase text-ink-subtle">
-              <tr>
-                <th scope="col" className="px-4 py-3">Received</th>
-                <th scope="col" className="px-4 py-3">Type</th>
-                <th scope="col" className="px-4 py-3">Name</th>
-                <th scope="col" className="px-4 py-3">Email</th>
-                <th scope="col" className="px-4 py-3">Status</th>
-                <th scope="col" className="px-4 py-3 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-800 bg-canvas/50">
-              {submissions.map((row) => (
-                <tr key={row.id} className="hover:bg-surface/80">
-                  <td className="px-4 py-3 text-ink-muted">
-                    {new Date(row.created_at).toLocaleString()}
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className="rounded-full bg-surface-raised px-2.5 py-0.5 text-xs text-signal">
-                      {row.type}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-ink-muted">{row.name}</td>
-                  <td className="px-4 py-3 text-ink-muted">{row.email}</td>
-                  <td className="px-4 py-3">
-                    <span
-                      className={`rounded-full px-2.5 py-0.5 text-xs ${
-                        row.status === "new"
-                          ? "bg-blue-500/20 text-blue-300"
-                          : row.status === "replied"
-                            ? "bg-green-500/20 text-green-300"
-                            : "bg-surface-raised text-ink-subtle"
-                      }`}
+        <AdminTableShell>
+          <AdminTableHead>
+            <tr>
+              <th scope="col" className="px-4 py-3">Received</th>
+              <th scope="col" className="px-4 py-3">Type</th>
+              <th scope="col" className="px-4 py-3">Name</th>
+              <th scope="col" className="px-4 py-3">Email</th>
+              <th scope="col" className="px-4 py-3">Status</th>
+              <th scope="col" className="px-4 py-3 text-right">Actions</th>
+            </tr>
+          </AdminTableHead>
+          <AdminTableBody>
+            {submissions.map((row) => (
+              <tr key={row.id} className="hover:bg-surface/80">
+                <td className="px-4 py-3 text-ink-muted">
+                  {new Date(row.created_at).toLocaleString()}
+                </td>
+                <td className="px-4 py-3">
+                  <span className="rounded-atelier bg-surface-raised px-2.5 py-0.5 text-xs text-signal">
+                    {row.type}
+                  </span>
+                </td>
+                <td className="px-4 py-3 text-ink-muted">{row.name}</td>
+                <td className="px-4 py-3 text-ink-muted">{row.email}</td>
+                <td className="px-4 py-3">
+                  <span
+                    className={`rounded-atelier px-2.5 py-0.5 text-xs ${
+                      row.status === "new"
+                        ? "bg-signal/20 text-signal"
+                        : row.status === "replied"
+                          ? "bg-emerald-500/20 text-emerald-300"
+                          : "bg-surface-raised text-ink-subtle"
+                    }`}
+                  >
+                    {row.status}
+                  </span>
+                </td>
+                <td className="px-4 py-3 text-right">
+                  <div className="inline-flex items-center gap-3">
+                    <Link
+                      href={`/admin/submissions/${row.id}`}
+                      className="text-signal transition-colors duration-200 hover:text-signal"
                     >
-                      {row.status}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    <div className="inline-flex items-center gap-3">
-                      <Link
-                        href={`/admin/submissions/${row.id}`}
-                        className="text-signal transition-colors duration-200 hover:text-signal"
-                      >
-                        View
-                      </Link>
-                      {mayDelete && (
-                        <ConfirmDeleteButton
-                          action={deleteSubmission}
-                          id={row.id}
-                          label={`Delete submission from ${row.name}`}
-                          confirmMessage={`Delete the submission from ${row.name}? This cannot be undone.`}
-                        />
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                      View
+                    </Link>
+                    {mayDelete && (
+                      <ConfirmDeleteButton
+                        action={deleteSubmission}
+                        id={row.id}
+                        label={`Delete submission from ${row.name}`}
+                        confirmMessage={`Delete the submission from ${row.name}? This cannot be undone.`}
+                      />
+                    )}
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </AdminTableBody>
+        </AdminTableShell>
       )}
     </div>
   );

@@ -56,7 +56,7 @@ function Field({
           id={def.name}
           name={def.name}
           defaultChecked={value === true}
-          className="h-4 w-4 rounded border-gray-600 bg-surface-raised text-cyan-500 focus:ring-cyan-400/40"
+          className="h-4 w-4 rounded-atelier border-line-strong bg-surface-raised text-signal focus:ring-signal/40"
         />
       );
       break;
@@ -155,6 +155,23 @@ function Field({
             </option>
           ))}
         </select>
+      );
+      break;
+    }
+    case "slug": {
+      const locked = Boolean(value && String(value).trim());
+      control = (
+        <input
+          type="text"
+          id={def.name}
+          name={def.name}
+          defaultValue={typeof value === "string" ? value : ""}
+          maxLength={def.maxLength ?? 200}
+          readOnly={locked}
+          className={`${inputClasses}${locked ? " cursor-not-allowed opacity-70" : ""}`}
+          aria-describedby={describedBy}
+          aria-readonly={locked || undefined}
+        />
       );
       break;
     }

@@ -8,9 +8,10 @@
 // - The response is accepted ONLY on an explicit `success === true`. A missing
 //   or malformed field is treated as failure — it never fails open.
 // - Tokens are compared timing-safely before use.
-// - When no secret is configured the check is SKIPPED (development only).
-//   That is deliberate and loud in the logs: production must configure the
-//   secret, otherwise Turnstile is decorative. See isTurnstileConfigured().
+// - When no secret is configured:
+//   - development / test: verification is SKIPPED so local work is unblocked
+//   - production: FAIL CLOSED (`not_configured`) — forms must not accept spam
+//     without Turnstile (FRONTEND_AUDIT F33).
 
 import { createHash, timingSafeEqual as cryptoTimingSafeEqual } from "node:crypto";
 
@@ -38,15 +39,18 @@ export function timingSafeEqual(a: string, b: string): boolean {
 /**
  * Verifies a Turnstile response token.
  *
- * Returns `{ ok: true }` when Turnstile is not configured (development), so a
- * missing local secret never blocks a developer — but it also means an
- * unconfigured production deploy has NO spam protection, which is why the
- * caller logs a warning and the plan treats the secret as a launch gate.
+ * When `TURNSTILE_SECRET_KEY` is unset: development/test skip (`ok: true`);
+ * production returns `{ ok: false, reason: "not_configured" }` (fail closed).
  */
 export async function verifyTurnstile(token: unknown): Promise<TurnstileResult> {
   const secret = process.env.TURNSTILE_SECRET_KEY;
 
-  if (!secret) return { ok: true };
+  if (!secret) {
+    if (process.env.NODE_ENV === "production") {
+      return { ok: false, reason: "not_configured" };
+    }
+    return { ok: true };
+  }
 
   if (typeof token !== "string" || !token.trim())
     return { ok: false, reason: "missing_token" };

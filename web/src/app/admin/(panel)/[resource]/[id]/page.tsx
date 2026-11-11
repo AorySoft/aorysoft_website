@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import {
+  initialForResourceForm,
   resources,
   resolveResourceKey,
 } from "@/lib/admin/resources";
@@ -52,10 +53,12 @@ export default async function EditResourcePage({
 
   if (!row) notFound();
 
-  const options =
-    key === "posts"
-      ? await getFormOptions(supabase)
-      : { categories: [], media: [] };
+  const needsFormOptions = def.fields.some(
+    (field) => field.kind === "mediaRef" || field.kind === "categoryRef",
+  );
+  const options = needsFormOptions
+    ? await getFormOptions(supabase)
+    : { categories: [], media: [] };
 
   return (
     <div className="space-y-6">
@@ -64,7 +67,10 @@ export default async function EditResourcePage({
       </h1>
       <ResourceForm
         def={def}
-        initial={row as unknown as Record<string, unknown>}
+        initial={initialForResourceForm(
+          key,
+          row as unknown as Record<string, unknown>,
+        )}
         categories={options.categories}
         media={options.media}
       />
