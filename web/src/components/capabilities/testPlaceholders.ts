@@ -7,6 +7,7 @@ import type { Capability } from "./serviceModel";
 export const PLACEHOLDER_CAPABILITIES: Capability[] = [
   {
     id: "placeholder-ai-automation",
+    href: null,
     iconKey: "bot",
     title: "AI Automation",
     subtitle: "Cut repetitive work with practical AI workflows",
@@ -22,6 +23,7 @@ export const PLACEHOLDER_CAPABILITIES: Capability[] = [
   },
   {
     id: "placeholder-custom-software",
+    href: null,
     iconKey: "code",
     title: "Custom Software",
     subtitle: "Web, mobile, and SaaS products",
@@ -37,6 +39,7 @@ export const PLACEHOLDER_CAPABILITIES: Capability[] = [
   },
   {
     id: "placeholder-ai-agents",
+    href: null,
     iconKey: "brain",
     title: "AI Agents & Chat",
     subtitle: "Assistants that work in context",
@@ -52,6 +55,7 @@ export const PLACEHOLDER_CAPABILITIES: Capability[] = [
   },
   {
     id: "placeholder-integrations-cloud",
+    href: null,
     iconKey: "cloud",
     title: "Integrations & Cloud",
     subtitle: "Connect systems and keep them running",

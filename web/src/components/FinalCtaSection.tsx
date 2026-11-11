@@ -6,7 +6,7 @@ import { MARK_PATHS } from "@/components/brand/markGeometry";
  * Closing call to action. Also carries the honest "selected work" note (and
  * the #work anchor) until real case studies are cleared for publication.
  */
-const FinalCtaSection = () => {
+const FinalCtaSection = ({ hasWork = false }: { hasWork?: boolean }) => {
   return (
     <section
       id="work"
@@ -58,10 +58,20 @@ const FinalCtaSection = () => {
           </Link>
         </div>
 
-        <p className="mt-14 max-w-xl border-t border-line pt-6 text-sm leading-relaxed text-ink-subtle">
-          Public case studies will show here once they are cleared for display.
-          Until then, we share relevant experience privately when we talk.
-        </p>
+        {hasWork ? (
+          <p className="mt-14 max-w-xl border-t border-line pt-6 text-sm leading-relaxed text-ink-muted">
+            Want to see how we work on real projects?{" "}
+            <Link href="/work" className="text-ink underline decoration-signal underline-offset-4 hover:text-signal">
+              Read our case studies
+            </Link>
+            .
+          </p>
+        ) : (
+          <p className="mt-14 max-w-xl border-t border-line pt-6 text-sm leading-relaxed text-ink-muted">
+            Public case studies will show here once they are cleared for display.
+            Until then, we share relevant experience privately when we talk.
+          </p>
+        )}
       </div>
     </section>
   );

@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 import type { ServiceRow } from "@/lib/types";
-import { findCapabilityIndex, toCapabilities, vignetteFor } from "./serviceModel";
+import {
+  findCapabilityIndex,
+  serviceHrefFor,
+  toCapabilities,
+  toCapability,
+  vignetteFor,
+} from "./serviceModel";
 import { PLACEHOLDER_CAPABILITIES } from "./testPlaceholders";
 
 const row = (overrides: Partial<ServiceRow>): ServiceRow => ({
@@ -23,6 +29,33 @@ const row = (overrides: Partial<ServiceRow>): ServiceRow => ({
   created_at: "",
   updated_at: "",
   ...overrides,
+});
+
+describe("service detail links", () => {
+  const published = {
+    active: true,
+    description: "Overview",
+    deliverables: ["a", "b", "c", "d"],
+  };
+
+  it("links a capability only when its service meets the publish threshold", () => {
+    expect(toCapability(row({ ...published, slug: "test-ai-chatbots" })).href).toBe("/services/test-ai-chatbots");
+    expect(toCapability(row({ ...published, slug: null })).href).toBeNull();
+    expect(toCapability(row({ ...published, slug: "x", deliverables: ["a"] })).href).toBeNull();
+    expect(toCapability(row({ ...published, slug: "x", active: false })).href).toBeNull();
+  });
+
+  it("finds the published page for a hero node's icon keys, skipping unpublished matches", () => {
+    const rows = [
+      row({ id: "1", icon: "bot", slug: null }),
+      row({ id: "2", icon: "brain", ...published, slug: "agents" }),
+      row({ id: "3", icon: "bot", ...published, slug: "chatbots" }),
+    ];
+    expect(serviceHrefFor(rows, ["brain", "bot"])).toBe("/services/agents");
+    expect(serviceHrefFor(rows, ["bot"])).toBe("/services/chatbots");
+    expect(serviceHrefFor(rows, ["zap"])).toBeNull();
+    expect(serviceHrefFor(null, ["bot"])).toBeNull();
+  });
 });
 
 describe("toCapabilities", () => {

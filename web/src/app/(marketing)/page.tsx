@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
 import HeroSection from "@/components/HeroSection";
-import AboutSection from "@/components/AboutSection";
 import ServicesSection from "@/components/ServicesSection";
+import HowWeWorkSection from "@/components/HowWeWorkSection";
 import TechnologiesSection from "@/components/TechnologiesSection";
 import IndustriesSection from "@/components/IndustriesSection";
-import CareersPreview from "@/components/CareersPreview";
 import ReviewsSection from "@/components/ReviewsSection";
 import FinalCtaSection from "@/components/FinalCtaSection";
-import { getActiveServices, getPublishedReviews } from "@/lib/data";
+import { getActiveServices, getPublishedCaseStudies, getPublishedReviews } from "@/lib/data";
 import { SITE_DEFAULT_TITLE } from "@/lib/site";
 
 export const revalidate = 60;
@@ -29,24 +28,25 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
 };
 
-// Selected work is not rendered until real case studies are cleared; its note
-// and the #work anchor live in FinalCtaSection (PortfolioSection is kept for then).
+// Home is a summary: every section links on to its dedicated page. Reviews
+// render only once at least one is published (no empty band); careers live in
+// the nav and footer. The #work anchor and case-study note are in FinalCtaSection.
 export default async function Home() {
-  const [services, reviews] = await Promise.all([
+  const [services, reviews, cases] = await Promise.all([
     getActiveServices(),
     getPublishedReviews(),
+    getPublishedCaseStudies(),
   ]);
 
   return (
     <main className="overflow-x-hidden">
-      <HeroSection />
+      <HeroSection services={services} />
       <ServicesSection services={services} />
-      <AboutSection />
+      <HowWeWorkSection />
       <TechnologiesSection />
       <IndustriesSection />
-      <ReviewsSection reviews={reviews} />
-      <CareersPreview />
-      <FinalCtaSection />
+      {reviews && reviews.length > 0 ? <ReviewsSection reviews={reviews} /> : null}
+      <FinalCtaSection hasWork={(cases?.length ?? 0) > 0} />
     </main>
   );
 }

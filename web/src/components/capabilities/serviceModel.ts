@@ -1,4 +1,5 @@
 import type { ServiceRow } from "@/lib/types";
+import { isServiceDetailPublished } from "@/lib/services-publish";
 
 export type VignetteKind =
   | "chat"
@@ -17,6 +18,8 @@ export type Capability = {
   subtitle: string;
   description: string;
   features: string[];
+  /** Detail page URL when the service meets the publish threshold, else null. */
+  href: string | null;
 };
 
 /** Admin icon choice → the illustrative vignette shown in the switchboard. */
@@ -43,7 +46,15 @@ export function toCapability(row: ServiceRow): Capability {
     subtitle: row.subtitle ?? "",
     description: row.description ?? "",
     features: Array.isArray(row.features) ? row.features.map(String) : [],
+    href: isServiceDetailPublished(row) && row.slug ? `/services/${row.slug}` : null,
   };
+}
+
+/** Published detail page for the first service whose icon matches, in key priority order. */
+export function serviceHrefFor(rows: ServiceRow[] | null | undefined, keys: readonly string[]): string | null {
+  const published = (rows ?? []).map(toCapability).filter((item) => item.href);
+  const index = findCapabilityIndex(published, keys);
+  return index === -1 ? null : published[index].href;
 }
 
 /**

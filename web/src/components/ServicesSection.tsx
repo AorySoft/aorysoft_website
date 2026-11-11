@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState, type KeyboardEvent } from "react";
-import { motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import type { ServiceRow } from "@/lib/types";
@@ -13,30 +12,30 @@ import {
   findCapabilityIndex,
   toCapabilities,
   vignetteFor,
+  type Capability,
 } from "@/components/capabilities/serviceModel";
+import ExampleFrame from "@/components/patterns/ExampleFrame";
+import SectionHeader from "@/components/patterns/SectionHeader";
 
-const EASE = [0.16, 1, 0.3, 1] as const;
+const prefersReducedMotion = () =>
+  typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 const ServicesSection = ({ services: rows }: { services?: ServiceRow[] | null }) => {
   const capabilities = useMemo(() => toCapabilities(rows), [rows]);
   const [activeIndex, setActiveIndex] = useState(0);
   const active = capabilities[Math.min(activeIndex, Math.max(capabilities.length - 1, 0))];
-  const reduceMotion = useReducedMotion();
 
-  const select = useCallback(
-    (index: number, tab?: HTMLElement | null, focus = false) => {
-      setActiveIndex(index);
-      if (!tab) return;
-      if (focus) tab.focus({ preventScroll: true });
-      // Keep the chosen tab in view inside the scrolling rail without moving the page.
-      const rail = tab.parentElement;
-      if (rail && rail.scrollWidth > rail.clientWidth) {
-        const left = tab.offsetLeft - (rail.clientWidth - tab.offsetWidth) / 2;
-        rail.scrollTo({ left, behavior: reduceMotion ? "auto" : "smooth" });
-      }
-    },
-    [reduceMotion],
-  );
+  const select = useCallback((index: number, tab?: HTMLElement | null, focus = false) => {
+    setActiveIndex(index);
+    if (!tab) return;
+    if (focus) tab.focus({ preventScroll: true });
+    // Keep the chosen tab in view inside the scrolling rail without moving the page.
+    const rail = tab.parentElement;
+    if (rail && rail.scrollWidth > rail.clientWidth) {
+      const left = tab.offsetLeft - (rail.clientWidth - tab.offsetWidth) / 2;
+      rail.scrollTo({ left, behavior: prefersReducedMotion() ? "auto" : "smooth" });
+    }
+  }, []);
 
   // Hero nodes ask for a capability by icon key.
   useEffect(() => {
@@ -70,14 +69,12 @@ const ServicesSection = ({ services: rows }: { services?: ServiceRow[] | null })
   return (
     <section id="services" aria-labelledby="services-title" className="section-y scroll-mt-16">
       <div className="shell">
-        <div className="max-w-3xl">
-          <h2 id="services-title" className="display-title">
-            Capabilities
-          </h2>
-          <p className="body-lead mt-5">
-            Product engineering, AI, and automation in one place. Pick what you
-            need, or ask us to help shape the first version.
-          </p>
+        <SectionHeader
+          id="services-title"
+          eyebrow="What we build"
+          title="Capabilities"
+          lead="Product engineering, AI, and automation in one place. Pick what you need, or ask us to help shape the first version."
+        >
           <Link
             href="/services"
             className="mt-6 inline-flex items-center gap-2 text-sm text-signal transition-colors hover:text-ink"
@@ -85,7 +82,7 @@ const ServicesSection = ({ services: rows }: { services?: ServiceRow[] | null })
             All services
             <ArrowRight size={14} aria-hidden="true" />
           </Link>
-        </div>
+        </SectionHeader>
 
         {capabilities.length === 0 || !active ? (
           <div className="mt-12 max-w-2xl space-y-6 md:mt-16">
@@ -102,9 +99,7 @@ const ServicesSection = ({ services: rows }: { services?: ServiceRow[] | null })
         ) : (
           <CapabilitySwitchboard
             capabilities={capabilities}
-            active={active}
             activeIndex={activeIndex}
-            reduceMotion={Boolean(reduceMotion)}
             onKeyDown={onKeyDown}
             select={select}
           />
@@ -117,14 +112,11 @@ const ServicesSection = ({ services: rows }: { services?: ServiceRow[] | null })
 function CapabilitySwitchboard({
   capabilities,
   activeIndex,
-  reduceMotion,
   onKeyDown,
   select,
 }: {
-  capabilities: ReturnType<typeof toCapabilities>;
-  active: NonNullable<(typeof capabilities)[number]>;
+  capabilities: Capability[];
   activeIndex: number;
-  reduceMotion: boolean;
   onKeyDown: (event: KeyboardEvent<HTMLDivElement>) => void;
   select: (index: number, tab?: HTMLElement | null, focus?: boolean) => void;
 }) {
@@ -153,10 +145,8 @@ function CapabilitySwitchboard({
               }`}
             >
               {selected ? (
-                <motion.span
-                  layoutId={reduceMotion ? undefined : "capability-indicator"}
-                  transition={{ duration: 0.35, ease: EASE }}
-                  className="absolute inset-x-0 bottom-[-1px] h-px bg-signal"
+                <span
+                  className={`${styles.indicator} absolute inset-x-0 bottom-[-1px] h-px bg-signal`}
                   aria-hidden="true"
                 />
               ) : null}
@@ -164,9 +154,7 @@ function CapabilitySwitchboard({
                 iconKey={capability.iconKey}
                 className={`h-4 w-4 shrink-0 transition-colors ${selected ? "text-signal" : "text-ink-subtle group-hover:text-ink-muted"}`}
               />
-              <span className="whitespace-nowrap font-display text-xl">
-                {capability.title}
-              </span>
+              <span className="whitespace-nowrap text-sm font-medium md:text-base">{capability.title}</span>
             </button>
           );
         })}
@@ -174,7 +162,7 @@ function CapabilitySwitchboard({
 
       {/* Every capability stays in the DOM for crawlers/LLMs; only the active panel is shown.
           The display utility goes on the selected panel only: `grid` would override `[hidden]`. */}
-      <div className="mt-10 rounded-atelier-lg md:mt-12">
+      <div className="mt-10 md:mt-12">
         {capabilities.map((capability, index) => {
           const selected = index === activeIndex;
           return (
@@ -197,9 +185,7 @@ function CapabilitySwitchboard({
                   {capability.title}
                 </h3>
                 {capability.subtitle ? (
-                  <p className="mt-2 text-sm font-medium text-signal">
-                    {capability.subtitle}
-                  </p>
+                  <p className="mt-2 text-sm font-medium text-signal">{capability.subtitle}</p>
                 ) : null}
                 {capability.description ? (
                   <p className="mt-5 text-pretty text-base leading-relaxed text-ink-muted">
@@ -208,37 +194,39 @@ function CapabilitySwitchboard({
                 ) : null}
                 {capability.features.length > 0 ? (
                   <>
-                    <h4 className="mt-8 text-sm font-semibold text-ink">
-                      What this can include
-                    </h4>
+                    <h4 className="mt-8 text-sm font-semibold text-ink">What this can include</h4>
                     <ul className="mt-3 divide-y divide-line border-y border-line">
                       {capability.features.map((feature) => (
-                        <li
-                          key={feature}
-                          className="flex items-center gap-3 py-2.5 text-sm text-ink-muted"
-                        >
-                          <span
-                            className="h-1 w-1 shrink-0 bg-signal"
-                            aria-hidden="true"
-                          />
+                        <li key={feature} className="flex items-center gap-3 py-2.5 text-sm text-ink-muted">
+                          <span className="h-1 w-1 shrink-0 bg-signal" aria-hidden="true" />
                           {feature}
                         </li>
                       ))}
                     </ul>
                   </>
                 ) : null}
-                <Link href="/quote" className="btn-primary mt-8 self-start">
-                  Get started with {capability.title}
-                  <ArrowRight size={16} aria-hidden="true" />
-                </Link>
+                <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4">
+                  <Link href="/quote" className="btn-primary">
+                    Get a Quote
+                    <ArrowRight size={16} aria-hidden="true" />
+                  </Link>
+                  {capability.href ? (
+                    <Link
+                      href={capability.href}
+                      className="inline-flex items-center gap-2 text-sm font-medium text-ink transition-colors hover:text-signal"
+                    >
+                      View {capability.title}
+                      <ArrowRight size={14} aria-hidden="true" />
+                    </Link>
+                  ) : null}
+                </div>
               </div>
 
-              <div
-                aria-hidden="true"
-                className={`${styles.stage} min-w-0 lg:sticky lg:top-24 lg:col-span-7 lg:self-start`}
-              >
+              <div className="min-w-0 lg:sticky lg:top-24 lg:col-span-7 lg:self-start">
                 {selected ? (
-                  <CapabilityVignette kind={vignetteFor(capability.iconKey)} />
+                  <ExampleFrame frameClassName={styles.stage}>
+                    <CapabilityVignette kind={vignetteFor(capability.iconKey)} />
+                  </ExampleFrame>
                 ) : null}
               </div>
             </div>

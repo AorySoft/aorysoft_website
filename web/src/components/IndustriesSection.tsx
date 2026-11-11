@@ -1,3 +1,5 @@
+import SectionHeader from "@/components/patterns/SectionHeader";
+
 const industries = [
   {
     title: "Healthcare & clinical",
@@ -29,16 +31,12 @@ const IndustriesSection = () => {
   return (
     <section id="industries" aria-labelledby="industries-title" className="section-y scroll-mt-16 border-t border-line bg-surface">
       <div className="shell">
-        <div className="max-w-3xl">
-          <h2 id="industries-title" className="display-title">
-            Who we build for
-          </h2>
-          <p className="body-lead mt-5">
-            We work with startups and established teams in healthcare,
-            commerce, education, and product companies that need a steady
-            engineering partner.
-          </p>
-        </div>
+        <SectionHeader
+          id="industries-title"
+          eyebrow="Industries"
+          title="Who we build for"
+          lead="We work with startups and established teams in healthcare, commerce, education, and product companies that need a steady engineering partner."
+        />
 
         <ul className="mt-14 border-t border-line md:mt-16">
           {industries.map((industry) => (
@@ -50,7 +48,7 @@ const IndustriesSection = () => {
                 className="absolute inset-x-0 -bottom-px h-px origin-left scale-x-0 bg-gradient-to-r from-signal-deep to-signal transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-x-100 motion-reduce:transition-none"
                 aria-hidden="true"
               />
-              <h3 className="font-display text-[clamp(2rem,4.6vw,3.75rem)] leading-[1.05] tracking-[-0.02em] text-ink-muted transition-[color,transform] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-2 group-hover:text-ink motion-reduce:transition-none motion-reduce:group-hover:translate-x-0 md:col-span-7">
+              <h3 className="font-display text-[clamp(2rem,4.6vw,3.75rem)] leading-[1.05] tracking-[-0.02em] text-ink transition-[color,transform] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-2 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0 md:col-span-7">
                 {industry.title}
               </h3>
               <p className="max-w-md text-base leading-relaxed text-ink-muted transition-colors duration-500 group-hover:text-ink md:col-span-5">

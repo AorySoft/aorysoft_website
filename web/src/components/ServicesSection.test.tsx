@@ -1,4 +1,4 @@
-import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import type { ServiceRow } from "@/lib/types";
 import ServicesSection from "./ServicesSection";
@@ -90,14 +90,35 @@ describe("Capabilities switchboard", () => {
     expect(tabs()[0]).toHaveFocus();
   });
 
-  it("selects on click and shows that capability's details", async () => {
+  it("selects on click and shows that capability's details", () => {
     render(<ServicesSection services={fixtureServices} />);
     fireEvent.click(tabs()[2]);
     expect(tabs()[2]).toHaveAttribute("aria-selected", "true");
-    expect(await screen.findByRole("link", { name: /Get started with AI Agents & Chat/ })).toHaveAttribute(
-      "href",
-      "/quote",
+    const panel = screen.getByRole("tabpanel");
+    expect(panel).toHaveAccessibleName("AI Agents & Chat");
+    expect(within(panel).getByRole("link", { name: /Get a Quote/ })).toHaveAttribute("href", "/quote");
+  });
+
+  it("labels the illustrative scene as an example", () => {
+    const { container } = render(<ServicesSection services={fixtureServices} />);
+    const caption = container.querySelector("figcaption");
+    expect(caption).toHaveTextContent("Illustrative example");
+  });
+
+  it("links to the service page only when the service is published", () => {
+    const published = fixtureServices.map((service, index) =>
+      index === 0
+        ? { ...service, slug: "test-ai-chatbots", deliverables: ["a", "b", "c", "d"] }
+        : service,
     );
+    render(<ServicesSection services={published} />);
+    const panel = screen.getByRole("tabpanel");
+    expect(within(panel).getByRole("link", { name: /View AI Automation/ })).toHaveAttribute(
+      "href",
+      "/services/test-ai-chatbots",
+    );
+    fireEvent.click(tabs()[1]);
+    expect(within(screen.getByRole("tabpanel")).queryByRole("link", { name: /^View / })).toBeNull();
   });
 
   it("opens the capability a hero node requests", () => {
