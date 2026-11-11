@@ -28,6 +28,8 @@ const display = Instrument_Serif({
 
 export const viewport: Viewport = {
   themeColor: "#000000",
+  // Content may extend under notches; .shell, Navbar, and Footer pad by the safe-area insets.
+  viewportFit: "cover",
   colorScheme: "dark",
 };
 

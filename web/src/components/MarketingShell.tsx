@@ -25,7 +25,7 @@ export default async function MarketingShell({
         Skip to content
       </a>
       <Navbar showBlog={showBlog} showWork={showWork} />
-      <div id="main-content" tabIndex={-1} className="pt-16 focus:outline-none">
+      <div id="main-content" tabIndex={-1} className="pt-[calc(var(--nav-h)+env(safe-area-inset-top,0px))] focus:outline-none">
         {children}
       </div>
       <Footer showBlog={showBlog} showWork={showWork} />

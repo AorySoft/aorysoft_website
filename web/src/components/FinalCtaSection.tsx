@@ -29,10 +29,10 @@ const FinalCtaSection = ({ hasWork = false }: { hasWork?: boolean }) => {
         aria-hidden="true"
       />
 
-      <div className="shell py-24 md:py-36">
+      <div className="shell py-[clamp(3.5rem,14svh,9rem)]">
         <h2
           id="final-cta-title"
-          className="max-w-4xl text-balance font-display text-[clamp(2.75rem,7vw,5.5rem)] leading-[1.02] tracking-[-0.025em] text-ink"
+          className="max-w-4xl text-balance font-display text-[clamp(2.25rem,min(7vw,10svh),5.5rem)] leading-[1.02] tracking-[-0.025em] text-ink"
         >
           Ready to talk about <em className="italic">your project?</em>
         </h2>
@@ -48,7 +48,7 @@ const FinalCtaSection = ({ hasWork = false }: { hasWork?: boolean }) => {
           and help you figure out the next step.
         </p>
 
-        <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:gap-4">
+        <div className="mt-[clamp(1.5rem,5svh,2.5rem)] flex flex-col gap-3 sm:flex-row sm:gap-4">
           <Link href="/quote" className="btn-primary sm:min-w-[10.5rem]">
             Get a Quote
             <ArrowRight size={16} aria-hidden="true" />
@@ -59,7 +59,7 @@ const FinalCtaSection = ({ hasWork = false }: { hasWork?: boolean }) => {
         </div>
 
         {hasWork ? (
-          <p className="mt-14 max-w-xl border-t border-line pt-6 text-sm leading-relaxed text-ink-muted">
+          <p className="mt-[clamp(2rem,6svh,3.5rem)] max-w-xl border-t border-line pt-6 text-sm leading-relaxed text-ink-muted">
             Want to see how we work on real projects?{" "}
             <Link href="/work" className="text-ink underline decoration-signal underline-offset-4 hover:text-signal">
               Read our case studies
@@ -67,7 +67,7 @@ const FinalCtaSection = ({ hasWork = false }: { hasWork?: boolean }) => {
             .
           </p>
         ) : (
-          <p className="mt-14 max-w-xl border-t border-line pt-6 text-sm leading-relaxed text-ink-muted">
+          <p className="mt-[clamp(2rem,6svh,3.5rem)] max-w-xl border-t border-line pt-6 text-sm leading-relaxed text-ink-muted">
             Public case studies will show here once they are cleared for display.
             Until then, we share relevant experience privately when we talk.
           </p>

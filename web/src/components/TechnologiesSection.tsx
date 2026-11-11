@@ -18,14 +18,14 @@ const TechnologiesSection = () => {
   return (
     <section id="technologies" aria-labelledby="technologies-title" className="section-y scroll-mt-16 border-t border-line">
       <div className="shell">
-        <SectionHeader
+        <SectionHeader split
           id="technologies-title"
           eyebrow="Stack"
           title="Technology we work with"
           lead="Tools we actually use on client work. The stack can shift per project; this is the core set we reach for most often."
         />
 
-        <StackRows layers={layers} className="mt-12 md:mt-16" />
+        <StackRows layers={layers} className="mt-[clamp(1.5rem,5svh,4rem)]" />
       </div>
     </section>
   );

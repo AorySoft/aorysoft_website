@@ -16,7 +16,7 @@ export default function HowWeWorkSection() {
       className="section-y scroll-mt-16 border-t border-line bg-surface"
     >
       <div className="shell">
-        <SectionHeader id="how-we-work-title" eyebrow="How we work" title="How a project runs" lead={ABOUT_LEAD}>
+        <SectionHeader split id="how-we-work-title" eyebrow="How we work" title="How a project runs" lead={ABOUT_LEAD}>
           <Link
             href="/about"
             className="mt-6 inline-flex items-center gap-2 text-sm text-signal transition-colors hover:text-ink"
@@ -25,7 +25,7 @@ export default function HowWeWorkSection() {
             <ArrowRight size={14} aria-hidden="true" />
           </Link>
         </SectionHeader>
-        <StepRoute steps={PROCESS_STEPS} className="mt-14 md:mt-16" />
+        <StepRoute steps={PROCESS_STEPS} className="mt-[clamp(1.75rem,6svh,4rem)]" />
       </div>
     </section>
   );

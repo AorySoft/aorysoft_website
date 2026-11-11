@@ -80,3 +80,45 @@
     transition: none;
   }
 }
+
+/* ── Layout: the whole hero fits the first screen (Batch 8 sizing rule) ───────
+   Two columns on laptops and on any landscape screen ≥768px wide (which also
+   covers 150% browser zoom on 1366×768). The hero fills the visible height
+   under the nav, capped on very tall screens; the sculpture's size is derived
+   from the height left over, so it shrinks instead of pushing content down. */
+.layout {
+  --pad: clamp(1rem, 4svh, 3rem);
+  --sculpt-h: 40svh;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: center;
+  row-gap: clamp(1.5rem, 4svh, 2.5rem);
+  padding-block: var(--pad);
+}
+
+@media (min-width: 1024px), (min-width: 768px) and (orientation: landscape) {
+  .layout {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: 2rem;
+    min-height: min(var(--avail-h), 60rem);
+    /* Height left for the sculpture inside the hero. */
+    --sculpt-h: calc(min(var(--avail-h), 60rem) - 2 * var(--pad));
+  }
+  .copy,
+  .art {
+    grid-column: span 6;
+  }
+}
+
+.title {
+  font-size: clamp(2.25rem, min(7.4vw, 9svh), 5.75rem);
+}
+
+.lead {
+  font-size: clamp(1rem, min(0.9rem + 0.6vw, 2.8svh), 1.25rem);
+  margin-top: clamp(0.875rem, 3svh, 2rem);
+}
+
+.actions {
+  margin-top: clamp(1.25rem, 4.5svh, 2.75rem);
+}

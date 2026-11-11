@@ -27,7 +27,7 @@ export default function PageHero({
     <section className="relative isolate overflow-hidden border-b border-line bg-surface">
       <GhostMark className="-right-24 -top-16 h-[30rem] opacity-[0.04] md:-right-10 md:h-[34rem]" />
       <div className={`${styles.heroField} pointer-events-none absolute inset-0 -z-10`} aria-hidden="true" />
-      <div className={`shell relative ${compact ? "py-14 md:py-20" : "py-16 md:py-24"}`}>
+      <div className={`shell relative ${compact ? "py-[clamp(2.25rem,7svh,5rem)]" : "py-[clamp(2.5rem,9svh,6rem)]"}`}>
         <div className="max-w-3xl">
           <Eyebrow>{eyebrow}</Eyebrow>
           <h1 className="display-title mt-5">{title}</h1>

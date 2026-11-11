@@ -69,7 +69,7 @@ const ServicesSection = ({ services: rows }: { services?: ServiceRow[] | null })
   return (
     <section id="services" aria-labelledby="services-title" className="section-y scroll-mt-16">
       <div className="shell">
-        <SectionHeader
+        <SectionHeader split
           id="services-title"
           eyebrow="What we build"
           title="Capabilities"
@@ -121,7 +121,7 @@ function CapabilitySwitchboard({
   select: (index: number, tab?: HTMLElement | null, focus?: boolean) => void;
 }) {
   return (
-    <div className="mt-12 md:mt-16">
+    <div className="mt-[clamp(1.5rem,5svh,4rem)]">
       <div
         role="tablist"
         aria-label="Capabilities"
@@ -162,7 +162,7 @@ function CapabilitySwitchboard({
 
       {/* Every capability stays in the DOM for crawlers/LLMs; only the active panel is shown.
           The display utility goes on the selected panel only: `grid` would override `[hidden]`. */}
-      <div className="mt-10 md:mt-12">
+      <div className="mt-[clamp(1.25rem,4svh,3rem)]">
         {capabilities.map((capability, index) => {
           const selected = index === activeIndex;
           return (
@@ -180,7 +180,7 @@ function CapabilitySwitchboard({
               }
             >
               <div className="flex flex-col lg:col-span-5">
-                <h3 className="flex items-center gap-3 font-display text-3xl text-ink md:text-[2.25rem] md:leading-tight">
+                <h3 className="flex items-center gap-3 font-display text-[clamp(1.625rem,min(2.6vw,4.6svh),2.25rem)] leading-tight text-ink">
                   <CapabilityIcon iconKey={capability.iconKey} className="h-5 w-5 shrink-0 text-signal" />
                   {capability.title}
                 </h3>
@@ -188,16 +188,16 @@ function CapabilitySwitchboard({
                   <p className="mt-2 text-sm font-medium text-signal">{capability.subtitle}</p>
                 ) : null}
                 {capability.description ? (
-                  <p className="mt-5 text-pretty text-base leading-relaxed text-ink-muted">
+                  <p className="mt-[clamp(0.75rem,2.5svh,1.25rem)] text-pretty text-base leading-relaxed text-ink-muted">
                     {capability.description}
                   </p>
                 ) : null}
                 {capability.features.length > 0 ? (
                   <>
-                    <h4 className="mt-8 text-sm font-semibold text-ink">What this can include</h4>
-                    <ul className="mt-3 divide-y divide-line border-y border-line">
+                    <h4 className="mt-[clamp(1.25rem,3.5svh,2rem)] text-sm font-semibold text-ink">What this can include</h4>
+                    <ul className="mt-3 grid border-t border-line lg:grid-cols-2 lg:gap-x-6">
                       {capability.features.map((feature) => (
-                        <li key={feature} className="flex items-center gap-3 py-2.5 text-sm text-ink-muted">
+                        <li key={feature} className="flex items-center gap-3 border-b border-line py-2 text-sm text-ink-muted">
                           <span className="h-1 w-1 shrink-0 bg-signal" aria-hidden="true" />
                           {feature}
                         </li>
@@ -205,7 +205,7 @@ function CapabilitySwitchboard({
                     </ul>
                   </>
                 ) : null}
-                <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4">
+                <div className="mt-[clamp(1.25rem,3.5svh,2rem)] flex flex-wrap items-center gap-x-6 gap-y-4">
                   <Link href="/quote" className="btn-primary">
                     Get a Quote
                     <ArrowRight size={16} aria-hidden="true" />

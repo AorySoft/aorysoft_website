@@ -14,16 +14,16 @@ export default function StackRows({ layers, className = "" }: { layers: readonly
       {layers.map((layer) => (
         <div
           key={layer.name}
-          className="relative grid gap-3 border-b border-line py-6 pl-8 md:grid-cols-12 md:items-center md:gap-8 md:pl-10"
+          className="relative grid gap-3 border-b border-line py-[clamp(0.875rem,2.4svh,1.5rem)] pl-8 md:grid-cols-12 md:items-center md:gap-8 md:pl-10"
         >
           <span
-            className="absolute left-[3px] top-[1.9rem] h-[9px] w-[9px] border border-line-strong bg-canvas md:left-[11px] md:top-1/2 md:-translate-y-1/2"
+            className="absolute left-[3px] top-[calc(clamp(0.875rem,2.4svh,1.5rem)+0.45rem)] h-[9px] w-[9px] border border-line-strong bg-canvas md:left-[11px] md:top-1/2 md:-translate-y-1/2"
             aria-hidden="true"
           />
           <dt className="text-sm font-medium text-ink-muted md:col-span-3">{layer.name}</dt>
           <dd className="flex flex-wrap gap-x-8 gap-y-2 md:col-span-9">
             {layer.tools.map((tool) => (
-              <span key={tool} className="font-display text-2xl text-ink md:text-3xl">
+              <span key={tool} className="font-display text-[clamp(1.375rem,min(2.6vw,4.2svh),1.875rem)] text-ink">
                 {tool}
               </span>
             ))}

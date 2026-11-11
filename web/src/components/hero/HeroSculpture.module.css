@@ -25,7 +25,8 @@
   --py: 0;
   position: relative;
   width: 100%;
-  max-width: 600px;
+  /* Width follows the height the hero leaves for it (--sculpt-h), keeping the 600:640 ratio. */
+  max-width: min(600px, calc(var(--sculpt-h, 640px) * 0.9375));
   margin-inline: auto;
   aspect-ratio: 600 / 640;
   container-type: inline-size;
@@ -129,9 +130,10 @@
   display: inline-flex;
   min-height: 2.75rem;
   align-items: center;
-  padding-inline: 0.5rem;
+  padding-inline: clamp(0.125rem, 1.2cqw, 0.5rem);
   border-radius: var(--radius-atelier);
-  font-size: 0.8125rem;
+  /* Scales with the sculpture so labels never crowd when it shrinks to fit. */
+  font-size: clamp(0.6875rem, 2.4cqw, 0.8125rem);
   font-weight: 500;
   white-space: nowrap;
   color: rgb(var(--color-ink-muted));

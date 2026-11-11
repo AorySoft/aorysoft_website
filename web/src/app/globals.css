@@ -16,6 +16,23 @@
   --color-signal-deep: 37 99 235;
   --radius-atelier: 6px;
   --radius-atelier-lg: 10px;
+  /* Layout rhythm (Batch 8 sizing rule): side gutter per breakpoint, fixed nav height,
+     and the visible height under the nav that heroes and frames size against. */
+  --gutter: 1rem;
+  --nav-h: 4rem;
+  --avail-h: calc(100svh - var(--nav-h) - env(safe-area-inset-top, 0px));
+}
+
+@media (min-width: 640px) {
+  :root {
+    --gutter: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --gutter: 2rem;
+  }
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -56,20 +73,28 @@
 }
 
 @layer components {
+  /* Gutters never sit under a notch or rounded corner (viewport-fit=cover). */
   .shell {
-    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+    @apply mx-auto w-full max-w-7xl;
+    padding-left: max(var(--gutter), env(safe-area-inset-left, 0px));
+    padding-right: max(var(--gutter), env(safe-area-inset-right, 0px));
   }
 
+  /* Section padding follows the screen: wide and tall screens get room, short
+     (landscape phones, zoomed laptops) and narrow screens tighten. */
   .section-y {
-    @apply py-20 md:py-28;
+    padding-block: clamp(3rem, min(6vw + 2rem, 11svh), 7rem);
   }
 
   .display-title {
-    @apply font-display text-4xl font-normal tracking-tight text-ink md:text-5xl lg:text-[3.25rem] lg:leading-[1.12];
+    @apply font-display font-normal tracking-tight text-ink;
+    font-size: clamp(1.875rem, min(1.1rem + 2.7vw, 7svh), 3.25rem);
+    line-height: 1.12;
   }
 
   .body-lead {
-    @apply max-w-measure text-lg leading-relaxed text-ink-muted md:text-xl;
+    @apply max-w-measure leading-relaxed text-ink-muted;
+    font-size: clamp(1rem, min(0.92rem + 0.45vw, 2.6svh), 1.25rem);
   }
 
   .btn-primary {

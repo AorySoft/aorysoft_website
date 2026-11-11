@@ -114,7 +114,7 @@ const Navbar = ({
   return (
     <nav
       aria-label="Main"
-      className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 pt-[env(safe-area-inset-top,0px)] transition-colors duration-300 ${
         isScrolled
           ? "border-b border-line bg-canvas/90 backdrop-blur-md"
           : "bg-transparent"

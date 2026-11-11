@@ -32,7 +32,7 @@ export default function Footer({
   ];
 
   return (
-    <footer className="border-t border-line bg-surface">
+    <footer className="border-t border-line bg-surface pb-[env(safe-area-inset-bottom,0px)]">
       <div className="shell py-14">
         <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-3">
           <div className="space-y-4">

@@ -121,3 +121,16 @@
     animation: none;
   }
 }
+
+/* Sizing rule: the example frame is capped by viewport height as well as width,
+   keeping its aspect ratio (5:4 stacked, 16:10 beside the copy). */
+.stage > div {
+  max-width: min(100%, calc(52svh * 1.25));
+  min-height: min(17rem, 48svh);
+}
+
+@media (min-width: 1024px) {
+  .stage > div {
+    max-width: min(100%, calc((var(--avail-h) - 6rem) * 1.6));
+  }
+}
