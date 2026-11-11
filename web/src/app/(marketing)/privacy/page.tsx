@@ -66,17 +66,65 @@ export default function PrivacyPage() {
             <p>
               We use Cloudflare Web Analytics and Vercel Analytics on the public
               site only. Both report aggregated, anonymous usage statistics (page
-              views, referrers, country, device type). Staff activity under
-              /admin is not tracked. We do not use advertising or cross-site
-              tracking cookies.
+              views, referrers, country, device type) and neither sets cookies.
+              Staff activity under /admin is not tracked. We do not use
+              advertising or cross-site tracking.
             </p>
           </section>
 
           <section className="space-y-3">
-            <h2 className="font-display text-2xl font-normal text-ink md:text-3xl">Cookies</h2>
+            <h2 className="font-display text-2xl font-normal text-ink md:text-3xl">
+              Cookies and browser storage
+            </h2>
             <p>
-              The public website sets no tracking cookies. Cookies are used only for
-              staff signing in to the administration area, to keep that session secure.
+              The public pages of this website set no cookies and store nothing in
+              your browser. The only cookie we set is for staff who sign in to the
+              administration area. Some third-party services we load may set their
+              own strictly necessary security cookies on their own domains.
+            </p>
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[36rem] border-collapse text-left text-sm">
+                <caption className="sr-only">Cookies and storage used on this website</caption>
+                <thead>
+                  <tr className="border-b border-line text-ink">
+                    <th scope="col" className="py-2 pr-4 font-medium">Name</th>
+                    <th scope="col" className="py-2 pr-4 font-medium">Set by</th>
+                    <th scope="col" className="py-2 pr-4 font-medium">Purpose</th>
+                    <th scope="col" className="py-2 font-medium">Duration</th>
+                  </tr>
+                </thead>
+                <tbody className="align-top">
+                  <tr className="border-b border-line">
+                    <td className="py-3 pr-4 font-mono text-xs text-ink">sb-…-auth-token</td>
+                    <td className="py-3 pr-4">AorySoft (Supabase sign-in), staff only</td>
+                    <td className="py-3 pr-4">Keeps a staff member signed in to /admin. Never set for visitors of the public pages.</td>
+                    <td className="py-3">Until sign-out, at most about 400 days</td>
+                  </tr>
+                  <tr className="border-b border-line">
+                    <td className="py-3 pr-4 font-mono text-xs text-ink">__cf_bm</td>
+                    <td className="py-3 pr-4">Cloudflare, on the domains of services we load (for example image storage)</td>
+                    <td className="py-3 pr-4">Bot protection for that service. Set on their domain, not ours; many browsers block it as a third-party cookie.</td>
+                    <td className="py-3">About 30 minutes</td>
+                  </tr>
+                  <tr className="border-b border-line">
+                    <td className="py-3 pr-4 font-mono text-xs text-ink">Cloudflare Turnstile</td>
+                    <td className="py-3 pr-4">Cloudflare, inside the security check on the contact, quote, and newsletter forms</td>
+                    <td className="py-3 pr-4">Tells people and bots apart so the forms stay free of spam. It runs in a Cloudflare frame and sets no cookies on our domain.</td>
+                    <td className="py-3">Handled by Cloudflare</td>
+                  </tr>
+                  <tr className="border-b border-line">
+                    <td className="py-3 pr-4 font-mono text-xs text-ink">__va_attribution</td>
+                    <td className="py-3 pr-4">Vercel Analytics script (local storage)</td>
+                    <td className="py-3 pr-4">The script checks for this value but only writes it when a site identifies its users. We do not, so nothing is stored.</td>
+                    <td className="py-3">Not stored</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              Because the public site sets no cookies, there is nothing to accept
+              or decline. You can still block or clear cookies and site data in
+              your browser settings at any time; the public pages keep working.
             </p>
           </section>
 
