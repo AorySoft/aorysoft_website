@@ -1,255 +1,174 @@
 # AorySoft Frontend Audit — Status
 
-**Last updated:** 2026-11-11  
-**Scope:** Entire `web/` frontend (public marketing + `/admin`)  
-**Phase:** Phase 3 Batches 1–7 implemented locally (uncommitted on `fix/disable-admin-analytics`); Batches 8–9 not started  
-**Tests:** `npm run test` — **22** files, **166** passed (2026-11-11)  
-**Build:** `npm run build` (incl. `check-indexable-pages`) — **OK** (2026-11-11)  
-**Lighthouse / axe / contrast / PSI:** **not run** this phase (see Manual verification)
+**Last updated:** 2026-11-11 (after Phase B verification fixes)
+**Scope:** Entire `web/` frontend (public marketing + `/admin`)
+**Branch:** `fix/disable-admin-analytics`. Restore point: tag `pre-claude-code-verify` (= commit `25ece99`, Batches 1–7 as implemented in Cursor, before verification fixes).
+**Verification:** Independent review in `VERIFICATION_REPORT.md`; every status below is re-verified from code, build output, tests, and (where noted) Chromium.
 
-Original Phase 1 analysis dated 2026-11-11. This document is the living status of that audit after Batches 1–7.
-
----
-
-## 1. Project summary
-
-| Item | Detail |
-|------|--------|
-| **Stack** | Next.js 16 App Router, React 19, TypeScript, Tailwind 3, Framer Motion, lucide-react, Supabase (Auth/Postgres/Storage), Resend, Cloudflare Turnstile, Vercel + Cloudflare Analytics |
-| **Rendering** | Server Components by default; client islands for nav, hero sculpture, capabilities tabs, forms, blog filter/newsletter, analytics. Marketing chrome via `MarketingShell` (not under `/admin`) |
-| **Styling** | Tailwind + CSS modules + `globals.css` Signal Atelier tokens (`DESIGN.md`) |
-| **App root** | All work under `web/` |
-
-### Public routes (current)
-
-| Route | Notes |
-|-------|--------|
-| `/` | Marketing home |
-| `/about`, `/about.md` | About HTML + markdown twin (`noindex` + canonical Link) |
-| `/services`, `/services/[slug]`, `/services.md` | Catalog + detail (publish gate); md twin 404 if none published |
-| `/work` | Case studies — **404** until ≥1 published case study |
-| `/reviews` | Reviews index — **404** until ≥3 published reviews |
-| `/blog`, `/blog/[slug]` | Blog; index `noindex` until ≥1 post; nav/footer gated |
-| `/careers`, `/contact`, `/quote` | Careers, contact, quote wizard |
-| `/privacy`, `/terms` | Legal |
-| `/feedback` | Invite-only review form (`noindex`) |
-| `/newsletter/confirm`, `/newsletter/unsubscribe` | Token HTML |
-| `/llms.txt`, `/llms-full.txt` | `text/plain; charset=utf-8` |
-| `/robots.txt`, `/sitemap.xml`, `/manifest.webmanifest`, `/opengraph-image` | SEO / PWA / OG |
-| `not-found`, `error`, `loading` | Global UI states |
-
-### Admin
-
-`/admin/login`, `/admin` dashboard, resource CRUD (`posts`, `categories`, `services`, `jobs`, `reviews`, `cases`), media, submissions, newsletter, settings, users, **CSP reports**.
+| Gate (run in `web/`) | Result |
+|---|---|
+| `npm run lint` | 0 errors, 2 warnings (pre-existing, `scripts/apply-reviews-and-social.mjs`, `scripts/check-db.mjs`) |
+| `npm run typecheck` | clean |
+| `npm run test` | **35 files, 228 tests passed** |
+| `npm run build` | OK, no warnings (plain `next build`) |
+| `npm run check:seo` | OK — 8 sitemap URLs (run separately before deploy) |
+| Lighthouse / axe / contrast / PSI | **not run** (see §7) |
 
 ---
 
-## 2. Scorecard (current)
+## 1. Findings — verified status
 
-Scores reflect **code/repo state**, not a new Lighthouse/axe pass. Runtime scores: **not run**.
+Status: **Fixed** · **Partial** · **Pending** · **Skipped** (with reason)
 
-| # | Category | Score | What changed | What remains |
-|---|----------|-------|--------------|--------------|
-| 1 | Visual Design Quality | **Needs Work** | Blog article + admin login restyled to atelier; admin pills/tokens cleaned; token pages branded | Hero brand signal still weak after removing nav (**F15** pending) |
-| 2 | UX and Usability | **Needs Work** | Submissions dual filters, mobile Sign out, confirm dialog, role/status feedback, reviews media options | Conversion still thin until real reviews/cases/posts; device UX matrix **not run** |
-| 3 | Layout and Responsiveness | **Needs Work** | Fluid shells retained; marketing/admin layout split | Full breakpoint / safe-area matrix **not run** |
-| 4 | Components | **Pass** | Shared `ConfirmDialog`, `AdminTableShell`, `HoneypotField`; contact/blog islands | No Playwright component E2E |
-| 5 | UI States | **Pass** | Loading / 404 / error / honest empties retained; gated routes 404 when empty | — |
-| 6 | Interaction and Animation | **Pass** | Mobile menu focus trap + inert + restore; spinner reduced-motion in CSS; blog Framer → CSS | Framer kept for capabilities indicator, ProcessLine scroll, quote steps (intentional) |
-| 7 | Accessibility (WCAG 2.2 AA) | **Needs Work** | Menu trap, form `aria-invalid`/`describedby`, Settings `htmlFor`, admin skip link, category filter group | axe / WAVE / keyboard audit on production **not run** |
-| 8 | Dark Mode / Theming | **Pass** | Admin login on `bg-canvas` / `surface-panel`; dark-only brand intentional | — |
-| 9 | Performance (UI) | **Needs Work** | `next/image` + Supabase `remotePatterns`; Contact/Blog RSC shells; blog motion trimmed | Lighthouse / CrUX **not run**; Quote/Services still ship Framer |
-| 10 | Content and Copy | **Pass** | Silent placeholder capabilities removed; honest empty catalog | Real CMS service/case/review content still to fill |
-| 11 | Navigation and Flow | **Pass** | About/Services in chrome; Work/Blog gated; footer “Case studies” → `/work` | Reviews page gated but not in primary nav (home `#reviews` + direct URL) |
-| 12 | Traditional SEO | **Pass** | Sitewide JSON-LD, OG image route, manifest, `theme-color`/`color-scheme`, richer home meta, indexable-pages build check | OG preview / Rich Results Test / Search Console submit **not run** |
-| 13 | LLMO / AIO / GEO | **Pass** | `llms.txt` + `llms-full.txt`; Organization/WebSite JSON-LD; per-agent robots groups (allow + shared Disallow) | Live curl against production after deploy still needed |
-| 14 | Security and Privacy (FE) | **Needs Work** | Security headers + CSP **Report-Only** + report endpoint/admin; Turnstile fail-closed in production | Enforce CSP only after 7–14 days of report review; Cookie Policy (**F34**) pending |
-| 15 | Design System and Reusability | **Needs Work** | Admin gray/pill leftovers largely cleared; tokens consistent on blog/login | **F15** hero brand; Impeccable detector not re-run |
-| 16 | Code-Level Quality | **Needs Work** | `resources` + SettingsForm split; Vitest 166 green | QuoteForm not split (162 lines); no Playwright E2E |
-| 17 | Cross-Browser / Tooling | **Needs Work** | — | Manual browser/device matrix **not run** |
-
-### Impeccable audit health (Phase 1 baseline — not re-scored)
-
-| Dimension | Phase 1 score (0–4) | Notes after Batches 1–7 |
-|-----------|---------------------|-------------------------|
-| Accessibility | 2 | Code fixes for F09–F11, F23–F25, F32, F38; axe **not run** |
-| Performance | 2 | F16/F17/F30 addressed in code; Lighthouse **not run** |
-| Theming | 3 | Blog slug + login aligned; F15 open |
-| Responsive | 3 | Unchanged — matrix **not run** |
-| Implementation Integrity | 2 | Placeholders removed; admin chrome split; IA pages added |
-| **Total** | **12/20** | Historical Phase 1 total; do not treat as current measured score |
-
----
-
-## 3. Findings table
-
-Severity: **Critical** / **Major** / **Minor**  
-Status: **Fixed** | **Partial** | **Pending** | **Skipped**
-
-| ID | Category | Severity | Status | Batch | Notes |
-|----|----------|----------|--------|-------|-------|
-| F01 | Security | Critical | **Partial** | 1 | Headers in `next.config.ts` (`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, Reporting-Endpoints). CSP is **Report-Only** (`Content-Security-Policy-Report-Only`) — enforcement deferred until reports reviewed. |
-| F02 | Content / Trust | Critical | **Fixed** | 1 | `toCapabilities` returns `[]` when CMS empty; placeholders only via explicit test option (`testPlaceholders.ts`). Honest empty in `ServicesSection`. |
-| F03 | Security / Admin UX | Major | **Fixed** | 2 | Root layout no longer mounts public nav/footer. Public chrome in `MarketingShell`; admin `(panel)/layout` standalone. |
-| F04 | Design | Major | **Fixed** | 4 | `blog/[slug]` uses atelier tokens (`display-title`, `shell`, `border-line`, `signal`); no leftover `gray-*` / `rounded-full` / cyan kit. |
-| F05 | Design | Major | **Fixed** | 2 | `admin/login` uses `bg-canvas` + `surface-panel`. |
-| F06 | SEO / LLMO | Major | **Fixed** | 6 | Dynamic `app/llms.txt` + `llms-full.txt` (`text/plain; charset=utf-8`) via `lib/seo/llms.ts`. |
-| F07 | SEO / LLMO | Major | **Fixed** | 6 | `SiteJsonLd` Organization + WebSite (+ `sameAs`) in root layout. |
-| F08 | SEO | Major | **Fixed** | 6 | `app/opengraph-image.tsx` 1200×630; Twitter `summary_large_image`. |
-| F09 | A11y | Major | **Fixed** | 3 | Navbar mobile: focus trap, Escape, focus restore to button, `inert` on main/footer. |
-| F10 | A11y | Major | **Fixed** | 3 | Contact + quote ContactStep + newsletter wire `aria-invalid` / `aria-describedby`. |
-| F11 | A11y | Major | **Fixed** | 3 | Settings `Labeled` requires `htmlFor`; controls have matching `id`s (`SettingsFields.tsx`). |
-| F12 | UX | Major | **Fixed** | 2 | Submissions `filterLink` preserves sibling `type`/`status` query params. |
-| F13 | UX | Major | **Fixed** | 2 | Mobile `AdminNav` includes Sign out. |
-| F14 | UX / A11y | Major | **Fixed** | 3 | Shared `ConfirmDialog`; no `window.confirm` in `src/`. Used by ResourceTable, ConfirmDeleteButton, MediaManager. |
-| F15 | Design / Brand | Major | **Pending** | 8 | Hero brand still primarily nav; sculpture wordmark not elevated. **Plan before coding.** |
-| F16 | Performance | Major | **Fixed** | 7 | `images.remotePatterns` for Supabase storage; blog index + slug use `next/image` with `sizes`/`priority`. Featured cover has min-height for `fill`. |
-| F17 | Performance | Major | **Fixed** | 7 | Contact RSC shell + `ContactForm` island; Blog RSC hero + `BlogIndex` + `NewsletterSignup` islands. |
-| F18 | LLMO | Major | **Fixed** | 6 | Explicit AI UA groups in `robots-policy.ts` (allowed) with full Disallow parity; parse test. |
-| F19 | Design system | Major | **Fixed** | 4 | Admin submissions/newsletter/etc. use `rounded-atelier` chips; no `rounded-full` under admin panel. |
-| F20 | UX | Major | **Fixed** | 2 | Form options load when any field is `mediaRef`/`categoryRef` (not posts-only). |
-| F21 | UX | Major | **Fixed** | 2 | `UserRoleForm` + `SubmissionStatusForm` surface `role="status"` / `role="alert"`. |
-| F22 | SEO | Minor | **Fixed** | 6 | `manifest.ts`, viewport `themeColor` + `colorScheme: "dark"`. |
-| F23 | A11y | Minor | **Fixed** | 3 | `globals.css` disables `.animate-spin` under `prefers-reduced-motion`. |
-| F24 | A11y | Minor | **Fixed** | 3 | Blog category filters: `role="group"` + `aria-label="Filter by category"`. |
-| F25 | A11y / SEO | Minor | **Fixed** | 3 | Cover queries include media `alt`; UI falls back to title. |
-| F26 | Design | Minor | **Fixed** | 4 | Newsletter hover uses `hover:shadow-signal`. |
-| F27 | Design | Minor | **Fixed** | 4 | Blockquote rule is `border-l` + `border-line` (not thick cyan side-tab). |
-| F28 | UX / IA | Minor | **Fixed** | 5 | Footer label “Case studies” → `/work` (gated); no misleading `/#work` portfolio link. |
-| F29 | UX | Minor | **Fixed** | 5 | Nav/footer: About, Services, gated Blog/Work. Technologies/Industries remain home sections by design. `/reviews` exists (3+ gate) but is not in primary chrome. |
-| F30 | Performance | Minor | **Fixed** | 7 | Blog Framer removed; CSS `atelier-fade-up`. FM kept for capability tab indicator, ProcessLine, quote wizard. |
-| F31 | Code quality | Minor | **Partial** | 7 | Split: `resource-types` (109), `resource-catalog` (367), `resource-input` (129), barrel `resources` (17); SettingsForm (265) + SettingsFields (106). **QuoteForm not split** (162 lines — under 450 hard / 300 warn). |
-| F32 | A11y | Minor | **Fixed** | 2 | Admin panel skip link → `#admin-main`. |
-| F33 | Security | Minor | **Fixed** | 1 | Turnstile fail-closed in production when secret unset (`turnstile.ts` + tests). |
-| F34 | Privacy | Minor | **Pending** | 9 | No separate Cookie Policy; counsel/browser cookie verification still open. |
-| F35 | Design | Minor | **Fixed** | 4 | `token-page.ts` uses atelier canvas/signal + DM Sans. |
-| F36 | SEO | Minor | **Fixed** | 5 | Home metadata: richer description + service-oriented keywords + canonical. |
-| F37 | Components | Minor | **Fixed** | 2 | `AdminTableShell` shared by submissions, newsletter, users, resources, csp-reports. |
-| F38 | Interaction | Minor | **Fixed** | 3 | `HoneypotField`: `hidden` + `aria-hidden` + `tabIndex={-1}` + `autocomplete="off"`. |
-
-### Original issue / suggested fix (reference)
-
-Unchanged intent from Phase 1; see git history / code for implementations. File paths in the original audit often pointed at pre-`(marketing)` locations — current files live under `web/src/app/(marketing)/…` where applicable.
+| ID | Area | Sev. | Status | Verified evidence / notes |
+|----|------|------|--------|---------------------------|
+| F01 | Security headers / CSP | Critical | **Partial** | nosniff, `X-Frame-Options: DENY`, Referrer-Policy, Permissions-Policy, `Reporting-Endpoints: csp="/api/csp-report"`, CSP **Report-Only** with `object-src`/`base-uri`/`form-action`/`frame-ancestors`/`report-uri`/`report-to` (curl). Phase B: `connect-src` now allows `https://cloudflareinsights.com` (RUM beacon seen in Chromium); `upgrade-insecure-requests` removed (ignored in Report-Only). **Partial only because enforcement is deliberately deferred** until reports are reviewed. |
+| F02 | Placeholder services | Critical | **Fixed** | `toCapabilities` returns `[]` when CMS empty; placeholders test-only. |
+| F03 | Public chrome on admin | Major | **Fixed** | Marketing chrome only in `(marketing)/layout`. Phase B: `app/admin/not-found.tsx` + `app/admin/error.tsx` (no public chrome) and `(panel)/[...missing]` so admin 404s/errors no longer fall back to public Navbar/Footer. |
+| F04 | Blog article tokens | Major | **Fixed** | No off-token classes in `blog/[slug]`. |
+| F05 | Admin login styling | Major | **Fixed** | `bg-canvas` + `surface-panel`. |
+| F06 | llms.txt | Major | **Fixed** | `/llms.txt`, `/llms-full.txt` → `text/plain; charset=utf-8`, live indexable pages only. |
+| F07 | Organization/WebSite JSON-LD | Major | **Fixed** | Sitewide graph from `lib/site.ts`. Footer brand line now uses `SITE_DESCRIPTION` (was divergent copy). |
+| F08 | OG image | Major | **Partial** | `/opengraph-image` 1200×630 + OG/Twitter meta work. Image still uses a letter "A", not the official BrandMark — **deferred to Batch 8** by decision. |
+| F09 | Mobile menu a11y | Major | **Fixed** | Verified in Chromium: focus trap, Escape, focus restore, `inert` on main/footer. Phase B: close (X) button is now inside the trap; stray focus is pulled back. RTL test. |
+| F10 | Form error wiring | Major | **Fixed** | `aria-invalid` + `aria-describedby` on contact, quote, newsletter, review forms. |
+| F11 | Settings labels | Major | **Fixed** | `htmlFor` required in `SettingsFields`. |
+| F12 | Submission filters | Major | **Fixed** | Type/status links preserve each other. |
+| F13 | Mobile sign out | Major | **Fixed** | Sign out in desktop + mobile `AdminNav`. |
+| F14 | Confirm dialog | Major | **Fixed** | No `window.confirm` left. Phase B: `ConfirmDialog` captures focus once (no re-render focus theft), keeps focus while pending, shows action errors **inside** the dialog, returns focus to the trigger (cancel) or `<main>` (successful delete). RTL test (fails 3/6 against the old version). |
+| F15 | Hero brand | Major | **Pending** | Batch 8 — plan first. |
+| F16 | Image host allowlist | Major | **Fixed** | Was **wrong** in Batch 7 (wildcard `*.supabase.co` remained). Now only the exact `NEXT_PUBLIC_SUPABASE_URL` host + `/storage/v1/object/public/**`; `next build` fails with a clear message if the env var is missing. Tested. |
+| F17 | Contact/Blog RSC shells | Major | **Fixed** | h1 + main copy in raw HTML; copy identical to before. |
+| F18 | AI crawler robots groups | Major | **Fixed** | `*` + 9 AI UAs, each repeats the full Disallow list (curl). |
+| F19 | Admin chips/tokens | Major | **Fixed** | No `rounded-full` / gray-blue-cyan classes in touched files. |
+| F20 | Form options loading | Major | **Fixed** | Any `mediaRef`/`categoryRef` field loads options. |
+| F21 | Role/status feedback | Major | **Fixed** | `role="status"` / `role="alert"`. |
+| F22 | Manifest / theme | Minor | **Fixed** | `theme-color`, `color-scheme: dark`, manifest. |
+| F23 | Spinner reduced motion | Minor | **Fixed** | Verified in Chromium (`animation-name: none`). |
+| F24 | Blog filter group | Minor | **Fixed** | `role="group"` + label. |
+| F25 | Cover alt text | Minor | **Fixed** | Media alt, title fallback. |
+| F26 | Newsletter hover | Minor | **Fixed** | `hover:shadow-signal`. |
+| F27 | Blockquote rule | Minor | **Fixed** | `border-l border-line`. |
+| F28 | Footer "Case studies" | Minor | **Fixed** | → `/work`, gated. |
+| F29 | Nav IA | Minor | **Fixed** | About/Services always; Blog/Work gated. Gates now refresh on publish (see N1 below). |
+| F30 | Framer → CSS on blog | Minor | **Fixed** | Phase B: keyframes animate `translate` (not `transform`) so the card hover lift works again (verified against built CSS in Chromium); `useRevealOnView` restores animate-when-seen for below-the-fold items. Framer intentionally kept for capabilities, ProcessLine, quote steps. |
+| F31 | File size / splits | Minor | **Partial** | `resources.ts` 17 (was 420) → `resource-catalog` 367, `resource-input` 129, `resource-types` 109; `SettingsForm` 265 + `SettingsFields` 106. **QuoteForm not split** (162 lines, under limits). `ResourceForm.tsx` is 330 lines (over the 300 warn, under 450 hard). |
+| F32 | Admin skip link | Minor | **Fixed** | → `#admin-main`. |
+| F33 | Turnstile fail-closed | Minor | **Fixed** | Fails closed when `NODE_ENV=production` and secret missing — note this includes Vercel **Preview** and local `next start`. |
+| F34 | Cookie policy | Minor | **Pending** | Batch 9. |
+| F35 | Token pages | Minor | **Fixed** | Atelier tokens. |
+| F36 | Home metadata | Minor | **Fixed** | Richer description/keywords/canonical. Phase B: title no longer repeats the brand (`title.absolute`, single `SITE_DEFAULT_TITLE`). |
+| F37 | Admin table shell | Minor | **Fixed** | Shared `AdminTableShell`. |
+| F38 | Honeypot | Minor | **Fixed** | Hidden + `aria-hidden` + `tabIndex=-1`; server rejects. Tests for contact, quote, newsletter, and (Phase B) feedback/review form. |
 
 ---
 
-## 4. Changes beyond the original audit
+## 2. Verification follow-ups (from `VERIFICATION_REPORT.md`)
 
-Work added during Batches 1–7 that was not a one-line “fix the finding” item:
+| ID | Item | Status |
+|----|------|--------|
+| R1 | Home title doubled brand | **Fixed** |
+| R2 | Blog hover lift broken by fade-up | **Fixed** |
+| R3 | ConfirmDialog focus/error | **Fixed** |
+| R4 | Footer became client component | **Fixed** (server component again) |
+| R5 | UI slug lock on posts/categories | **Fixed** (services/cases only) |
+| N1 | Nav gates + sitemap frozen at build | **Fixed** — publish/unpublish of posts, services, cases, reviews revalidates the public layout + `/sitemap.xml` (+ `/reviews`); sitemap is ISR (3600 s). Tested. |
+| N2 | `reviews.submitter_email` readable by anon | **Fixed in code; DB fix in migration 0013 (apply manually)** |
+| N3 | CSP collector races / prune / PII / size cap | **Fixed** — atomic RPC upsert (0014) with fallback, prune throttled to 10 min, query strings stripped, streamed byte cap |
+| N4 | 0011/0012 not idempotent | **Fixed** |
+| N5 | Fake sitemap `lastmod` | **Fixed** — only real `updated_at` |
+| N6 | Weak SEO gate | **Fixed** — default title/description, canonical path, noindex checks |
+| N7 | Gated 404 raw HTML = loading spinner | **Investigated, not fixed** — cause is root `app/loading.tsx` (Suspense around every page). A metadata-level gate does not help (Next 16 streams metadata). Fix requires moving/removing `app/loading.tsx` → awaiting owner decision. Browsers render the 404 correctly; status is 404. |
+| N8 | Admin errors show public chrome | **Fixed** (see F03) |
+| N9 | Slug lock rule / DB enforcement / duplicate message | **Fixed** — locked once published (migration 0016 trigger + server check), friendly duplicate/lock messages |
+| N10 | SEO gate inside Vercel build | **Fixed** — `npm run check:seo` separate; env errors exit 2, content failures exit 1 |
+| N11 | `toLocaleDateString` in client BlogIndex | **Pending** (not in approved list) |
+| N12 | Docs say validate-last, code validates first | **Pending** (not in approved list; pre-existing) |
+| — | 0012 revoked authenticated writes on `case_studies` | **Found + fixed in Phase B** — migration 0015 (admin case-study CRUD would otherwise fail) |
+
+---
+
+## 3. Changes beyond the original audit
 
 | Area | What shipped |
-|------|----------------|
-| **CSP reporting** | `POST /api/csp-report`, rate limit helpers/tests, `supabase/0011_csp_reports.sql`, admin `/admin/csp-reports` + retention/cleanup hooks |
-| **IA pages** | `/about`, `/services`, `/services/[slug]`, gated `/work`, gated `/reviews` |
-| **CMS schema** | `supabase/0012_services_detail_and_case_studies.sql` — service detail fields + `case_studies` table; admin resource `cases` |
-| **Service publish gate** | Detail pages require active + slug + overview + ≥4 deliverables (`services-publish.ts` + tests) |
-| **Slug lock** | After first non-empty slug save, UI `readOnly` + server forces existing slug (`actions.ts` / `ResourceForm`) |
-| **Markdown twins** | `/about.md`, `/services.md` with `X-Robots-Tag: noindex` + canonical `Link`; services.md **404** when no published details |
-| **LLMO files** | `/llms.txt`, `/llms-full.txt` driven by live indexable routes |
-| **Indexable SEO helper** | `lib/seo/indexable.ts` + build script `scripts/check-indexable-pages.mjs` (wired into `npm run build`) |
-| **Robots policy module** | `lib/seo/robots-policy.ts` + tests — shared Disallow list on `*` and every AI UA group |
-| **Site constants** | `lib/site.ts` for name/description/URLs used by metadata, JSON-LD, llms, md twins |
-| **Nav gates** | `MarketingShell` hides Blog/Work until content thresholds met |
-| **Tests** | New/extended Vitest coverage (robots, CSP reports/rate-limit, services-publish, turnstile fail-closed, etc.) — suite now **166** tests |
+|------|--------------|
+| CSP reporting | `POST /api/csp-report` (rate limit, streamed 16 KB byte cap, query stripping), `csp_reports` table (0011), atomic `record_csp_report` + `prune_csp_reports` RPCs (0014), owner-only `/admin/csp-reports` |
+| IA pages | `/about`, `/services`, `/services/[slug]`, gated `/work` and `/reviews` |
+| CMS schema | 0012 service detail fields + `case_studies`; 0015 authenticated write grants; 0016 slug lock trigger |
+| Publish gates | Service detail = active + slug + overview + ≥4 deliverables; `/work` ≥1 case; `/reviews` ≥3 reviews; `/blog` noindex until first post |
+| Revalidation | `lib/admin/revalidation.ts` — layout + sitemap + affected pages on every admin mutation |
+| Markdown twins | `/about.md` (generated from shared `lib/about-content.ts`), `/services.md` (404 until a detail page is published); both `X-Robots-Tag: noindex` + canonical `Link` |
+| LLMO | `/llms.txt`, `/llms-full.txt` from live indexable pages |
+| SEO gate | `scripts/check-indexable-pages.mjs` + `scripts/seo-check-lib.mjs` (unit-tested), `npm run check:seo` |
+| Privacy | Public review queries exclude `submitter_email`; test asserts no PII columns in public queries; 0013 column grants |
+| Admin UX | `ConfirmDialog`, admin 404/error pages, slug lock explanation, friendly slug errors |
+| Image security | `lib/image-remote-patterns.ts` exact-host allowlist |
 
 ---
 
-## 5. Decisions made
+## 4. Decisions made
 
 | Decision | Choice |
 |----------|--------|
-| AI crawlers (GPTBot, OAI-SearchBot, ChatGPT-User, ClaudeBot, Claude-SearchBot, PerplexityBot, Google-Extended, Applebot-Extended, CCBot) | **Allowed** (same Allow/Disallow as `*`) |
+| AI crawlers (GPTBot, OAI-SearchBot, ChatGPT-User, ClaudeBot, Claude-SearchBot, PerplexityBot, Google-Extended, Applebot-Extended, CCBot) | **All allowed**, same Allow/Disallow as `*` |
 | Canonical service slugs | `ai-chatbots`, `ai-agents`, `automation`, `web-development` |
-| Slug edits after first save | **Locked** (UI + server) |
-| `/work` gate | ≥1 published case study (else 404; omit from nav/sitemap/llms) |
-| `/reviews` gate | ≥3 published reviews (else 404; omit from sitemap/llms) |
-| `/blog` indexing | `noindex` until ≥1 published post; nav/footer link gated the same way |
-| CSP | Stay **Report-Only** until reports reviewed (**7–14 days** recommended); then consider enforcing |
-| Live AI product features | **None** in this phase (site is marketing + CMS + forms only) |
-| Placeholder capabilities | **Never** on public UI; tests only |
-| Hero brand (F15) | Deferred to Batch 8 with a plan-first gate |
-| Cookie Policy (F34) | Deferred to Batch 9 |
+| Slug edits (services, case studies) | **Locked once the page has been published** (meets its publish threshold), and stay locked if later unpublished. Free to change before that. Posts and categories stay editable. |
+| `/work` gate | ≥1 published case study, else 404 and omitted from nav/sitemap/llms |
+| `/reviews` gate | ≥3 published reviews with permission, else 404 and omitted from sitemap/llms |
+| `/blog` | `noindex` until ≥1 published post; nav/footer link gated the same way |
+| CSP | **Stays Report-Only** until production reports are reviewed (7–14 days), then decide on enforcing |
+| Live AI features | **None in this phase** (marketing site + CMS + forms only) |
+| Placeholder content | Never on public UI; tests only |
+| SEO gate | Not part of the Vercel build; owner runs `npm run check:seo` before deploy |
+| OG image brand mark | Deferred to Batch 8 |
+
+---
+
+## 5. Migrations to apply manually (in order)
+
+Run in the Supabase SQL editor (postgres role). All are idempotent (safe to re-run).
+
+| # | File | Purpose |
+|---|------|---------|
+| 1 | `0011_csp_reports.sql` | `csp_reports` table, RLS, owner-only select (skip if already applied — safe either way) |
+| 2 | `0012_services_detail_and_case_studies.sql` | Service detail columns + `case_studies` table/RLS (skip if already applied — safe either way) |
+| 3 | `0013_reviews_hide_submitter_email.sql` | Anon can read every `reviews` column except `submitter_email` |
+| 4 | `0014_csp_reports_functions.sql` | Atomic `record_csp_report` + `prune_csp_reports` (service role only) |
+| 5 | `0015_case_studies_authenticated_writes.sql` | Restores insert/update/delete grants on `case_studies` for signed-in admins (RLS still decides) |
+| 6 | `0016_slug_lock_on_publish.sql` | `slug_locked_at` columns, lock triggers, backfill for already-public rows |
 
 ---
 
 ## 6. Remaining work
 
-### Batch 8 (plan first)
-- **F15** — Elevate hero brand signal without fake claims / without breaking Signal Atelier.
-
-### Batch 9
-- **F34** — Cookie Policy / counsel review; verify CF + Vercel analytics cookie behavior in a real browser.
-
-### Follow-through on Partial items
-- **F01** — After CSP report review window, decide enforce vs keep Report-Only; document breakage if any (Turnstile, Supabase, analytics).
-- **F31** — Optional: split `QuoteForm` further if it grows past warn threshold.
-
-### Product / content (not audit code)
-- Fill real service detail content in admin for the four slugs.
-- Publish first permitted reviews (≥3), first case study, first blog post when ready.
-- Deploy Batches 1–7 and re-curl production `robots.txt` / `llms.txt` / headers.
-
-### Later / out of scope this phase
-- Playwright E2E.
-- Enforcing CSP without report evidence.
-- Inventing testimonials or case studies.
+- **Batch 8 (F15 + OG mark):** plan first, with baseline (first viewport, LCP element, JS size), reuse vs new components, honesty rules, reduced-motion/CLS/a11y/SSR constraints, bundle impact.
+- **Batch 9 (F34):** verify real Cloudflare/Vercel analytics cookie behavior; add an accurate cookies section to the privacy page.
+- **N7:** decide whether to move `app/loading.tsx` (e.g. to `app/admin/(panel)/loading.tsx`, and `/feedback` if wanted) so gated 404s ship real HTML.
+- **CSP:** review `/admin/csp-reports` for 7–14 days after deploy; then decide on enforcing (re-add `upgrade-insecure-requests` when enforcing).
+- **N11 / N12:** locale-stable blog dates; align docs with actual form pipeline order (or reorder).
+- **F31:** optional split of `ResourceForm.tsx` (330 lines) if it grows.
+- **Content:** fill the four service detail pages; publish first case study, ≥3 permitted reviews, first post when ready.
+- **Playwright E2E:** still not installed.
 
 ---
 
 ## 7. Manual verification still needed
 
-| Check | Status |
-|-------|--------|
-| Lighthouse Perf / A11y / SEO / Best Practices (desktop + mobile) on `/`, `/contact`, `/quote`, `/blog`, `/services` | **not run** |
-| Before/after Lighthouse comparison | **not run** (no baseline numbers recorded this phase) |
-| axe / WAVE on production | **not run** |
-| Contrast (`ink-muted` / `ink-subtle` on canvas/surface) | **not run** |
-| CSP report review **7–14 days**, then enforce decision | **pending** (endpoint exists; production accumulation after deploy) |
-| OG preview ([opengraph.xyz](https://www.opengraph.xyz) / LinkedIn inspector) | **not run** |
-| Google Rich Results Test (Organization / WebSite / BlogPosting) | **not run** |
-| Raw-HTML curl on key pages (`/`, `/about`, `/services`, `/contact`, `/blog`, `/llms.txt`, `/robots.txt`) for RSC copy + headers | **not run** on production post-deploy |
-| Real devices / touch targets (320–1920) | **not run** |
-| Cross-browser (Chrome, Firefox, Edge, Safari, iOS Safari, Android Chrome) | **not run** |
-| Search Console + Bing sitemap submission | **not run** |
-| Analytics cookies vs privacy claims (DevTools Application) | **not run** (ties to F34) |
-| Fill/publish real service content in admin for four slugs | **content pending** |
-| E2E forms (contact, quote, newsletter, feedback token) | Manual / no Playwright |
-
----
-
-## 8. Quick wins (historical Phase 1 list)
-
-Most of the original quick-win list is done in Batches 1–7. Still open from that spirit: **F15** hero brand, **CSP enforce** after review, **F34** cookies, and **shipping real CMS proof** (reviews / cases / posts).
-
----
-
-## 9. Design and UX notes (updated)
-
-- Homepage Signal Atelier direction remains the reference; blog article and admin login are no longer the largest integrity gaps.
-- Largest remaining design gap called out by the audit: **F15** hero brand-test after removing nav.
-- Trust/conversion still limited by empty proof surfaces — correct ethically; content is the unlock, not more UI chrome.
-- Admin Operate chrome is separated from marketing; confirm dialog and table shell reduce a11y/UX debt.
-
-Phase 1 browser screenshots and page-by-page notes remain valid as a **pre-fix** snapshot of production; they were not re-captured after Batches 1–7.
+| Check | How |
+|-------|-----|
+| Apply migrations 0011–0016 and verify (see §5 and the Phase B summary) | Supabase SQL editor |
+| RLS matrix incl. new anon review checks | `npm run test:rls` — **only against a non-production project** (it creates and deletes users/rows) |
+| Admin flows: confirm dialog (Tab/Esc/error/focus), slug lock message, case-study CRUD after 0015, admin 404 page | Sign in to `/admin` on a preview deploy |
+| Populated states: `/work`, `/reviews`, `/services/<slug>`, `/blog`, nav links appearing on `/about` after publish, sitemap update | Staging data, then `npm run build && npm run check:seo` and curl |
+| CSP reports arrive | Preview deploy → DevTools Reporting → `/admin/csp-reports` |
+| Production headers/robots/llms | `curl -sI https://www.aorysoft.com/`, `curl -s …/robots.txt`, `…/llms.txt` after deploy |
+| Lighthouse / axe / contrast; OG preview; Rich Results | Not run this phase |
+| iOS Safari menu (`inert`, iOS ≥15.5) | Real device |
+| Turnstile secret on Vercel Preview | Vercel env settings (F33 note) |
+| Analytics cookies | Batch 9 |
 
 ---
 
 ## Positive findings (keep)
 
-- Official BrandMark (not Lucide Zap-as-logo).  
-- Design tokens in `globals.css` / Tailwind match `DESIGN.md`.  
-- Skip link + global `:focus-visible` signal rings (public + admin).  
-- Honest empty states; gated routes instead of fake portfolios.  
-- Form pipeline: honeypot → Turnstile → rate limit → validate.  
-- `SafeHtml` sanitization for admin HTML.  
-- Per-page metadata + canonicals; sitemap + robots; feedback/admin noindex.  
-- `prefers-reduced-motion` on hero field, sculpture, capabilities, ProcessLine, Quote `MotionConfig`, and CSS spinners.  
-- Analytics skipped on `/admin`.  
-- External social links use `rel="noopener noreferrer"`.  
-- `npm audit` (prod): 0 vulnerabilities at original audit time (**not re-run** for this status update).
-
----
-
-## Phase gate
-
-Batches **1–7** code is in the working tree. Next approved step: **Batch 8 (F15) — plan first**, then Batch 9 (F34), plus manual verification list above after deploy.
+Official BrandMark in nav/footer; design tokens unchanged in meaning (globals.css changes are additive); skip links + `:focus-visible` rings (public + admin); honest empty states and gated routes; honeypot → Turnstile → rate limit around every public write; `SafeHtml` for admin-authored HTML (service/case long-form fields are plain text, React-escaped); per-page metadata + canonicals, feedback/admin noindex; `prefers-reduced-motion` respected (hero, sculpture, capabilities, ProcessLine, quote, spinners, fade-ups); analytics skipped on `/admin`; external links `rel="noopener noreferrer"`; every admin server action re-checks the role; no service-role or PII strings in client bundles.
