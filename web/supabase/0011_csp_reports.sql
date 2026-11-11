@@ -19,6 +19,8 @@ create index if not exists csp_reports_last_seen_idx
 alter table public.csp_reports enable row level security;
 
 -- No public policies. Owners can read for the admin UI.
+-- drop-then-create keeps this migration re-runnable (idempotent).
+drop policy if exists "csp_reports_owner_select" on public.csp_reports;
 create policy "csp_reports_owner_select" on public.csp_reports
   for select to authenticated
   using (public.is_admin());

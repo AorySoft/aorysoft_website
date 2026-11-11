@@ -54,23 +54,28 @@ create index if not exists case_studies_published_idx
 
 alter table public.case_studies enable row level security;
 
+drop policy if exists "case_studies_published_read" on public.case_studies;
 create policy "case_studies_published_read" on public.case_studies
   for select to anon, authenticated
   using (status = 'published');
 
+drop policy if exists "case_studies_select" on public.case_studies;
 create policy "case_studies_select" on public.case_studies
   for select to authenticated
   using (public.is_editor_or_admin());
 
+drop policy if exists "case_studies_insert" on public.case_studies;
 create policy "case_studies_insert" on public.case_studies
   for insert to authenticated
   with check (public.is_editor_or_admin());
 
+drop policy if exists "case_studies_update" on public.case_studies;
 create policy "case_studies_update" on public.case_studies
   for update to authenticated
   using (public.is_editor_or_admin())
   with check (public.is_editor_or_admin());
 
+drop policy if exists "case_studies_delete_owner" on public.case_studies;
 create policy "case_studies_delete_owner" on public.case_studies
   for delete to authenticated
   using (public.is_admin());

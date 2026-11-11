@@ -3,6 +3,7 @@
 import { NextResponse } from "next/server";
 import { createHash } from "node:crypto";
 import { allowCspReport } from "@/lib/csp-report-rate-limit";
+import { readBodyWithLimit } from "@/lib/csp-report-body";
 import {
   extractCspReports,
   pruneCspReports,
@@ -27,20 +28,14 @@ export async function POST(request: Request) {
     return new NextResponse(null, { status: 429 });
   }
 
-  const contentLength = Number(request.headers.get("content-length") ?? "0");
-  if (contentLength > MAX_BODY_BYTES) {
-    return new NextResponse(null, { status: 413 });
+  // Streamed read that counts bytes and stops at the cap (no full buffering).
+  const body = await readBodyWithLimit(request, MAX_BODY_BYTES);
+  if (!body.ok) {
+    return new NextResponse(null, {
+      status: body.reason === "too_large" ? 413 : 400,
+    });
   }
-
-  let text: string;
-  try {
-    text = await request.text();
-  } catch {
-    return new NextResponse(null, { status: 400 });
-  }
-  if (text.length > MAX_BODY_BYTES) {
-    return new NextResponse(null, { status: 413 });
-  }
+  const text = body.text;
 
   let payload: unknown = null;
   if (text.trim()) {
@@ -61,7 +56,8 @@ export async function POST(request: Request) {
     }
   }
 
-  // Opportunistic retention: 30-day age prune + 500-row hard cap.
+  // Opportunistic retention (30-day age + 500-row cap), throttled to at most
+  // once per 10 minutes per instance inside pruneCspReports().
   try {
     await pruneCspReports();
   } catch (error) {

@@ -36,6 +36,25 @@ function asString(value: unknown): string {
   return typeof value === "string" ? value : "";
 }
 
+/**
+ * Drop query string + fragment from a blocked URI so tokens or personal data
+ * in URLs are never stored. Keywords like "inline"/"eval" pass through.
+ */
+export function stripUriQuery(uri: string): string {
+  const trimmed = uri.trim();
+  if (!trimmed) return "";
+  try {
+    const parsed = new URL(trimmed);
+    if (parsed.protocol === "http:" || parsed.protocol === "https:" || parsed.protocol === "wss:" || parsed.protocol === "ws:") {
+      return `${parsed.origin}${parsed.pathname}`;
+    }
+    // data:, blob:, etc. — keep only the scheme (payloads can be large/sensitive).
+    return parsed.protocol.replace(/:$/, "");
+  } catch {
+    return trimmed.split(/[?#]/)[0] ?? "";
+  }
+}
+
 /** Normalize one browser report body into storage columns. */
 export function normalizeCspReport(body: Record<string, unknown>): CspReportRow | null {
   const directive = clip(
@@ -45,7 +64,7 @@ export function normalizeCspReport(body: Record<string, unknown>): CspReportRow 
   if (!directive) return null;
 
   const blockedUri = clip(
-    asString(body["blocked-uri"] ?? body.blockedURI ?? ""),
+    stripUriQuery(asString(body["blocked-uri"] ?? body.blockedURI ?? "")),
     MAX_URI,
   );
   const documentPath = pathFromUri(body["document-uri"] ?? body.documentURI ?? body.documentURL);
@@ -87,17 +106,46 @@ export function extractCspReports(payload: unknown): CspReportRow[] {
   return out;
 }
 
+type ServiceClient = NonNullable<ReturnType<typeof getServiceClient>>;
+
+/** PostgREST/Postgres "function does not exist" — migration 0014 not applied yet. */
+function isMissingFunction(error: { code?: string } | null): boolean {
+  return error?.code === "PGRST202" || error?.code === "42883";
+}
+
 /**
- * Upsert deduped rows via service role. Failures are logged; the HTTP collector
- * still returns 204 so browsers are not encouraged to retry forever.
+ * Upsert deduped rows via service role. Uses the atomic record_csp_report RPC
+ * (0014: INSERT … ON CONFLICT DO UPDATE hit_count + 1); falls back to the
+ * legacy select-then-write path if the function is not deployed yet.
+ * Failures are logged; the HTTP collector still returns 204.
  */
 export async function recordCspReports(rows: CspReportRow[]): Promise<void> {
   if (rows.length === 0) return;
   const supabase = getServiceClient();
   if (!supabase) return;
 
-  const now = new Date().toISOString();
   for (const row of rows) {
+    const { error } = await supabase.rpc("record_csp_report", {
+      p_directive: row.directive,
+      p_blocked_uri: row.blockedUri,
+      p_document_path: row.documentPath,
+    });
+    if (!error) continue;
+    if (isMissingFunction(error)) {
+      await recordCspReportLegacy(supabase, row);
+      continue;
+    }
+    console.error("[csp-report] record failed:", error.message);
+  }
+}
+
+/** Pre-0014 fallback (non-atomic). Remove once 0014 is applied everywhere. */
+async function recordCspReportLegacy(
+  supabase: ServiceClient,
+  row: CspReportRow,
+): Promise<void> {
+  const now = new Date().toISOString();
+  {
     const { data: existing, error: selectError } = await supabase
       .from("csp_reports")
       .select("id, hit_count")
@@ -108,7 +156,7 @@ export async function recordCspReports(rows: CspReportRow[]): Promise<void> {
 
     if (selectError) {
       console.error("[csp-report] select failed:", selectError.message);
-      continue;
+      return;
     }
 
     if (existing?.id) {
@@ -120,7 +168,7 @@ export async function recordCspReports(rows: CspReportRow[]): Promise<void> {
         })
         .eq("id", existing.id);
       if (error) console.error("[csp-report] update failed:", error.message);
-      continue;
+      return;
     }
 
     const { error } = await supabase.from("csp_reports").insert({
@@ -135,15 +183,48 @@ export async function recordCspReports(rows: CspReportRow[]): Promise<void> {
   }
 }
 
+/** Prune at most once per interval per server instance (not every request). */
+export const CSP_PRUNE_INTERVAL_MS = 10 * 60_000;
+let lastPruneAt = 0;
+
+/** True when a prune is due; claims the slot so concurrent requests skip. */
+export function claimPruneSlot(now = Date.now()): boolean {
+  if (now - lastPruneAt < CSP_PRUNE_INTERVAL_MS) return false;
+  lastPruneAt = now;
+  return true;
+}
+
+/** Test-only: reset the throttle. */
+export function resetPruneThrottleForTests(): void {
+  lastPruneAt = 0;
+}
+
 /**
  * Opportunistic retention: drop rows older than 30 days, then trim to the
- * hard row cap by deleting the least-recently-seen leftovers.
+ * hard row cap by deleting the least-recently-seen leftovers. Throttled via
+ * claimPruneSlot(); uses the single-call prune_csp_reports RPC (0014) and
+ * falls back to the legacy multi-query prune if it is not deployed.
  * Runs via service role from the report endpoint (no anon write path).
  */
-export async function pruneCspReports(): Promise<void> {
+export async function pruneCspReports(now = Date.now()): Promise<void> {
+  if (!claimPruneSlot(now)) return;
   const supabase = getServiceClient();
   if (!supabase) return;
 
+  const { error } = await supabase.rpc("prune_csp_reports", {
+    p_retention_days: CSP_REPORTS_RETENTION_DAYS,
+    p_max_rows: CSP_REPORTS_MAX_ROWS,
+  });
+  if (!error) return;
+  if (!isMissingFunction(error)) {
+    console.error("[csp-report] prune failed:", error.message);
+    return;
+  }
+  await pruneCspReportsLegacy(supabase);
+}
+
+/** Pre-0014 fallback. Remove once 0014 is applied everywhere. */
+async function pruneCspReportsLegacy(supabase: ServiceClient): Promise<void> {
   const cutoff = new Date();
   cutoff.setUTCDate(cutoff.getUTCDate() - CSP_REPORTS_RETENTION_DAYS);
   const cutoffIso = cutoff.toISOString();
