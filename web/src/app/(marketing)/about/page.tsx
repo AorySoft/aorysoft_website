@@ -2,6 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import ProcessLine from "@/components/sections/ProcessLine";
+import {
+  ABOUT_HEADING,
+  ABOUT_HONESTY,
+  ABOUT_LEAD,
+  ABOUT_PILLARS,
+} from "@/lib/about-content";
 
 export const metadata: Metadata = {
   title: "About",
@@ -12,23 +18,8 @@ export const metadata: Metadata = {
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
-const pillars = [
-  {
-    title: "Engineering",
-    description:
-      "Websites, apps, and platforms that are clear to use and easier to maintain over time.",
-  },
-  {
-    title: "AI",
-    description:
-      "Chatbots, voice agents, and custom AI wired into the work your team already does. Not demos for demos' sake.",
-  },
-  {
-    title: "Automation",
-    description:
-      "Workflows and integrations that cut repetitive work so people can spend time on the decisions that matter.",
-  },
-];
+// Copy is shared with /about.md (src/lib/about-content.ts) so they never drift.
+const pillars = ABOUT_PILLARS;
 
 export default function AboutPage() {
   const jsonLd = {
@@ -68,15 +59,10 @@ export default function AboutPage() {
 
       <section className="section-y border-b border-line bg-surface">
         <div className="shell max-w-3xl">
-          <h1 className="display-title">How we build</h1>
-          <p className="body-lead mt-5">
-            We help teams ship digital products, AI features, and automation
-            that hold up in day-to-day use. Software first, AI where it earns
-            its place, and a process you can follow without guesswork.
-          </p>
+          <h1 className="display-title">{ABOUT_HEADING}</h1>
+          <p className="body-lead mt-5">{ABOUT_LEAD}</p>
           <p className="mt-4 max-w-measure text-base leading-relaxed text-ink-subtle">
-            We care about honest delivery: clear communication, realistic
-            timelines, and work we are willing to stand behind.
+            {ABOUT_HONESTY}
           </p>
         </div>
       </section>

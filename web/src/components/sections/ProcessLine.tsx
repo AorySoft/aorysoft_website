@@ -2,14 +2,10 @@
 
 import { useRef, useState } from "react";
 import { motion, useMotionValueEvent, useScroll, useSpring } from "framer-motion";
+import { PROCESS_STEPS } from "@/lib/about-content";
 
-const STEPS = [
-  { title: "Discover", text: "Goals, users, and constraints first." },
-  { title: "Design", text: "Flows and interfaces shaped before code." },
-  { title: "Build", text: "Software and AI systems in small, reviewable steps." },
-  { title: "Integrate", text: "Connected to the tools and data you already use." },
-  { title: "Operate", text: "Deployed, maintained, and improved." },
-] as const;
+// Shared with /about.md so the HTML and markdown twin never drift.
+const STEPS = PROCESS_STEPS;
 
 /** Steps whose node the fill has passed, for a scroll progress value 0–1. */
 export function reachedFor(progress: number) {

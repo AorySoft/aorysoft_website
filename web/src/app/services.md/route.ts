@@ -46,12 +46,10 @@ export async function GET() {
     lines.push(`## ${service.title}`);
     if (service.subtitle) lines.push(service.subtitle);
     if (service.description) lines.push(service.description);
+    // Only link real detail pages; unpublished ones are simply not linked
+    // (no internal CMS wording in public output).
     if (isServiceDetailPublished(service) && service.slug) {
       lines.push(`Detail: ${absoluteUrl(`/services/${service.slug}`)}`);
-    } else {
-      lines.push(
-        "Detail page not published yet (needs overview + 4 deliverables).",
-      );
     }
     if (service.features?.length) {
       lines.push("Features:");

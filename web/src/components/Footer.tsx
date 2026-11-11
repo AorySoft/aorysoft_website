@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Mail } from "lucide-react";
 import BrandMark from "@/components/BrandMark";
 import { SOCIAL_LINKS } from "@/lib/social";
+import { SITE_DESCRIPTION } from "@/lib/site";
 
 export default function Footer({
   showBlog = false,
@@ -36,9 +37,9 @@ export default function Footer({
         <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-3">
           <div className="space-y-4">
             <BrandMark size="sm" />
+            {/* Same brand line as metadata, JSON-LD, and llms.txt. */}
             <p className="max-w-sm text-sm leading-6 text-ink-muted">
-              Software, AI, and automation for teams that need systems that
-              ship and stay maintainable.
+              {SITE_DESCRIPTION}
             </p>
             <ul className="flex flex-wrap gap-4 pt-1">
               {SOCIAL_LINKS.map((link) => (
