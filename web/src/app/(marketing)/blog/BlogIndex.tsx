@@ -5,6 +5,25 @@ import Image from "next/image";
 import Link from "next/link";
 import { Calendar, Clock, User, SearchX } from "lucide-react";
 import type { PostWithRelations } from "@/lib/data";
+import { useRevealOnView } from "@/components/useRevealOnView";
+
+/** Card wrapper: animates when scrolled into view (F30 / whileInView parity). */
+function RevealArticle({
+  className,
+  style,
+  children,
+}: {
+  className: string;
+  style?: React.CSSProperties;
+  children: React.ReactNode;
+}) {
+  const ref = useRevealOnView<HTMLElement>();
+  return (
+    <article ref={ref} className={className} style={style}>
+      {children}
+    </article>
+  );
+}
 
 type Post = {
   id: number | string;
@@ -177,7 +196,7 @@ export default function BlogIndex({
           {filteredPosts.length > 0 ? (
             <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
               {filteredPosts.map((post, index) => (
-                <article
+                <RevealArticle
                   key={post.id}
                   style={{ animationDelay: `${Math.min(index, 6) * 60}ms` }}
                   className="atelier-fade-up group overflow-hidden rounded-atelier-lg border border-line bg-surface-raised/50 transition-all duration-300 hover:-translate-y-1 hover:border-signal/40 motion-reduce:hover:translate-y-0"
@@ -238,7 +257,7 @@ export default function BlogIndex({
                       </div>
                     </div>
                   </Link>
-                </article>
+                </RevealArticle>
               ))}
             </div>
           ) : (

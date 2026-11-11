@@ -4,6 +4,7 @@ import { useActionState, useState } from "react";
 import { Loader2 } from "lucide-react";
 import TurnstileField from "@/components/TurnstileField";
 import HoneypotField from "@/components/HoneypotField";
+import { useRevealOnView } from "@/components/useRevealOnView";
 import { subscribeNewsletter } from "@/lib/public-forms/actions";
 import { idleFormState } from "@/lib/public-forms/state";
 
@@ -19,11 +20,15 @@ export default function NewsletterSignup() {
   );
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const turnstileMissing = turnstileConfigured && !turnstileToken;
+  const revealRef = useRevealOnView<HTMLDivElement>();
 
   return (
     <section className="bg-surface-raised/30 py-20">
       <div className="mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
-        <div className="atelier-fade-up space-y-8 rounded-atelier-lg border border-line bg-surface p-12">
+        <div
+          ref={revealRef}
+          className="atelier-fade-up space-y-8 rounded-atelier-lg border border-line bg-surface p-12"
+        >
           <h2 className="font-display text-4xl font-normal text-ink">
             Newsletter
           </h2>

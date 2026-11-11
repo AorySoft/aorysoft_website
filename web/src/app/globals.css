@@ -98,19 +98,33 @@
   }
 }
 
+/*
+ * Uses the standalone `translate` property, NOT `transform`: an animation with
+ * fill-mode `both` keeps its last keyframe applied, which would override
+ * hover utilities such as `hover:-translate-y-1` (those set `transform`).
+ */
 @keyframes atelier-fade-up {
   from {
     opacity: 0;
-    transform: translateY(0.75rem);
+    translate: 0 0.75rem;
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    translate: 0 0;
   }
+}
+
+/* Below-the-fold items wait (hidden) until scrolled into view — set only by
+   JS (useRevealOnView), so no-JS visitors always see the content. */
+[data-reveal="pending"] {
+  opacity: 0;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .atelier-fade-up {
     animation: none;
+  }
+  [data-reveal="pending"] {
+    opacity: 1;
   }
 }
