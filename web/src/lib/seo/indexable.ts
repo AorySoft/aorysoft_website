@@ -6,7 +6,7 @@ import {
   getPublishedReviews,
   getPublishedServiceDetails,
 } from "@/lib/data";
-import { SITE_DESCRIPTION, SITE_NAME, absoluteUrl } from "@/lib/site";
+import { SITE_DEFAULT_TITLE, SITE_DESCRIPTION, absoluteUrl } from "@/lib/site";
 
 export type IndexablePage = {
   path: string;
@@ -18,7 +18,7 @@ export type IndexablePage = {
 const ALWAYS: IndexablePage[] = [
   {
     path: "/",
-    title: `${SITE_NAME} | AI-first solutions, real-world impact`,
+    title: SITE_DEFAULT_TITLE,
     description: SITE_DESCRIPTION,
   },
   {

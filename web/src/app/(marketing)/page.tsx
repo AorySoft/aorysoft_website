@@ -8,12 +8,13 @@ import CareersPreview from "@/components/CareersPreview";
 import ReviewsSection from "@/components/ReviewsSection";
 import FinalCtaSection from "@/components/FinalCtaSection";
 import { getActiveServices, getPublishedReviews } from "@/lib/data";
+import { SITE_DEFAULT_TITLE } from "@/lib/site";
 
 export const revalidate = 60;
 
 export const metadata: Metadata = {
   // absolute: the root template ("%s | AorySoft") would otherwise repeat the brand.
-  title: { absolute: "AorySoft | AI-first solutions, real-world impact" },
+  title: { absolute: SITE_DEFAULT_TITLE },
   description:
     "AorySoft builds AI chatbots, agents, workflow automation, and web applications for businesses that need software that ships and stays maintainable.",
   keywords: [

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { DM_Sans, Instrument_Serif } from "next/font/google";
 import SiteJsonLd from "@/components/SiteJsonLd";
 import {
+  SITE_DEFAULT_TITLE,
   SITE_DESCRIPTION,
   SITE_LOGO_PATH,
   SITE_MARK_PATH,
@@ -33,7 +34,7 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(absoluteUrl("/")),
   title: {
-    default: `${SITE_NAME} | AI-first solutions, real-world impact`,
+    default: SITE_DEFAULT_TITLE,
     template: `%s | ${SITE_NAME}`,
   },
   description: SITE_DESCRIPTION,
@@ -49,13 +50,13 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: SITE_NAME,
-    title: `${SITE_NAME} | AI-first solutions, real-world impact`,
+    title: SITE_DEFAULT_TITLE,
     description: SITE_DESCRIPTION,
     url: absoluteUrl("/"),
   },
   twitter: {
     card: "summary_large_image",
-    title: `${SITE_NAME} | AI-first solutions, real-world impact`,
+    title: SITE_DEFAULT_TITLE,
     description: SITE_DESCRIPTION,
   },
   icons: {

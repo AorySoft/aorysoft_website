@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build && node scripts/check-indexable-pages.mjs",
+    "build": "next build",
     "check:seo": "node scripts/check-indexable-pages.mjs",
     "start": "next start",
     "lint": "eslint .",
