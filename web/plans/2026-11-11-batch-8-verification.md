@@ -130,3 +130,18 @@ Median of 3 runs per round, 2 rounds. Mobile uses 4× CPU and throttled networki
   - 1366×768: 1.12× → fits
   - 1024×768: 1.11× → 1.08×
   - 1280×720 (1920×1080 at 150%): 1.17× → 1.07×
+
+## Option A applied: invisible `app/(marketing)/loading.tsx`
+
+Same method: minimal data in both builds, alternating runs, medians.
+
+| Profile | Pre-Batch-8 (`a55f551`) | Option A | Δ |
+|---|---|---|---|
+| Mobile, 4× CPU + throttled network (7 runs) | 2672 ms | 2708 ms | **+36 ms** |
+| Mobile, network only (7 runs) | 1048 ms | 1080 ms | +32 ms |
+| Desktop (5 runs) | 316 ms | 276 ms | −40 ms |
+
+**Raw HTML on the real-data production build:**
+- The h1 and main copy are present on `/`, `/services`, `/about` and `/contact`, inside Next's hidden swap container.
+- There's no spinner.
+- With JavaScript disabled, a visitor would see a blank page. This is the accepted trade-off.
