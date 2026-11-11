@@ -36,7 +36,7 @@ Status: **Fixed** · **Partial** · **Pending** · **Skipped** (with reason)
 | F12 | Submission filters | Major | **Fixed** | Type/status links preserve each other. |
 | F13 | Mobile sign out | Major | **Fixed** | Sign out in desktop + mobile `AdminNav`. |
 | F14 | Confirm dialog | Major | **Fixed** | No `window.confirm` left. Phase B: `ConfirmDialog` captures focus once (no re-render focus theft), keeps focus while pending, shows action errors **inside** the dialog, returns focus to the trigger (cancel) or `<main>` (successful delete). RTL test (fails 3/6 against the old version). |
-| F15 | Hero brand | Major | **Pending** | Batch 8 — plan first. |
+| F15 | Hero brand | Major | **Fixed (Batch 8)** | Hero wordmark is a lockup under the mark; the official mark is carried into PageHero (every inner page), the OG image, newsletter pages and 404s. The hero is sized to the visible viewport (see DESIGN.md Viewport Fit Rule). |
 | F16 | Image host allowlist | Major | **Fixed** | Was **wrong** in Batch 7 (wildcard `*.supabase.co` remained). Now only the exact `NEXT_PUBLIC_SUPABASE_URL` host + `/storage/v1/object/public/**`; `next build` fails with a clear message if the env var is missing. Tested. |
 | F17 | Contact/Blog RSC shells | Major | **Fixed** | h1 + main copy in raw HTML; copy identical to before. |
 | F18 | AI crawler robots groups | Major | **Fixed** | `*` + 9 AI UAs, each repeats the full Disallow list (curl). |
@@ -78,11 +78,11 @@ Status: **Fixed** · **Partial** · **Pending** · **Skipped** (with reason)
 | N4 | 0011/0012 not idempotent | **Fixed** |
 | N5 | Fake sitemap `lastmod` | **Fixed** — only real `updated_at` |
 | N6 | Weak SEO gate | **Fixed** — default title/description, canonical path, noindex checks |
-| N7 | Gated 404 raw HTML = loading spinner | **Investigated, not fixed** — cause is root `app/loading.tsx` (Suspense around every page). A metadata-level gate does not help (Next 16 streams metadata). Fix requires moving/removing `app/loading.tsx` → awaiting owner decision. Browsers render the 404 correctly; status is 404. |
+| N7 | Gated 404 raw HTML = loading spinner | **Partly fixed (Batch 8)** — `app/loading.tsx` moved to `app/admin/(panel)/loading.tsx`; no public page ships the spinner and unknown URLs ship the full 404 HTML. A `notFound()` thrown inside a dynamic route (e.g. `/services/unknown`) still streams the 404 body only in the RSC payload (no `<h1>` until JS); status is 404, so it is not indexed. |
 | N8 | Admin errors show public chrome | **Fixed** (see F03) |
 | N9 | Slug lock rule / DB enforcement / duplicate message | **Fixed** — locked once published (migration 0016 trigger + server check), friendly duplicate/lock messages |
 | N10 | SEO gate inside Vercel build | **Fixed** — `npm run check:seo` separate; env errors exit 2, content failures exit 1 |
-| N11 | `toLocaleDateString` in client BlogIndex | **Pending** (not in approved list) |
+| N11 | `toLocaleDateString` in client BlogIndex | **Partly fixed (Batch 8)** — blog post and service pages use one fixed server format; the client BlogIndex list is unchanged. |
 | N12 | Docs say validate-last, code validates first | **Pending** (not in approved list; pre-existing) |
 | — | 0012 revoked authenticated writes on `case_studies` | **Found + fixed in Phase B** — migration 0015 (admin case-study CRUD would otherwise fail) |
 
@@ -141,9 +141,10 @@ Run in the Supabase SQL editor (postgres role). All are idempotent (safe to re-r
 
 ## 6. Remaining work
 
-- **Batch 8 (F15 + OG mark):** plan first, with baseline (first viewport, LCP element, JS size), reuse vs new components, honesty rules, reduced-motion/CLS/a11y/SSR constraints, bundle impact.
+- **Batch 8:** done on branch `batch-8-ai-native` — see `web/plans/2026-11-11-batch-8-ai-native-site.md`, `web/plans/2026-11-11-batch-8-baseline.md`, and DESIGN.md (patterns, Viewport Fit Rule, Example Label Rule). Also fixed: capability tab panels all rendering at once (Tailwind `grid` overrode `[hidden]`); an example scene that implied real channel data.
+- **Test content:** temporary rows from `web/scripts/seed-test-content.mjs` are live until `--remove` is run.
 - **Batch 9 (F34):** verify real Cloudflare/Vercel analytics cookie behavior; add an accurate cookies section to the privacy page.
-- **N7:** decide whether to move `app/loading.tsx` (e.g. to `app/admin/(panel)/loading.tsx`, and `/feedback` if wanted) so gated 404s ship real HTML.
+- **N7 (remainder):** dynamic-route `notFound()` 404 body is RSC-only.
 - **CSP:** review `/admin/csp-reports` for 7–14 days after deploy; then decide on enforcing (re-add `upgrade-insecure-requests` when enforcing).
 - **N11 / N12:** locale-stable blog dates; align docs with actual form pipeline order (or reorder).
 - **F31:** optional split of `ResourceForm.tsx` (330 lines) if it grows.
