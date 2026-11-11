@@ -1,4 +1,4 @@
-﻿// Validate + normalize form payloads for admin resources.
+// Validate + normalize form payloads for admin resources.
 import {
   validateBoolean,
   validateEnum,

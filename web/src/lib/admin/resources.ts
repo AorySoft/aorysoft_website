@@ -1,4 +1,4 @@
-﻿// Resource metadata: catalog + input validation for admin CRUD.
+// Resource metadata: catalog + input validation for admin CRUD.
 export {
   ICON_CHOICES,
   COLOR_CHOICES,

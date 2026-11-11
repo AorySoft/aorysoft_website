@@ -1,4 +1,10 @@
+import path from "node:path";
 import type { NextConfig } from "next";
+import { PHASE_PRODUCTION_BUILD } from "next/constants";
+import {
+  supabaseImagePattern,
+  type SupabaseImagePattern,
+} from "./src/lib/image-remote-patterns";
 
 /**
  * Security headers (FRONTEND_AUDIT F01 + Batch 2 CSP follow-up).
@@ -18,7 +24,9 @@ import type { NextConfig } from "next";
  * - font-src 'self' data: — next/font self-hosted files (+ data URLs)
  * - connect-src *.supabase.co + wss — Supabase REST/Auth/Realtime
  * - connect-src challenges.cloudflare.com — Turnstile siteverify (server also; client may ping)
- * - connect-src static.cloudflareinsights.com — analytics beacon
+ * - connect-src static.cloudflareinsights.com — analytics beacon script host
+ * - connect-src cloudflareinsights.com — beacon POSTs RUM data to /cdn-cgi/rum
+ *   (observed in Chromium during verification; required before enforcing)
  * - connect-src vitals.vercel-insights.com / va.vercel-scripts.com — Vercel Analytics
  * - frame-src challenges.cloudflare.com — Turnstile iframe
  * - frame-ancestors 'none' — clickjacking protection (pairs with X-Frame-Options)
@@ -56,12 +64,14 @@ const cspReportOnly = [
     "wss://*.supabase.co",
     "https://challenges.cloudflare.com",
     "https://static.cloudflareinsights.com",
+    "https://cloudflareinsights.com",
     "https://vitals.vercel-insights.com",
     "https://va.vercel-scripts.com",
   ].join(" "),
   "frame-src https://challenges.cloudflare.com",
   "worker-src 'self' blob:",
-  "upgrade-insecure-requests",
+  // upgrade-insecure-requests is ignored in Report-Only (Chromium logs an
+  // error on every page). Re-add it when switching to an enforced CSP.
   "report-uri /api/csp-report",
   "report-to csp",
 ].join("; ");
@@ -86,44 +96,39 @@ const securityHeaders = [
   },
 ];
 
-function supabaseImageHosts(): { protocol: "https"; hostname: string; pathname: string }[] {
-  const patterns: { protocol: "https"; hostname: string; pathname: string }[] = [
-    {
-      protocol: "https",
-      hostname: "*.supabase.co",
-      pathname: "/storage/v1/object/public/**",
-    },
-  ];
+/**
+ * F16: only our exact Supabase project host + public storage path.
+ * `next build` fails with a clear message when NEXT_PUBLIC_SUPABASE_URL is
+ * missing; dev/other phases fall back to no remote images instead of crashing.
+ */
+function imageRemotePatterns(phase: string): SupabaseImagePattern[] {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  if (url) {
-    try {
-      const hostname = new URL(url).hostname;
-      if (hostname && hostname !== "localhost") {
-        patterns.unshift({
-          protocol: "https",
-          hostname,
-          pathname: "/storage/v1/object/public/**",
-        });
-      }
-    } catch {
-      // ignore malformed env during local tooling
-    }
+  if (phase === PHASE_PRODUCTION_BUILD) return [supabaseImagePattern(url)];
+  try {
+    return [supabaseImagePattern(url)];
+  } catch (error) {
+    console.warn(
+      `[next.config] ${error instanceof Error ? error.message : String(error)} Remote images are disabled for this run.`,
+    );
+    return [];
   }
-  return patterns;
 }
 
-const nextConfig: NextConfig = {
-  images: {
-    remotePatterns: supabaseImageHosts(),
-  },
-  async headers() {
-    return [
-      {
-        source: "/:path*",
-        headers: securityHeaders,
-      },
-    ];
-  },
-};
-
-export default nextConfig;
+export default function nextConfig(phase: string): NextConfig {
+  return {
+    // Pin the workspace root to web/ (a stray lockfile in the user profile
+    // otherwise makes Turbopack infer the wrong root).
+    turbopack: { root: path.resolve(__dirname) },
+    images: {
+      remotePatterns: imageRemotePatterns(phase),
+    },
+    async headers() {
+      return [
+        {
+          source: "/:path*",
+          headers: securityHeaders,
+        },
+      ];
+    },
+  };
+}

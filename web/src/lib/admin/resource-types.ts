@@ -1,4 +1,4 @@
-﻿// Admin resource types and whitelist constants.
+// Admin resource types and whitelist constants.
 export const ICON_CHOICES = [
   "bot",
   "zap",

@@ -12,7 +12,8 @@ import { getActiveServices, getPublishedReviews } from "@/lib/data";
 export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: "AorySoft | AI-first solutions, real-world impact",
+  // absolute: the root template ("%s | AorySoft") would otherwise repeat the brand.
+  title: { absolute: "AorySoft | AI-first solutions, real-world impact" },
   description:
     "AorySoft builds AI chatbots, agents, workflow automation, and web applications for businesses that need software that ships and stays maintainable.",
   keywords: [

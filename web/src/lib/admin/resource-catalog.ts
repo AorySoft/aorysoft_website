@@ -1,4 +1,4 @@
-﻿// Admin resource field definitions (CRUD catalog).
+// Admin resource field definitions (CRUD catalog).
 import {
   COLOR_CHOICES,
   ICON_CHOICES,
